@@ -1,0 +1,34 @@
+# ─── Sistema / OS ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+$RECYCLE.BIN/
+ehthumbs.db
+
+# ─── Editores/IDEs ─────────────────────────────────────────
+.vscode/
+.idea/
+*.iml
+
+# ─── Dependencias y builds ─────────────────────────────────
+node_modules/
+dist/
+build/
+target/
+out/
+
+# ─── Archivos temporales ───────────────────────────────────
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ─── Entornos y credenciales ───────────────────────────────
+.env
+.env.*
+*.secret
+*.key
+
+# ─── Otros (añade según tu stack) ─────────────────────────
+# .terraform/
+# .gradle/
+# .parcel-cache/
