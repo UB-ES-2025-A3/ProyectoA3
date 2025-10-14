@@ -1,14 +1,14 @@
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\ViajesApplication.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\web\EventoController.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\dto\EventoDtos.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\config\SecurityConfig.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\web\AuthController.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\web\HealthController.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\dto\AuthDtos.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\service\AuthService.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\repository\EventoRepository.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\repository\ClienteRepository.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\domain\Cliente.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\domain\Evento.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\service\EventoService.java
-C:\Users\annah\OneDrive\Escritorio\cosas de la uni\PIS\ProyectoA3\backend\src\main\java\com\eventmanager\web\RestExceptionHandler.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/repository/EventoRepository.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/web/AuthController.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/web/HealthController.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/dto/EventoDtos.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/dto/AuthDtos.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/web/EventoController.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/service/AuthService.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/ViajesApplication.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/web/RestExceptionHandler.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/domain/Evento.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/domain/Cliente.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/service/EventoService.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/repository/ClienteRepository.java
+/home/arnau/arnau/University/UB/ES/ProyectoA3/backend/src/main/java/com/eventmanager/config/SecurityConfig.java

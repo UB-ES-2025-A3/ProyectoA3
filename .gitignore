@@ -1,34 +1,181 @@
-# ─── Sistema / OS ───────────────────────────────────────────
+# ════════════════════════════════════════════════════════════
+# ═══ Sistema / OS ═══════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
 .DS_Store
 Thumbs.db
 $RECYCLE.BIN/
 ehthumbs.db
+Desktop.ini
+*.lnk
 
-# ─── Editores/IDEs ─────────────────────────────────────────
+# ════════════════════════════════════════════════════════════
+# ═══ Editores/IDEs ══════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+# VS Code
 .vscode/
+*.code-workspace
+
+# IntelliJ IDEA
 .idea/
 *.iml
-
-# ─── Dependencias y builds ─────────────────────────────────
-node_modules/
-dist/
-build/
-target/
+*.iws
+*.ipr
+*.ids
 out/
 
-# ─── Archivos temporales ───────────────────────────────────
+# Eclipse
+.classpath
+.project
+.settings/
+*.launch
+.metadata
+.factorypath
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ════════════════════════════════════════════════════════════
+# ═══ Java / Maven ═══════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+# Compilados
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ════════════════════════════════════════════════════════════
+# ═══ Node.js / React ════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Build
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Misc
+.npm
+.eslintcache
+.stylelintcache
+.yarn/
+.pnp.*
+
+# ════════════════════════════════════════════════════════════
+# ═══ Base de Datos ══════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+# H2 Database
+*.db
+*.mv.db
+*.trace.db
+
+# PostgreSQL
+*.sql.backup
+
+# MySQL
+*.sql~
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# ════════════════════════════════════════════════════════════
+# ═══ Archivos temporales ════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
 *.log
 *.tmp
+*.temp
 *.swp
 *.swo
+*~
+.*.swp
+.*.swo
 
-# ─── Entornos y credenciales ───────────────────────────────
+# ════════════════════════════════════════════════════════════
+# ═══ Entornos y credenciales ════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
 .env
 .env.*
+!.env.example
 *.secret
 *.key
+*.pem
+*.p12
+*.jks
+application-local.yml
+application-local.properties
 
-# ─── Otros (añade según tu stack) ─────────────────────────
-# .terraform/
-# .gradle/
-# .parcel-cache/
+# ════════════════════════════════════════════════════════════
+# ═══ Spring Boot ════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+spring-shell.log
+**/application-*.yml
+**/application-*.properties
+!**/application.yml
+!**/application.properties
+!**/application-test.yml
+!**/application-test.properties
+
+# ════════════════════════════════════════════════════════════
+# ═══ Otros ══════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════
+
+# Backups
+*.bak
+*.backup
+*.old
+
+# Archivos comprimidos
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Documentación generada
+/docs/generated/
+/javadoc/

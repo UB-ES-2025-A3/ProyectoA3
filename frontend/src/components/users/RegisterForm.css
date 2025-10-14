@@ -131,3 +131,28 @@
   padding: 8px;
 }
 
+.form-footer {
+  margin-top: 24px;
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid #e1e5e9;
+}
+
+.form-footer p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.form-footer a {
+  color: #f037c8;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.form-footer a:hover {
+  color: #c117f1;
+  text-decoration: underline;
+}
+

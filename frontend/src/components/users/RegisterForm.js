@@ -240,6 +240,10 @@ const RegisterForm = ({ onSuccess, onError }) => {
             {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
           </button>
         </form>
+
+        <div className="form-footer">
+          <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a></p>
+        </div>
       </div>
     </div>
   );
