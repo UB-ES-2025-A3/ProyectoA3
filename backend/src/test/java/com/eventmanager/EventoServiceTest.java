@@ -1,17 +1,19 @@
 package com.eventmanager;
 
-import com.eventmanager.domain.Evento;
-import com.eventmanager.repository.EventoRepository;
-import com.eventmanager.service.EventoService;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.eventmanager.domain.Evento;
+import com.eventmanager.repository.EventoRepository;
+import com.eventmanager.service.EventoService;
+ 
+//Este test no comprueba en base de datos, solo la funcionalidad
 public class EventoServiceTest {
   @Test
   void listar_mapea_campos() {
