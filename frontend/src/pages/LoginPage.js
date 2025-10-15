@@ -18,7 +18,7 @@ const LoginPage = () => {
     
     // Redirigir al dashboard después de 2 segundos
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/events');
     }, 2000);
   };
 
