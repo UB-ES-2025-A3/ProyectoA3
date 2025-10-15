@@ -1,9 +1,14 @@
 package com.eventmanager.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Evento {
@@ -19,7 +24,7 @@ public class Evento {
   private Integer maxPersonas;
 
   @NotBlank private String titulo;
-  @Lob private String descripcion;
+  private String descripcion;
 
   public Evento() {}
 
