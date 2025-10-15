@@ -46,6 +46,7 @@ En caso de Windows:
 - ejecutar el archivo run-backend.ps1 con el comando .\run-backend.ps1
 
 Cualquier caso:
+- Cargar las credenciales del archivo credenciales.env 
 - mvn -U clean package (para actualizarlo)
 - mvn spring-boot:run  (para correrlo)
 
