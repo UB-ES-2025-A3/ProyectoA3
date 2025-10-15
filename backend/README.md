@@ -40,8 +40,14 @@ Recargar terminal y comprobar que esto funcione
 
 Ejecutar en el directorio donde esta el `pom.xml` (dentro de backend)
 
-- crear archivo .env llamado "credentials.env" en la siguiente ruta: "backend\src\main\resources\" y guardar las credenciales del servidor
+En caso de Windows:
+- Si no esta creado el archivo de credenciales:
+  - Crear archivo .env llamado "credentials.env" en la siguiente ruta: "backend\src\main\resources\" y guardar las credenciales del servidor
 - ejecutar el archivo run-backend.ps1 con el comando .\run-backend.ps1
+
+Cualquier caso:
+- mvn -U clean package (para actualizarlo)
+- mvn spring-boot:run  (para correrlo)
 
 
 
