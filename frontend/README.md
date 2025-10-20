@@ -136,3 +136,5 @@ npm test
 - [ ] Autenticación con JWT
 - [ ] Manejo de estado global (Redux/Context)
 
+
+
