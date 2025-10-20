@@ -1,0 +1,59 @@
+.App {
+  min-height: 100vh;
+}
+
+.message-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 16px 0;
+  text-align: center;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+.message-banner.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-bottom: 1px solid #c3e6cb;
+}
+
+.message-banner.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-bottom: 1px solid #f5c6cb;
+}
+
+.message-banner p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.redirect-message {
+  font-size: 14px !important;
+  opacity: 0.8;
+  margin-top: 4px !important;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Ajustar el padding del contenido cuando hay banner */
+.register-page:has(.message-banner) .register-form-container {
+  padding-top: 100px;
+}
+
+.login-page:has(.message-banner) .login-form-container {
+  padding-top: 100px;
+}
+

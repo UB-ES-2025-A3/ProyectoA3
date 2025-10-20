@@ -1,0 +1,6 @@
+/* src/styles/HomePage.css */
+.home-page { padding: 24px; }
+.home-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.home-list { list-style:none; padding:0; margin:0; display: grid; gap: 16px; }
+.home-empty { text-align:center; padding: 48px 0; }
+.home-loading { opacity:.8; }
