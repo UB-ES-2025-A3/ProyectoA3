@@ -9,6 +9,7 @@ const LoginForm = ({ onSuccess, onError }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -18,12 +19,15 @@ const LoginForm = ({ onSuccess, onError }) => {
       [name]: value
     }));
     
-    // Limpiar error del campo cuando el usuario empiece a escribir
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
       }));
+    }
+    
+    if (loginError) {
+      setLoginError('');
     }
   };
 
@@ -45,6 +49,8 @@ const LoginForm = ({ onSuccess, onError }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    setLoginError('');
+    
     if (!validateForm()) {
       return;
     }
@@ -57,9 +63,11 @@ const LoginForm = ({ onSuccess, onError }) => {
       if (result.success) {
         onSuccess && onSuccess(result.data);
       } else {
+        setLoginError(result.error || 'Usuario/correo o contraseña incorrectos');
         onError && onError(result.error);
       }
     } catch (error) {
+      setLoginError('Error inesperado al iniciar sesión. Por favor, intenta de nuevo.');
       onError && onError('Error inesperado al iniciar sesión');
     } finally {
       setIsLoading(false);
@@ -71,6 +79,13 @@ const LoginForm = ({ onSuccess, onError }) => {
       <div className="login-form">
         <h2>Iniciar Sesión</h2>
         <p className="form-subtitle">Accede a tu cuenta de eventos</p>
+        
+        {loginError && (
+          <div className="login-error-banner">
+            <span className="error-icon">⚠</span>
+            <span>{loginError}</span>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
