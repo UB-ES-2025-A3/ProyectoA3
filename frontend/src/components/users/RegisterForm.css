@@ -156,5 +156,29 @@
   text-decoration: underline;
 }
 
+.password-requirements {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 8px;
+}
+
+.password-requirements ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 4px;
+}
+
+.password-requirements li {
+  margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.password-requirements li.valid {
+  color: #28a745; /* verde */
+}
+
+.password-requirements li.invalid {
+  color: #dc3545; /* rojo */
+}
 
 

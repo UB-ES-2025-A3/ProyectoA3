@@ -16,6 +16,13 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [pwdRequirements, setPwdRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +37,16 @@ const RegisterForm = ({ onSuccess, onError }) => {
         ...prev,
         [name]: ''
       }));
+    }
+
+    if (name === 'password') {
+      setPwdRequirements({
+        length: value.length >= 6,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        specialChar: /[^A-Za-z0-9]/.test(value)
+      });
     }
   };
 
@@ -60,8 +77,11 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
     if (!formData.password) {
       newErrors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    } else {
+      const { length, uppercase, lowercase, number, specialChar } = pwdRequirements;
+      if (!length || !uppercase || !lowercase || !number || !specialChar) {
+        newErrors.password = 'La contraseña no cumple con los requisitos mínimos';
+      }
     }
 
     setErrors(newErrors);
@@ -229,6 +249,16 @@ const RegisterForm = ({ onSuccess, onError }) => {
               onChange={handleChange}
               placeholder="Mínimo 6 caracteres"
             />
+            <div className= "password-requirements">
+              <p>La contraseña debe incluir:</p>
+              <ul>
+                <li className={pwdRequirements.length ? 'met' : 'unmet'}>Al menos 6 caracteres</li>
+                <li className={pwdRequirements.uppercase ? 'met' : 'unmet'}>Una letra mayúscula</li>
+                <li className={pwdRequirements.lowercase ? 'met' : 'unmet'}>Una letra minúscula</li>
+                <li className={pwdRequirements.number ? 'met' : 'unmet'}>Un número</li>
+                <li className={pwdRequirements.specialChar ? 'met' : 'unmet'}>Un carácter especial</li>
+              </ul>
+            </div>
             {errors.password && <div className="error-message">{errors.password}</div>}
           </div>
 
