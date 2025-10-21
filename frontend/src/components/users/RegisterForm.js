@@ -249,14 +249,14 @@ const RegisterForm = ({ onSuccess, onError }) => {
               onChange={handleChange}
               placeholder="Mínimo 6 caracteres"
             />
-            <div className= "password-requirements">
+            <div className="password-requirements">
               <p>La contraseña debe incluir:</p>
               <ul>
-                <li className={pwdRequirements.length ? 'met' : 'unmet'}>Al menos 6 caracteres</li>
-                <li className={pwdRequirements.uppercase ? 'met' : 'unmet'}>Una letra mayúscula</li>
-                <li className={pwdRequirements.lowercase ? 'met' : 'unmet'}>Una letra minúscula</li>
-                <li className={pwdRequirements.number ? 'met' : 'unmet'}>Un número</li>
-                <li className={pwdRequirements.specialChar ? 'met' : 'unmet'}>Un carácter especial</li>
+                <li className={pwdRequirements.length ? 'valid' : 'unmet'}>Al menos 6 caracteres</li>
+                <li className={pwdRequirements.uppercase ? 'valid' : 'unmet'}>Una letra mayúscula</li>
+                <li className={pwdRequirements.lowercase ? 'valid' : 'unmet'}>Una letra minúscula</li>
+                <li className={pwdRequirements.number ? 'valid' : 'unmet'}>Un número</li>
+                <li className={pwdRequirements.specialChar ? 'valid' : 'unmet'}>Un carácter especial</li>
               </ul>
             </div>
             {errors.password && <div className="error-message">{errors.password}</div>}
@@ -264,7 +264,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
           <button
             type="submit"
-            className="btn btn-primary register-submit"
+            className="register-submit"
             disabled={isLoading}
           >
             {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}

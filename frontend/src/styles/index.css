@@ -37,17 +37,10 @@ code {
   text-align: center;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
 
-.btn-primary:hover {
-  background-color: #0056b3;
-}
 
 .btn-secondary {
-  background-color: #6c757d;
+  background-color: #7d6c6c;
   color: white;
 }
 
