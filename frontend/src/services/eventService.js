@@ -1,6 +1,6 @@
 import { mockEvents } from "../mocks/events.mock";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "/api";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
 const USE_MOCKS = process.env.REACT_APP_USE_MOCKS || "true";
 
 function authHeaders() {
