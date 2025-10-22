@@ -11,9 +11,9 @@ import "../styles/HomePage.css";
 import { FaLanguage, FaUsers, FaSearch, FaMapMarkerAlt, FaFeatherAlt } from "react-icons/fa"; 
 
 export default function HomePage() {
-  const [events, setEvents] = useState(mockEvents);
-  const [filteredEvents, setFilteredEvents] = useState(mockEvents);
-  const [loading, setLoading] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [banner, setBanner] = useState({ type: "success", message: "" });
   const [me, setMe] = useState(null);
   
@@ -72,6 +72,25 @@ export default function HomePage() {
     setFilteredEvents(filtered);
   };
 
+  // Cargar eventos al montar el componente
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        setLoading(true);
+        const eventsData = await getEvents();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error cargando eventos:', error);
+        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
   // Aplicar filtros cuando cambien
   useEffect(() => {
     applyFilters();
@@ -117,66 +136,84 @@ export default function HomePage() {
   };
 
   // Función para unirse a un evento
-  const handleJoinEvent = (eventId) => {
-    setEvents(prevEvents => 
-      prevEvents.map(event => {
-        if (event.id === eventId) {
-          // Verificar si ya está lleno
-          if (event.participants.length >= event.capacity) {
-            setBanner({ type: "error", message: "El evento está completo. No puedes apuntarte." });
-            setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-            return event;
+  const handleJoinEvent = async (eventId) => {
+    try {
+      const event = events.find(e => e.id === eventId);
+      
+      // Verificar si ya está lleno
+      if (event.participants.length >= event.capacity) {
+        setBanner({ type: "error", message: "El evento está completo. No puedes apuntarte." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+      
+      // Verificar si ya está apuntado
+      if (event.participants.some(p => p.id === "me")) {
+        setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+
+      // Llamar al servicio
+      await joinEvent(eventId);
+      
+      // Actualizar el estado local
+      setEvents(prevEvents => 
+        prevEvents.map(event => {
+          if (event.id === eventId) {
+            return {
+              ...event,
+              participants: [...event.participants, { id: "me" }]
+            };
           }
-          
-          // Verificar si ya está apuntado
-          if (event.participants.some(p => p.id === "me")) {
-            setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
-            setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-            return event;
-          }
-          
-          // Apuntarse al evento
-          const updatedEvent = {
-            ...event,
-            participants: [...event.participants, { id: "me" }]
-          };
-          
-          setBanner({ type: "success", message: "¡Te has apuntado al evento correctamente!" });
-          setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-          
-          return updatedEvent;
-        }
-        return event;
-      })
-    );
+          return event;
+        })
+      );
+      
+      setBanner({ type: "success", message: "¡Te has apuntado al evento correctamente!" });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+    } catch (error) {
+      console.error('Error al apuntarse al evento:', error);
+      setBanner({ type: "error", message: error.message || "Error al apuntarse al evento." });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
   };
 
   // Función para salirse de un evento
-  const handleLeaveEvent = (eventId) => {
-    setEvents(prevEvents => 
-      prevEvents.map(event => {
-        if (event.id === eventId) {
-          // Verificar si está apuntado
-          if (!event.participants.some(p => p.id === "me")) {
-            setBanner({ type: "warning", message: "No estás apuntado a este evento." });
-            setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-            return event;
+  const handleLeaveEvent = async (eventId) => {
+    try {
+      const event = events.find(e => e.id === eventId);
+      
+      // Verificar si está apuntado
+      if (!event.participants.some(p => p.id === "me")) {
+        setBanner({ type: "warning", message: "No estás apuntado a este evento." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+
+      // Llamar al servicio
+      await leaveEvent(eventId);
+      
+      // Actualizar el estado local
+      setEvents(prevEvents => 
+        prevEvents.map(event => {
+          if (event.id === eventId) {
+            return {
+              ...event,
+              participants: event.participants.filter(p => p.id !== "me")
+            };
           }
-          
-          // Desapuntarse del evento
-          const updatedEvent = {
-            ...event,
-            participants: event.participants.filter(p => p.id !== "me")
-          };
-          
-          setBanner({ type: "success", message: "Te has desapuntado del evento correctamente." });
-          setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-          
-          return updatedEvent;
-        }
-        return event;
-      })
-    );
+          return event;
+        })
+      );
+      
+      setBanner({ type: "success", message: "Te has desapuntado del evento correctamente." });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+    } catch (error) {
+      console.error('Error al desapuntarse del evento:', error);
+      setBanner({ type: "error", message: error.message || "Error al desapuntarse del evento." });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
   };
 
   return (
