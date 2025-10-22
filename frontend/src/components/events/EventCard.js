@@ -8,45 +8,68 @@ export default function EventCard({
   isFull,
   onJoin,
   onLeave,
+  onClick,
 }) {
   const start = new Date(event.startDate).toLocaleString();
+  const currentParticipants = event.participants ? event.participants.length : 0;
+  const availableSpots = event.capacity - currentParticipants;
 
   return (
-    <article className="event-card">
+    <article className="event-card" onClick={onClick}>
       <div className="event-card__media">
         <img src={event.imageUrl} alt={event.name} />
+        <div className="event-card__status">
+          {isFull ? (
+            <span className="status-badge status-full">Completo</span>
+          ) : (
+            <span className="status-badge status-available">
+              {availableSpots} plazas libres
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="event-card__body">
-        <header className="event-card__header">
+        <div className="event-card__main">
           <h3 className="event-card__title">{event.name}</h3>
-          <span className="event-card__date">{start}</span>
-        </header>
+          <p className="event-card__location">📍 {event.location}</p>
+          <p className="event-card__date">📅 {start}</p>
+        </div>
 
-        <p className="event-card__location">📍 {event.location}</p>
-        <p className="event-card__desc">{event.description}</p>
-        {event.restrictions && (
-          <p className="event-card__restrictions">⚠️ {event.restrictions}</p>
-        )}
+        <div className="event-card__sidebar">
+          <div className="event-card__capacity-info">
+            <span className="capacity-number">{currentParticipants}/{event.capacity}</span>
+            <span className="capacity-label">participantes</span>
+          </div>
+          
+          <footer className="event-card__footer">
+            {!isEnrolled && (
+              <button
+                className="btn btn-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onJoin();
+                }}
+                disabled={isFull}
+                aria-disabled={isFull}
+              >
+                {isFull ? "Completo" : "Apuntarse"}
+              </button>
+            )}
 
-        <footer className="event-card__footer">
-          {!isEnrolled && (
-            <button
-              className="btn btn-primary"
-              onClick={onJoin}
-              disabled={isFull}
-              aria-disabled={isFull}
-            >
-              {isFull ? "Evento completo" : "Apuntarse"}
-            </button>
-          )}
-
-          {isEnrolled && (
-            <button className="btn btn-outline" onClick={onLeave}>
-              Desapuntarse
-            </button>
-          )}
-        </footer>
+            {isEnrolled && (
+              <button 
+                className="btn btn-outline" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLeave();
+                }}
+              >
+                Desapuntarse
+              </button>
+            )}
+          </footer>
+        </div>
       </div>
     </article>
   );

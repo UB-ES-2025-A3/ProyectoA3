@@ -26,6 +26,12 @@
   border-bottom: 1px solid #f5c6cb;
 }
 
+.message-banner.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-bottom: 1px solid #ffeaa7;
+}
+
 .message-banner p {
   margin: 0;
   font-size: 16px;
