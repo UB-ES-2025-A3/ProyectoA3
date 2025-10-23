@@ -50,6 +50,10 @@ Cualquier caso:
 - mvn -U clean package (para actualizarlo)
 - mvn spring-boot:run  (para correrlo)
 
+En caso de MacOS:
+- export $(grep -v '^#' src/main/resources/credentials.env | xargs)
+- mvn -U clean package (para actualizarlo)
+
 
 
 # Verificación que el backend esta funcionando
