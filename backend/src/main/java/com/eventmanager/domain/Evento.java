@@ -4,6 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,12 +33,16 @@ public class Evento {
   @NotNull private LocalTime hora;
   @NotBlank private String lugar;
 
-  private String idiomasPermitidos;
-  private Integer edadMinima;
-  private Integer maxPersonas;
+  @JdbcTypeCode(SqlTypes.JSON)
+  private Map<String, Object> restricciones = new HashMap<>();
 
   @NotBlank private String titulo;
   private String descripcion;
+
+  private List<String> tags = new ArrayList<>();
+
+  private Long idCreador;
+
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
   @JoinTable(
           name = "evento_cliente",
@@ -54,14 +65,8 @@ public class Evento {
   public String getLugar() { return lugar; }
   public void setLugar(String lugar) { this.lugar = lugar; }
 
-  public String getIdiomasPermitidos() { return idiomasPermitidos; }
-  public void setIdiomasPermitidos(String idiomasPermitidos) { this.idiomasPermitidos = idiomasPermitidos; }
-
-  public Integer getEdadMinima() { return edadMinima; }
-  public void setEdadMinima(Integer edadMinima) { this.edadMinima = edadMinima; }
-
-  public Integer getMaxPersonas() { return maxPersonas; }
-  public void setMaxPersonas(Integer maxPersonas) { this.maxPersonas = maxPersonas; }
+  public Map<String, Object> getRestricciones() { return restricciones; }
+  public void setRestricciones(Map<String, Object> restricciones) { this.restricciones = restricciones; }
 
   public String getTitulo() { return titulo; }
   public void setTitulo(String titulo) { this.titulo = titulo; }
@@ -69,8 +74,15 @@ public class Evento {
   public String getDescripcion() { return descripcion; }
   public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
+  public List<String> getTags() { return tags; }
+  public void setTags(List<String> tags) { this.tags = tags; }
+
   public Set<Cliente> getParticipantes() { return participantes; }
   public void setParticipantes(Set<Cliente> participantes) { this.participantes = participantes; }
   public void addParticipante(Cliente cliente) { this.participantes.add(cliente);}
+  public void removeParticipante(Cliente cliente) {this.participantes.remove(cliente);}
+
+  public Long getIdCreador() { return idCreador; }
+  public void setIdCreador(Long idCreador) { this.idCreador = idCreador; }
 
 }
