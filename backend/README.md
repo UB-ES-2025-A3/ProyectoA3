@@ -100,6 +100,39 @@ Para ver la lista hacer (deberian de haber 2 creados en el `schema.sql` y `data.
 
 Invoke-RestMethod "http://127.0.0.1:8080/api/events"
 
+## Añadir evento
+
+Ejemplo de añadir evento:
+curl -X POST http://localhost:8080/api/events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fecha": "2025-11-05",
+    "hora": "18:00:00",
+    "lugar": "Madrid",
+    "idiomasPermitidos": "es,en",
+    "edadMinima": 18,
+    "maxPersonas": 50,
+    "titulo": "Evento desde curl",
+    "descripcion": "Probando crear evento desde curl",
+    "idCreador": 83
+  }'
+
+es necesario que la id sea existente
+
+se espera una respuesta parecida a:
+{
+  "id": 117,
+  "fecha": "2025-11-05",
+  "hora": "18:00:00",
+  "lugar": "Madrid",
+  "idiomasPermitidos": "es,en",
+  "edadMinima": 18,
+  "maxPersonas": 50,
+  "titulo": "Evento desde curl",
+  "descripcion": "Probando crear evento desde curl",
+  "participantesIds": [83]
+}
+
 
 # Como esta estructurado el backend
 
