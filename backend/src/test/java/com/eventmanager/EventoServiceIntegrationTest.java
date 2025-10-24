@@ -11,9 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.eventmanager.domain.Evento;
+import com.eventmanager.domain.Cliente;
 import com.eventmanager.dto.EventoDtos;
 import com.eventmanager.repository.EventoRepository;
+import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.service.EventoService;
+import com.eventmanager.dto.EventoDtos.EventoCreate;
+import com.eventmanager.dto.EventoDtos.EventoView;
 
 import jakarta.transaction.Transactional;
 
@@ -25,7 +29,44 @@ public class EventoServiceIntegrationTest {
     private EventoRepository eventoRepository;
 
     @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
     private EventoService eventoService;
+
+    @Test
+    void crear_eventoEnBaseDeDatos() {
+        Long idCreador = 83L;
+        var creador = clienteRepository.findById(idCreador)
+                .orElseThrow(() -> new RuntimeException("Cliente 83 no existe en BD"));
+
+
+        EventoCreate dto = new EventoCreate(
+                LocalDate.of(2025, 11, 5),
+                LocalTime.of(18, 0),
+                "Madrid",
+                "es,en",
+                18,
+                50,
+                "EventoCrear",
+                "Prueba de crear evento",
+                idCreador
+        );
+
+        EventoView resultado = eventoService.createEvent(dto);
+
+        Evento eventoDB = eventoRepository.findById(resultado.id())
+                .orElseThrow();
+
+        assertEquals("EventoCrear", eventoDB.getTitulo());
+        assertEquals("Madrid", eventoDB.getLugar());
+
+        assertTrue(
+                eventoDB.getParticipantes().stream()
+                        .anyMatch(c -> c.getId().equals(idCreador)),
+                "El creador debe aparecer en evento_cliente"
+        );
+    }
 
     @Test
     void guardarYListar_eventoEnBaseDeDatos() {

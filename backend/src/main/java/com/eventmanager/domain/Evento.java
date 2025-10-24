@@ -2,13 +2,20 @@ package com.eventmanager.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
 
 @Entity
 public class Evento {
@@ -25,6 +32,13 @@ public class Evento {
 
   @NotBlank private String titulo;
   private String descripcion;
+  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+  @JoinTable(
+          name = "evento_cliente",
+          joinColumns = @JoinColumn(name = "evento_id"),
+          inverseJoinColumns = @JoinColumn(name = "cliente_id")
+  )
+  private Set<Cliente> participantes = new HashSet<>();
 
   public Evento() {}
 
@@ -54,4 +68,9 @@ public class Evento {
 
   public String getDescripcion() { return descripcion; }
   public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+  public Set<Cliente> getParticipantes() { return participantes; }
+  public void setParticipantes(Set<Cliente> participantes) { this.participantes = participantes; }
+  public void addParticipante(Cliente cliente) { this.participantes.add(cliente);}
+
 }
