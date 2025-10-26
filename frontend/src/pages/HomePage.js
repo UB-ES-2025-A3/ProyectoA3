@@ -148,7 +148,7 @@ export default function HomePage() {
       }
       
       // Verificar si ya está apuntado
-      if (event.participants.some(p => p.id === "me")) {
+      if (event.isEnrolled) {
         setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
@@ -157,18 +157,9 @@ export default function HomePage() {
       // Llamar al servicio
       await joinEvent(eventId);
       
-      // Actualizar el estado local
-      setEvents(prevEvents => 
-        prevEvents.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              participants: [...event.participants, { id: "me" }]
-            };
-          }
-          return event;
-        })
-      );
+      // Recargar los eventos para obtener el estado actualizado
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents);
       
       setBanner({ type: "success", message: "¡Te has apuntado al evento correctamente!" });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
@@ -185,7 +176,7 @@ export default function HomePage() {
       const event = events.find(e => e.id === eventId);
       
       // Verificar si está apuntado
-      if (!event.participants.some(p => p.id === "me")) {
+      if (!event.isEnrolled) {
         setBanner({ type: "warning", message: "No estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
@@ -194,18 +185,9 @@ export default function HomePage() {
       // Llamar al servicio
       await leaveEvent(eventId);
       
-      // Actualizar el estado local
-      setEvents(prevEvents => 
-        prevEvents.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              participants: event.participants.filter(p => p.id !== "me")
-            };
-          }
-          return event;
-        })
-      );
+      // Recargar los eventos para obtener el estado actualizado
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents);
       
       setBanner({ type: "success", message: "Te has desapuntado del evento correctamente." });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
@@ -509,7 +491,7 @@ export default function HomePage() {
             ) : filteredEvents.length > 0 ? (
               <div className="events-grid">
                 {filteredEvents.map(event => {
-                  const isEnrolled = event.participants.some(p => p.id === "me");
+                  const isEnrolled = event.isEnrolled || false;
                   const isFull = event.participants.length >= event.capacity;
                   
                   return (
@@ -568,20 +550,22 @@ export default function HomePage() {
           event={selectedEvent}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          isEnrolled={selectedEvent.participants.some(p => p.id === "me")}
+          isEnrolled={selectedEvent.isEnrolled || false}
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
-          onJoin={() => {
-            handleJoinEvent(selectedEvent.id);
-            // Actualizar el evento seleccionado
-            const updatedEvent = events.find(e => e.id === selectedEvent.id);
+          onJoin={async () => {
+            await handleJoinEvent(selectedEvent.id);
+            // Recargar el evento seleccionado
+            const updatedEvents = await getEvents();
+            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
             if (updatedEvent) {
               setSelectedEvent(updatedEvent);
             }
           }}
-          onLeave={() => {
-            handleLeaveEvent(selectedEvent.id);
-            // Actualizar el evento seleccionado
-            const updatedEvent = events.find(e => e.id === selectedEvent.id);
+          onLeave={async () => {
+            await handleLeaveEvent(selectedEvent.id);
+            // Recargar el evento seleccionado
+            const updatedEvents = await getEvents();
+            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
             if (updatedEvent) {
               setSelectedEvent(updatedEvent);
             }

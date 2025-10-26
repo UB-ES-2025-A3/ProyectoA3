@@ -20,10 +20,19 @@ function getConfig() {
 }
 
 function authHeaders() {
-  const token = localStorage.getItem("token"); // o donde guardes el JWT
-  return token
-    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
-    : { "Content-Type": "application/json" };
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  const headers = { "Content-Type": "application/json" };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  if (userId) {
+    headers["X-User-Id"] = userId;
+  }
+  
+  return headers;
 }
 
 export async function getEvents() {
@@ -50,8 +59,9 @@ export async function getEvents() {
     restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
     imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
     capacity: event.maxPersonas || 10,
-    participants: [], // Por ahora vacío, se puede implementar después
-    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
+    participants: Array(event.participantesCount || 0).fill({ id: "placeholder" }), // Array con el conteo real
+    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+    isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
   }));
 
   // Ordenar por fecha de inicio ASC (criterio de aceptación 3.0)
@@ -72,10 +82,10 @@ export async function joinEvent(eventId) {
     headers: authHeaders(),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "No se pudo apuntar al evento");
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo apuntar al evento");
   }
-  return res.json();
+  return { ok: true };
 }
 
 export async function leaveEvent(eventId) {
@@ -90,8 +100,8 @@ export async function leaveEvent(eventId) {
     headers: authHeaders(),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "No se pudo desapuntar del evento");
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo desapuntar del evento");
   }
-  return res.json();
+  return { ok: true };
 }

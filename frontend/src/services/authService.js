@@ -7,6 +7,13 @@ const authService = {
   async signUp(userData) {
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
+      // Guardar el token y userId en localStorage
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      if (response.data.id) {
+        localStorage.setItem('userId', response.data.id.toString());
+      }
       return {
         success: true,
         data: response.data
@@ -23,6 +30,13 @@ const authService = {
   async login(credentials) {
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
+      // Guardar el token y userId en localStorage
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      if (response.data.id) {
+        localStorage.setItem('userId', response.data.id.toString());
+      }
       return {
         success: true,
         data: response.data
@@ -33,6 +47,12 @@ const authService = {
         error: error.response?.data?.message || 'Error al iniciar sesión'
       };
     }
+  },
+
+  // Logout
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
   }
 };
 
