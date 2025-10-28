@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
+import EventPage from './pages/EventPage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
 
@@ -29,13 +30,15 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          {/* Redirigir a /home por defecto */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Rutas CON NavBar */}
           <Route element={<WithNavLayout />}>
-            <Route path="/events" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/events" element={<EventPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Routes>
