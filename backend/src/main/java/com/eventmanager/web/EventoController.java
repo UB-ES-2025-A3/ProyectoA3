@@ -1,6 +1,7 @@
 package com.eventmanager.web;
 
 import com.eventmanager.dto.EventoDtos.EventoView;
+import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.service.EventoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,4 +22,9 @@ public class EventoController {
   // prueba rápida para asegurar que el mapping existe
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }
+
+  @PostMapping
+  public EventoView crearEvento(@RequestBody EventoCreate dto) {
+    return service.createEvent(dto);
+  }
 }
