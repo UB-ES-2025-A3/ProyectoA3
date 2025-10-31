@@ -127,9 +127,11 @@ se espera una respuesta parecida a:
   "fecha": "2025-11-05",
   "hora": "18:00:00",
   "lugar": "Madrid",
-  "idiomasPermitidos": "es,en",
-  "edadMinima": 18,
-  "maxPersonas": 50,
+  "restricciones": {
+    "idiomas_permitidos": "es,en",
+    "edad_minima": 18,
+    "max_personas": 50
+  },
   "titulo": "Evento desde curl",
   "descripcion": "Probando crear evento desde curl",
   "participantesIds": [83]
