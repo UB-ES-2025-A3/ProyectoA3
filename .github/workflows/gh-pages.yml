@@ -56,7 +56,6 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      # OJO: este paso NO respeta working-directory → ruta completa
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
