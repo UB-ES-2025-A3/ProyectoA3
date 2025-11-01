@@ -136,7 +136,7 @@ const LoginForm = ({ onSuccess, onError }) => {
         </form>
 
         <div className="form-footer">
-          <p>¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+          <p>¿No tienes una cuenta? <Link to="/register">Registrate aqui</Link></p>
         </div>
       </div>
     </div>

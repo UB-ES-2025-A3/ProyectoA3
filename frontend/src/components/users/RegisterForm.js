@@ -272,7 +272,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
         </form>
 
         <div className="form-footer">
-          <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a></p>
+          <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
         </div>
       </div>
     </div>
