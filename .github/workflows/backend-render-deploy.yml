@@ -1,0 +1,40 @@
+name: Backend • Build & Deploy to Render
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests
+        run: ./mvnw -q -DskipTests=false test
+
+      - name: Build JAR (optional; Render construirá su propia imagen Docker)
+        run: ./mvnw -q -DskipTests package
+
+      # Opcional: lint del Dockerfile, etc.
+
+      - name: Trigger Render Deploy Hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
