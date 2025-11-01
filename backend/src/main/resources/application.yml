@@ -34,4 +34,4 @@ spring:
 
 app:
   cors:
-    allowed-origins: "http://localhost:5173,http://localhost:3000,https://andresrioo.github.io, https://ub-es-2025-a3.github.io""
+    allowed-origins: "http://localhost:5173,http://localhost:3000,https://ub-es-2025-a3.github.io"
