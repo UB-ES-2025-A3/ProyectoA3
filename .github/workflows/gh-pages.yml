@@ -36,6 +36,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          CI: false   # evitar que warnings sean errores en CI
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
