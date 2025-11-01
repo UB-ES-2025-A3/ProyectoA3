@@ -35,10 +35,6 @@ jobs:
         run: npm ci
 
       - name: Build
-        env:
-          # Expone las variables .env a tiempo de build si hiciera falta,
-          # pero CRA lee frontend/.env automáticamente.
-          REACT_APP_API_URL: ${{ env.REACT_APP_API_URL }}
         run: npm run build
 
       - name: Upload Pages artifact

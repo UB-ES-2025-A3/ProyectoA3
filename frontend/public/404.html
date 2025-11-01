@@ -24,9 +24,8 @@
   <script>
     // Redirección SPA para GitHub Pages
     (function() {
-      var segmentCount = 2; // publicas en UB.../ProyectoA3 -> 2
+      var segmentCount = 1; // publicas en /ProyectoA3 -> 1
       var l = window.location;
-      // si la URL no tiene ?/ ya, redirige a la home con la ruta embebida
       if (l.search.indexOf('?/') === -1) {
         l.replace(
           l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
@@ -50,7 +49,7 @@
         <div class="muted small">Te redirigiremos automáticamente si esta es una ruta interna.</div>
       </div>
       <div class="btns">
-        <a class="btn" href="/UB-ES-2025-A3/ProyectoA3">Volver al inicio</a>
+        <a class="btn" href="/ProyectoA3">Volver al inicio</a>
         <a class="btn" href="https://proyectoa3.onrender.com/ping" target="_blank" rel="noreferrer">Probar backend /ping</a>
       </div>
     </div>
