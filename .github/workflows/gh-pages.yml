@@ -22,6 +22,7 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+
     steps:
       - uses: actions/checkout@v4
 
@@ -31,14 +32,31 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
+      # (opcional) si quieres inyectar URL del backend:
+      # - name: Create .env
+      #   run: echo "REACT_APP_API_URL=${{ secrets.PREPROD_API_URL }}" > .env
+
       - name: Install deps
         run: npm ci
 
+        # evita que warnings paren el build
       - name: Build
         run: npm run build
         env:
-          CI: false   # evitar que warnings sean errores en CI
+          CI: false
 
+      # DEBUG: comprueba que realmente existe frontend/build en el runner
+      - name: List outputs
+        run: |
+          pwd
+          ls -la
+          ls -la build || true
+
+      # Recomendado por GitHub Pages antes de subir artefacto
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # OJO: este paso NO respeta working-directory → ruta completa
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -46,3 +64,6 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+        with:
+          # como es pre_prod, puedes desplegar como “preview”
+          preview: true
