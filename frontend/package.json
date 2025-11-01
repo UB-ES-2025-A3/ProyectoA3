@@ -15,7 +15,7 @@
     "web-vitals": "^2.1.4"
   },
   
-  "homepage": "https://ub-es-2025-a3.github.io/ProyectoA3",
+  "homepage": ".",
   
   "scripts": {
     "start": "react-scripts start",
