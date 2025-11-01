@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Página no encontrada · ProyectoA3</title>
+  <style>
+    :root { --bg: #0b1020; --card: #101933; --text: #e6e9f2; --muted:#aab3cf; --accent:#6ea8fe; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial; background: radial-gradient(1200px 800px at 10% 10%, #10162d 0, var(--bg) 55%), linear-gradient(180deg, #0a0f1f, #0b1020); color: var(--text);}
+    .wrap { min-height: 100%; display:flex; align-items:center; justify-content:center; padding: 24px;}
+    .card { width: 100%; max-width: 640px; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); backdrop-filter: blur(6px);}
+    .badge { display:inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border:1px solid rgba(255,255,255,0.12); border-radius: 999px; padding:6px 10px; }
+    h1 { margin: 16px 0 8px; font-size: 28px; line-height: 1.2; }
+    p  { margin: 10px 0; color: var(--muted); }
+    .rows { display:grid; gap: 10px; margin-top: 14px;}
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    .btns { margin-top: 18px; display:flex; gap:10px; flex-wrap:wrap;}
+    .btn { appearance:none; border:1px solid rgba(255,255,255,0.12); color: var(--text); background: #0d1430; padding:10px 14px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+    .btn:hover { border-color: rgba(255,255,255,0.25); transform: translateY(-1px); transition: all .15s ease; }
+    .muted { color: var(--muted);}
+    .small { font-size: 12px;}
+  </style>
+  <script>
+    // Redirección SPA para GitHub Pages
+    (function() {
+      var segmentCount = 2; // publicas en UB.../ProyectoA3 -> 2
+      var l = window.location;
+      // si la URL no tiene ?/ ya, redirige a la home con la ruta embebida
+      if (l.search.indexOf('?/') === -1) {
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?/' +
+          l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <span class="badge">404 · Recurso no encontrado</span>
+      <h1>Uy, esta ruta no existe</h1>
+      <p>Puede que el enlace haya cambiado o que hayas recargado una ruta interna de la SPA.</p>
+      <div class="rows">
+        <div><span class="muted mono small">Sugerencia:</span> comprueba la URL o vuelve a la página principal.</div>
+        <div class="muted small">Te redirigiremos automáticamente si esta es una ruta interna.</div>
+      </div>
+      <div class="btns">
+        <a class="btn" href="/UB-ES-2025-A3/ProyectoA3">Volver al inicio</a>
+        <a class="btn" href="https://proyectoa3.onrender.com/ping" target="_blank" rel="noreferrer">Probar backend /ping</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
