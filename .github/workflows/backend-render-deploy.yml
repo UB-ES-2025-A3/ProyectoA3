@@ -26,12 +26,13 @@ jobs:
           cache: maven
 
       - name: Run tests
-        run: ./mvnw -q -DskipTests=false test
+        run: mvn -q -DskipTests=false test
 
-      - name: Build JAR (optional; Render construirá su propia imagen Docker)
-        run: ./mvnw -q -DskipTests package
+      - name: Build JAR
+        run: mvn -q -DskipTests package
 
-      # Opcional: lint del Dockerfile, etc.
+
+      # Opcional: lint del Dockerfile, etc. 
 
       - name: Trigger Render Deploy Hook
         env:
