@@ -16,8 +16,8 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-  public static final String PASSWORD_REGEX =
-      "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\w\\s]).{6,}$";
+public static final String PASSWORD_REGEX =
+    "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9\\s]).{6,}$";
 
   @Value("${app.cors.allowed-origins:}")
   private String allowedOrigins;
