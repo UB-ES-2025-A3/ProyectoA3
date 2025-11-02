@@ -259,4 +259,45 @@
   color: #6b7280;
 }
 
+/* Estilos para el grupo de checkboxes de idiomas */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.checkbox-group label:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #8b5cf6;
+  transition: all 0.2s ease;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  accent-color: #7c3aed;
+}
+
+.checkbox-group label:has(input:checked) {
+  border-color: #7c3aed;
+  background-color: #faf5ff;
+}
+
 

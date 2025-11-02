@@ -24,7 +24,10 @@ public class AuthService {
     Cliente c = new Cliente();
     c.setNombre(req.nombre()); c.setApellidos(req.apellidos());
     c.setUsername(req.username()); c.setCorreo(req.correo());
-    c.setFechaNacimiento(req.fechaNacimiento()); c.setCiudad(req.ciudad()); c.setIdioma(req.idioma());
+    c.setFechaNacimiento(req.fechaNacimiento()); c.setCiudad(req.ciudad());
+    if (req.idiomas() != null && !req.idiomas().isEmpty()) {
+      c.setIdiomas(String.join(",", req.idiomas()));
+    }
     c.setPasswordHash(enc.encode(req.password()));
     repo.save(c);
     return new AuthResponse("token-" + c.getId(), c.getId(), c.getUsername());

@@ -15,7 +15,8 @@ public class Cliente {
   @NotBlank @Email @Column(unique = true) private String correo;
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
-  private String idioma;
+  @Column(columnDefinition = "TEXT")
+  private String idiomas;
   @NotBlank private String passwordHash;
 
   public Cliente() {}
@@ -41,8 +42,8 @@ public class Cliente {
   public String getCiudad() { return ciudad; }
   public void setCiudad(String ciudad) { this.ciudad = ciudad; }
 
-  public String getIdioma() { return idioma; }
-  public void setIdioma(String idioma) { this.idioma = idioma; }
+  public String getIdiomas() { return idiomas; }
+  public void setIdiomas(String idiomas) { this.idiomas = idiomas; }
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
