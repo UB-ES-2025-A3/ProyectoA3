@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
-import ProfilePage from './pages/ProfilePage';
+//import ProfilePage from './pages/ProfilePage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
 
@@ -32,7 +32,7 @@ function App() {
         {/* Rutas CON NavBar */}
         <Route element={<WithNavLayout />}>
           <Route path="/events" element={<HomePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          {/* <Route path="/profile" element={<ProfilePage />} /> */}
         </Route>
       </Routes>
     </div>
