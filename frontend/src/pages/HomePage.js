@@ -258,7 +258,7 @@ export default function HomePage() {
           <header className="home-main-header">
             <div className="header-top">
               <div>
-                <h1>Encuentra tu próximo evento 👋</h1>
+                <h1>Encuentra tu próximo evento</h1>
                 <p>Explora intercambios culturales y reuniones cerca de ti.</p>
               </div>
               <button className="btn btn-primary btn-create" onClick={handleOpenCreateForm}>
