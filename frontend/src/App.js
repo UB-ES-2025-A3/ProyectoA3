@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
@@ -25,21 +26,21 @@ function WithNavLayout() {
 function App() {
   return (
     <div className="App">
-      <Router>
-        <Routes>
-          {/* Redirigir a /home por defecto */}
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+      
+      <Routes>
+        {/* Redirigir a /home por defecto */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-          {/* Rutas CON NavBar */}
-          <Route element={<WithNavLayout />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/events" element={<EventPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Route>
-        </Routes>
-      </Router>
+        {/* Rutas CON NavBar */}
+        <Route element={<WithNavLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/events" element={<EventPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+      </Routes>
+    
 
     </div>
   );
