@@ -20,11 +20,12 @@ function getConfig() {
 }
 
 function authHeaders() {
-  const token = localStorage.getItem("token"); // o donde guardes el JWT
+  const token = localStorage.getItem("authToken"); // misma clave que guardas al hacer login
   return token
-    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
-    : { "Content-Type": "application/json" };
+    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json", Accept: "application/json" }
+    : { "Content-Type": "application/json", Accept: "application/json" };
 }
+
 
 export async function getEvents() {
   const config = getConfig();
