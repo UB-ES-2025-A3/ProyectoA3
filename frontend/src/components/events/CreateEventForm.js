@@ -128,7 +128,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               name="titulo"
               value={formData.titulo}
               onChange={handleChange}
-              placeholder="Idioma"
+              placeholder="ej: Paseo por el centro histórico"
               className={errors.titulo ? 'error' : ''}
             />
             {errors.titulo && <span className="error-message">{errors.titulo}</span>}

@@ -31,7 +31,7 @@ function App() {
       <Router>
         <Routes>
           {/* Redirigir a /home por defecto */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 

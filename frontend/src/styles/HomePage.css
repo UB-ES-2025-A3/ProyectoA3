@@ -2,8 +2,8 @@
 
 /* Variables de Color para fácil mantenimiento */
 :root {
-    --primary-color: #007bff; /* Azul corporativo */
-    --accent-color: #28a745; /* Verde para acciones */
+    --primary-color: #000000; /* Azul corporativo */
+    --accent-color: #4f4f50; /* Verde para acciones */
     --background-color: #f8f9fa; /* Fondo general suave */
     --surface-color: #ffffff; /* Fondo para elementos (tarjetas, filtros) */
     --text-color: #343a40; /* Texto oscuro */
@@ -28,12 +28,12 @@
 }
 
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
