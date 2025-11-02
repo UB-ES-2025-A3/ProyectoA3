@@ -3,12 +3,9 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
+import ProfilePage from './pages/ProfilePage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
-
-function ProfilePage() {
-  return <div style={{ padding: 24 }}><h1>Perfil</h1></div>;
-}
 
 function MyEventsPage() {
   return <div style={{ padding: 24 }}><h1>Mis eventos</h1></div>;
