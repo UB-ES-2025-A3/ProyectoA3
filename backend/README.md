@@ -1,4 +1,10 @@
 
+# Backend · ProyectoA3  
+
+Backend del sistema de gestión de eventos (Spring Boot 3 + Java 21).  
+Incluye endpoints REST para autenticación, gestión de eventos y conexión con base de datos **PostgreSQL (Supabase)**.  
+El entorno de **pre-producción** está desplegado automáticamente en **Render** mediante *GitHub Actions*.
+
 
 # Que necesito para correr el backend
 
@@ -31,12 +37,14 @@ Para que funcione el visual cambiar el `settings.json` !
 
 ```
 
+## Comprobar que funcione
+
 Recargar terminal y comprobar que esto funcione
 
 - java -version
 - mvn -v
 
-# Correr el server 
+# Correr el server de manera local (si no ir a readme del render)
 
 Ejecutar en el directorio donde esta el `pom.xml` (dentro de backend)
 
@@ -49,6 +57,10 @@ Cualquier caso:
 - Cargar las credenciales del archivo credenciales.env 
 - mvn -U clean package (para actualizarlo)
 - mvn spring-boot:run  (para correrlo)
+
+En caso de MacOS:
+- export $(grep -v '^#' src/main/resources/credentials.env | xargs)
+- mvn -U clean package (para actualizarlo)
 
 
 
@@ -96,8 +108,60 @@ Para ver la lista hacer (deberian de haber 2 creados en el `schema.sql` y `data.
 
 Invoke-RestMethod "http://127.0.0.1:8080/api/events"
 
+## Añadir evento
+
+Ejemplo de añadir evento:
+curl -X POST http://localhost:8080/api/events \
+-H "Content-Type: application/json" \
+-d '{
+  "fecha": "2025-11-05",
+  "hora": "18:00:00",
+  "lugar": "Madrid",
+  "restricciones": {
+    "idiomas_permitidos": "es,en",
+    "edad_minima": 18,
+    "max_personas": 50
+  },
+  "titulo": "Evento desde curl",
+  "descripcion": "Probando crear evento desde curl",
+  "idCreador": 83
+}'
+
+es necesario que la id sea existente
+
+se espera una respuesta parecida a:
+{
+  "id": 117,
+  "fecha": "2025-11-05",
+  "hora": "18:00:00",
+  "lugar": "Madrid",
+  "restricciones": {
+    "idiomas_permitidos": "es,en",
+    "edad_minima": 18,
+    "max_personas": 50
+  },
+  "titulo": "Evento desde curl",
+  "descripcion": "Probando crear evento desde curl",
+  "participantesIds": [83]
+}
+
 
 # Como esta estructurado el backend
+
+```
+backend/
+├── src/main/java/com/eventmanager/
+│ ├── config/ ← seguridad, CORS, codificación de contraseñas
+│ ├── domain/ ← entidades JPA
+│ ├── dto/ ← DTOs (requests/responses)
+│ ├── repository/ ← repositorios JPA
+│ ├── service/ ← lógica de negocio
+│ └── web/ ← controladores REST
+├── src/main/resources/
+│ ├── credentials.env ← supabase
+│ └── application.yml 
+└── pom.xml
+```
 
 `ViajesApplication.java`
 
@@ -105,36 +169,58 @@ Clase raíz para que Spring lea todo (no hace falta tocar)
 
 `config/`
 
-Se encarga de codificar las contraseñas. No se que es CORS ni JWT 
+Qué es:
+- Clases de configuración de Spring: seguridad, CORS, codificación de contraseñas, etc.
+
+Cuándo tocarlo:
+Solo si necesitas cambiar:
+
+- Reglas de CORS (orígenes permitidos).
+- Políticas de seguridad / contraseñas.
+- Nuevos beans globales (por ejemplo un PasswordEncoder o CorsConfiguration).
+
 
 `domain/`
 
-Las clases del modelo 
+Qué es:
+- Las entidades JPA que representan las tablas de la base de datos (@Entity).
 
-Si se cambian atributos de una clase ya existente 
-- Actualiza `schema.sql`
-- Revisar los `DTO`(lo que se recibe o envia), `service/` (lógica) y `web/` (JSON).
-- Ajustar `data.sql`
+Cuándo tocarlo:
+Cuando cambias el modelo de datos:
 
-Toda esta clase se verifica con `jakarta.validation`
+- Añades un campo a una tabla → agrégalo aquí.
+- Creas una nueva tabla → crea una nueva clase @Entity.
+- Cambias tipos o nombres →  actualizar también migraciones?
 
 `dto/` (Data Transfer Objects)
 
-Forma del JSON que entra/sale por la API. Sirve para no exponer entidades directamente (sí es necesario, no lo quiteis)
+Qué es:
+- Clases que definen el formato de datos que viaja por la API (lo que el frontend envía y recibe).
 
-Si se cambia alguna clase
-- Añadir/quitar campos para requests/responses sin romper la entidad.
-- Mantener compatibilidad con el frontend (nombres de propiedad).
+Cuándo tocarlo:
+
+- Si cambias el formato del JSON que se envía o se recibe. 
+- Para no exponer directamente las entidades (domain).
 
 `repository/` (Spring Data JPA)
 
-Querys de SQL automaticas. Spring Data genera automáticamente la implementación en tiempo de ejecución.
+Qué es:
+- Interfaces que hablan con la base de datos. Extienden JpaRepository y Spring genera las queries automáticamente.
+
+Cuándo tocarlo:
+
+- Si necesitas nuevas consultas (findByEmail, findByFecha, etc.).
+- Si agregas nuevas entidades.
 
 `service/` (lógica de negocio)
 
-- validaciones, hashing, mapeos DTO↔Entidad.
-- Si cambias atributos, actualiza mapeos y validaciones.
-- Añade nuevos servicios cuando aparezcan nuevos casos de uso.
+Qué es:
+- Lógica de negocio pura: validaciones, reglas, conversiones DTO ↔ Entidad, etc.
+
+Cuándo tocarlo:
+- Si cambias cómo funcionan las operaciones (por ejemplo, lógica de login, registro o validaciones de eventos).
+- Si agregas nuevos casos de uso o reglas de negocio.
+
 
 `web/` (controladores)
 
@@ -145,12 +231,19 @@ Querys de SQL automaticas. Spring Data genera automáticamente la implementació
 
 `src/main/resources/`
 
-`application.yml:`es el archivo central de configuración de Spring Boot. puerto/host del servidor, datasource (BDD), JPA/Hibernate, carga de schema.sql/data.sql, CORS, logging, etc.
+Qué es:
+Archivos de configuración y datos iniciales.
 
-`schema.sql`: crea/actualiza tablas locales.
-`data.sql`: datos demo (eventos) para probar datos.
+- application.yml → configuración general (puertos, conexión BBDD, CORS, etc.).
+- credentials.env → variables locales de Supabase (no se sube al repo).
+
+Cuándo tocarlo:
+
+- application.yml → si cambias la base de datos, puerto o CORS.
+- credentials.env → solo para tus credenciales locales.
 
 `src/test/*`
+
 
 Tests unitarios e integración
 
@@ -163,14 +256,6 @@ Ejemplo para añadir telefono a usuario
 private String telefono;
 public String getTelefono(){ return telefono; }
 public void setTelefono(String t){ this.telefono = t; }
-
-`schema.sql`
-
-``` sql
-alter table cliente add column telefono varchar(30);
-```
-
-también se puede : `drop table + create table` con la nueva columna
 
 `DTOs`
 
@@ -192,7 +277,6 @@ Actualizar tests para que pasen todos
 # Guia para añadir o quitar nuevas clases
 
 1. Crear la entidad en domain (mirar clases ya definidas + obligatorio tener getters y setters)
-2. Crear la tabla en `schema.sql`
 3. Crear su repositorio
 4. Crear su DTO 
 5. Crear su service 

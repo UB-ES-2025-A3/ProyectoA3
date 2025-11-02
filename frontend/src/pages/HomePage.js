@@ -1,5 +1,5 @@
 // src/pages/HomePage.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getEvents, joinEvent, leaveEvent } from "../services/eventService";
 import { mockEvents } from "../mocks/events.mock";
 import EventCard from "../components/events/EventCard";
@@ -37,8 +37,8 @@ export default function HomePage() {
   // Estado para el formulario de crear evento
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 
-  // Función para aplicar filtros
-  const applyFilters = () => {
+  // Función para aplicar filtros (memoizada para evitar error de dependencias)
+  const applyFilters = useCallback(() => {
     let filtered = events.filter(event => {
       // Filtro por texto (título o descripción)
       if (filters.searchText) {
@@ -73,8 +73,8 @@ export default function HomePage() {
       return true;
     });
 
-    setFilteredEvents(filtered);
-  };
+   setFilteredEvents(filtered);
+}, [events, filters]);
 
   // Cargar eventos al montar el componente
   useEffect(() => {
@@ -95,10 +95,11 @@ export default function HomePage() {
     loadEvents();
   }, []);
 
-  // Aplicar filtros cuando cambien
+  // Aplicar filtros cuando cambien eventos o filtros
   useEffect(() => {
     applyFilters();
-  }, [filters, events]);
+  }, [applyFilters]);
+
 
   // Cerrar filtros al hacer clic fuera
   useEffect(() => {
