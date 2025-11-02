@@ -35,6 +35,7 @@ function authHeaders() {
   return headers;
 }
 
+
 export async function getEvents() {
   const config = getConfig();
   if (config.USE_MOCKS) {

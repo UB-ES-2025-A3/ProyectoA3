@@ -11,9 +11,12 @@ const LoginPage = () => {
     setMessage(`¡Bienvenido de nuevo, ${data.username}!`);
     setMessageType('success');
     
-    // Guardar el token de autenticación si existe
+    // Guardar el token de autenticación y el userId
     if (data.token) {
       localStorage.setItem('authToken', data.token);
+    }
+    if (data.userId) {
+      localStorage.setItem('userId', data.userId);
     }
     
     // Redirigir al dashboard después de 2 segundos

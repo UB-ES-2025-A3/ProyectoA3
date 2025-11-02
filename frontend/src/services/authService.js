@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+function resolveApiBase() {
+  if (window.APP_CONFIG?.REACT_APP_API_URL) return window.APP_CONFIG.REACT_APP_API_URL;
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL; 
+  return 'http://localhost:8080/api';
+}
+const API_BASE_URL = resolveApiBase();
 
 const authService = {
   // Registro de usuario
