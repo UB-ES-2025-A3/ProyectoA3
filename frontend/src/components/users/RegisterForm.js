@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import authService from '../../services/authService';
 import './RegisterForm.css';
+import { Link } from 'react-router-dom';
 
 const RegisterForm = ({ onSuccess, onError }) => {
   const [formData, setFormData] = useState({
@@ -272,7 +273,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
         </form>
 
         <div className="form-footer">
-          <p>¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a></p>
+          <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
         </div>
       </div>
     </div>

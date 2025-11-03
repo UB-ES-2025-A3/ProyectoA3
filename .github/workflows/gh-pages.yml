@@ -1,0 +1,68 @@
+name: Frontend • Deploy to GitHub Pages
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+    branches: [ pre_prod ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      # (opcional) si quieres inyectar URL del backend:
+      # - name: Create .env
+      #   run: echo "REACT_APP_API_URL=${{ secrets.PREPROD_API_URL }}" > .env
+
+      - name: Install deps
+        run: npm ci
+
+        # evita que warnings paren el build
+      - name: Build
+        run: npm run build
+        env:
+          CI: false
+
+      # DEBUG: comprueba que realmente existe frontend/build en el runner
+      - name: List outputs
+        run: |
+          pwd
+          ls -la
+          ls -la build || true
+
+      # Recomendado por GitHub Pages antes de subir artefacto
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/build
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          # como es pre_prod, puedes desplegar como “preview”
+          preview: true
