@@ -29,8 +29,10 @@ export default function ProfilePage() {
         // Cargar perfil
         const profileResult = await userService.getUserProfile(userId);
         if (profileResult.success) {
-          setUserData(profileResult.data);
-          setEditData(profileResult.data);
+          // Normaliza: algunos servicios devuelven { data: {...} } y otros devuelven el objeto directamente
+          const user = profileResult.data?.data ?? profileResult.data;
+          setUserData(user);
+          setEditData(user);
         } else {
           setBanner({ type: "error", message: profileResult.error });
         }
@@ -66,12 +68,21 @@ export default function ProfilePage() {
     try {
       setSaving(true);
       const userId = localStorage.getItem('userId');
-      
+
       const result = await userService.updateUserProfile(userId, editData);
-      
+
       if (result.success) {
-        setUserData(result.data);
+        // Normaliza respuesta y actualiza estado
+        const updated = result.data?.data ?? result.data;
+        setUserData(updated);
+        setEditData(updated);
         setIsEditing(false);
+
+        // Actualiza username en localStorage si ha cambiado (opcional)
+        if (updated.username) {
+          localStorage.setItem('username', updated.username);
+        }
+
         setBanner({ type: "success", message: "Perfil actualizado correctamente" });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
       } else {
