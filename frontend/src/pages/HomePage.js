@@ -1,6 +1,7 @@
 // src/pages/HomePage.js
 import React, { useEffect, useState, useCallback } from "react";
 import { getEvents, joinEvent, leaveEvent } from "../services/eventService";
+import userService from '../services/userService';
 import { mockEvents } from "../mocks/events.mock";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
@@ -89,6 +90,22 @@ export default function HomePage() {
     };
 
     loadEvents();
+
+    (async () => {
+      const uid = localStorage.getItem('userId') || localStorage.getItem('id') || null;
+      if (!uid) return;
+      try {
+        const res = await userService.getUserProfile(uid);
+        if (res.success) {
+          const user = res.data?.data ?? res.data;
+          setMe(user);
+        } else {
+          console.warn('No se pudo cargar perfil:', res.error);
+        }
+      } catch (err) {
+        console.warn('Error cargando perfil:', err);
+      }
+    })();
   }, []);
 
   // Aplicar filtros cuando cambien eventos o filtros
