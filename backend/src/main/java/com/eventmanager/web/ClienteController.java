@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/clients")
 @CrossOrigin(
-  origins = "http://localhost:3000", 
-  allowedHeaders = "*",
+  origins = "*", 
+  allowedHeaders = "*", 
   methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS }
 )
 public class ClienteController {
@@ -35,4 +35,7 @@ public class ClienteController {
       return ResponseEntity.status(500).body(java.util.Map.of("message", "Error actualizando perfil"));
     }
   }
+
+  @GetMapping("/_ping")
+  public String ping() { return "clients-ok"; }
 }
