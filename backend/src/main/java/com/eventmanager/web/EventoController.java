@@ -1,13 +1,17 @@
 package com.eventmanager.web;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.dto.EventoDtos.EventoView;
-import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.service.EventoService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
@@ -20,11 +24,13 @@ public class EventoController {
     return ResponseEntity.ok(service.listar());
   }
 
+  /* 
   @PostMapping
   public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
     var created = service.crear(req);
     return ResponseEntity.ok(created);
   }
+    */
 
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }
