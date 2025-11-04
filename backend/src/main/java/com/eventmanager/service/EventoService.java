@@ -110,8 +110,6 @@ public class EventoService {
               restricciones.edad_minima(),
               restricciones.max_personas()
       );
-      System.out.println("Restricciones personas " + r.getMax_personas());
-      System.out.println("Restricciones personas en dto " + restricciones.max_personas());
       evento.setRestricciones(r);
     }
 
