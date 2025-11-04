@@ -6,6 +6,7 @@ function resolveApiBase() {
   return 'http://localhost:8080/api';
 }
 const API_BASE_URL = resolveApiBase();
+console.log('[authService] API_BASE_URL =', API_BASE_URL);
 
 const authService = {
   // Registro de usuario
