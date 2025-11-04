@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import EventPage from './pages/EventPage';
 import ProfilePage from './pages/ProfilePage';
+//import ProfilePage from './pages/ProfilePage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
 
