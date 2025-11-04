@@ -307,3 +307,14 @@ Objetivo: verificar que el servicio de eventos mapea Entidad → DTO correctamen
 4) ApiIntegrationTest (integración end-to-end)
 
 Objetivo: levantar Spring de verdad (puerto aleatorio), ejecutar signup → login → listar eventos usando TestRestTemplate.
+
+
+
+# Lanzar tests unitarios
+
+Poner el test que quieras probar
+
+```
+mvn -Dtest=SupabaseSchemaMismatchIT test
+mvn -Dtest=EventoServiceIntegrationTest test
+```

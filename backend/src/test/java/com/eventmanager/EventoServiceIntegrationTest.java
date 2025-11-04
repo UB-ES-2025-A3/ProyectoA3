@@ -3,9 +3,7 @@ package com.eventmanager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +15,24 @@ import com.eventmanager.service.EventoService;
 
 import jakarta.transaction.Transactional;
 
-@SpringBootTest // Arranca todo el contexto de Spring Boot
-@Transactional  // Para que cada test se haga en una transacción y se revierta al final
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
+@SpringBootTest
+@Transactional
 public class EventoServiceIntegrationTest {
+
+    // Estas propiedades se aplican SOLO en este test: usa H2 y crea las tablas desde las entidades
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry r) {
+        r.add("spring.datasource.url", () -> "jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1");
+        r.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
+        r.add("spring.datasource.username", () -> "sa");
+        r.add("spring.datasource.password", () -> "");
+        r.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop"); // autogenera esquema desde @Entity
+        r.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
+        r.add("spring.sql.init.mode", () -> "never"); // no ejecutar scripts externos
+    }
 
     @Autowired
     private EventoRepository eventoRepository;
@@ -29,7 +42,6 @@ public class EventoServiceIntegrationTest {
 
     @Test
     void guardarYListar_eventoEnBaseDeDatos() {
-        // Creamos un evento
         Evento evento = new Evento();
         evento.setFecha(LocalDate.of(2025, 11, 5));
         evento.setHora(LocalTime.of(18, 0));
@@ -40,10 +52,8 @@ public class EventoServiceIntegrationTest {
         evento.setTitulo("Prueba");
         evento.setDescripcion("Prueba de guardar evento");
 
-        // Guardamos en la base de datos
         eventoRepository.save(evento);
 
-        // Ahora lo leemos usando el servicio
         var lista = eventoService.listar();
 
         EventoDtos.EventoView v = lista.stream()
@@ -52,8 +62,6 @@ public class EventoServiceIntegrationTest {
             .orElseThrow(() -> new RuntimeException("Evento no encontrado en la lista"));
 
         assertFalse(lista.isEmpty(), "La lista no debería estar vacía");
-        
-        // Verificamos que los datos coinciden
         assertEquals(evento.getFecha(), v.fecha());
         assertEquals(evento.getHora(), v.hora());
         assertEquals(evento.getLugar(), v.lugar());
@@ -66,29 +74,24 @@ public class EventoServiceIntegrationTest {
 
     @Test
     void borrar_eventoEnBaseDeDatos() {
-    // Creamos un evento
-    Evento evento = new Evento();
-    evento.setFecha(LocalDate.of(2025, 11, 6));
-    evento.setHora(LocalTime.of(20, 0));
-    evento.setLugar("Granada");
-    evento.setIdiomasPermitidos("es,en");
-    evento.setEdadMinima(16);
-    evento.setMaxPersonas(30);
-    evento.setTitulo("EventoBorrar");  // título único
-    evento.setDescripcion("Prueba de borrar evento");
+        Evento evento = new Evento();
+        evento.setFecha(LocalDate.of(2025, 11, 6));
+        evento.setHora(LocalTime.of(20, 0));
+        evento.setLugar("Granada");
+        evento.setIdiomasPermitidos("es,en");
+        evento.setEdadMinima(16);
+        evento.setMaxPersonas(30);
+        evento.setTitulo("EventoBorrar");
+        evento.setDescripcion("Prueba de borrar evento");
 
-    // Guardamos en la base de datos
-    eventoRepository.save(evento);
+        eventoRepository.save(evento);
 
-    // Comprobamos que se ha guardado
-    var listaAntes = eventoRepository.findAll();
-    assertTrue(listaAntes.stream().anyMatch(e -> e.getTitulo().equals("EventoBorrar")));
+        var listaAntes = eventoRepository.findAll();
+        assertTrue(listaAntes.stream().anyMatch(e -> e.getTitulo().equals("EventoBorrar")));
 
-    // Borramos el evento
-    eventoRepository.delete(evento);
+        eventoRepository.delete(evento);
 
-    // Comprobamos que ya no está
-    var listaDespues = eventoRepository.findAll();
-    assertFalse(listaDespues.stream().anyMatch(e -> e.getTitulo().equals("EventoBorrar")));
+        var listaDespues = eventoRepository.findAll();
+        assertFalse(listaDespues.stream().anyMatch(e -> e.getTitulo().equals("EventoBorrar")));
     }
 }
