@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
+//import ProfilePage from './pages/ProfilePage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
 

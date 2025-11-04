@@ -20,16 +20,29 @@ import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.service.AuthService;
 
 import jakarta.validation.ValidationException;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
 
 @SpringBootTest
 @Transactional // Cada test se revierte al finalizar
 public class AuthServiceIntegrationTest {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    @org.springframework.test.context.DynamicPropertySource
+    static void h2(DynamicPropertyRegistry r) {
+        r.add("spring.datasource.url", () -> "jdbc:h2:mem:authdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1");
+        r.add("spring.datasource.driver-class-name", () -> "org.h2.Driver");
+        r.add("spring.datasource.username", () -> "sa");
+        r.add("spring.datasource.password", () -> "");
+        r.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        r.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
+        r.add("spring.sql.init.mode", () -> "never");
+        r.add("spring.jpa.properties.hibernate.type.preferred_json_mapper", () -> "jackson");
 
-    @Autowired
-    private AuthService authService;
+    }
+
+    @Autowired ClienteRepository clienteRepository;
+    @Autowired AuthService authService;
 
     @Test
     void signup_guarda_en_base_de_datos() {

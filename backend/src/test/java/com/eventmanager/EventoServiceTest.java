@@ -3,132 +3,57 @@ package com.eventmanager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.eventmanager.domain.Cliente;
 import com.eventmanager.domain.Evento;
+import com.eventmanager.domain.Evento.Restricciones;
+import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.repository.EventoRepository;
-import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.service.EventoService;
-import com.eventmanager.dto.EventoDtos.EventoCreate;
-import com.eventmanager.dto.EventoDtos.EventoAdd;
 
-public class EventoServiceTest {
+@org.junit.jupiter.api.extension.ExtendWith(MockitoExtension.class)
+class EventoServiceTest {
+
+  @Mock
+  EventoRepository repo;
+
+  @InjectMocks
+  EventoService service;
 
   @Test
-  void listar_mapea_campos() {
-    EventoRepository repo = mock(EventoRepository.class);
-    ClienteRepository clienteRepo = mock(ClienteRepository.class);
-
-    Cliente creador = new Cliente();
-    creador.setId(42L);
-
+  void listar_mapeaRestricciones_a_EventoView() {
     Evento e = new Evento();
-    e.setId(10L);
+    e.setId(1L);
     e.setFecha(LocalDate.of(2025, 11, 5));
     e.setHora(LocalTime.of(18, 0));
-    e.setLugar("Madrid");
-
-    Map<String, Object> restricciones = Map.of(
-            "idiomas_permitidos", "ch",
-            "edad_minima", 18,
-            "max_personas", 50
-    );
-    e.setRestricciones(restricciones);
-
-    e.setTitulo("Paseo");
-    e.setDescripcion("Ruta");
-    e.setTags(List.of("aire libre", "deporte"));
-    e.addParticipante(creador);
+    e.setLugar("Sevilla");
+    e.setTitulo("Prueba");
+    e.setDescripcion("desc");
+    e.setIdCreador(123L);
+    // restricciones JSON 
+    e.setRestricciones(new Restricciones("es,en", 18, 50));
 
     when(repo.findAll()).thenReturn(List.of(e));
-    when(clienteRepo.findById(42L)).thenReturn(Optional.of(creador));
 
-    var service = new EventoService(repo, clienteRepo);
-    var lista = service.listar();
-
+    List<EventoView> lista = service.listar();
     assertEquals(1, lista.size());
     var v = lista.get(0);
 
-    assertEquals(10L, v.id());
-    assertEquals("Madrid", v.lugar());
-    assertEquals("Paseo", v.titulo());
-    assertTrue(v.participantesIds().contains(42L));
-
-    Map<String, Object> r = v.restricciones();
-    assertEquals("ch", r.get("idiomas_permitidos"));
-    assertEquals(18, r.get("edad_minima"));
-    assertEquals(50, r.get("max_personas"));
-
-    assertTrue(v.tags().contains("aire libre"));
-  }
-
-  @Test
-  void crear_evento() {
-    EventoRepository repo = mock(EventoRepository.class);
-    ClienteRepository clienteRepo = mock(ClienteRepository.class);
-
-    Cliente creador = new Cliente();
-    creador.setId(42L);
-
-    when(clienteRepo.findById(42L)).thenReturn(Optional.of(creador));
-    when(repo.save(any(Evento.class))).thenAnswer(inv -> {
-      Evento ev = inv.getArgument(0);
-      ev.setId(10L);
-      return ev;
-    });
-
-    var service = new EventoService(repo, clienteRepo);
-
-    Map<String, Object> restricciones = Map.of(
-            "idiomas_permitidos", "ch",
-            "edad_minima", 18,
-            "max_personas", 50
-    );
-
-    EventoCreate dto = new EventoCreate(
-            LocalDate.of(2025, 11, 5),
-            LocalTime.of(18, 0),
-            "Madrid",
-            restricciones,
-            "Paseo",
-            "Ruta",
-            42L,
-            List.of("verano", "aventura")
-    );
-
-    var v = service.createEvent(dto);
-
-    assertEquals("Paseo", v.titulo());
-    assertEquals("Madrid", v.lugar());
-    assertTrue(v.participantesIds().contains(42L));
-    assertTrue(v.tags().contains("verano"));
-  }
-
-  @Test
-  void add_participante() {
-    EventoRepository repo = mock(EventoRepository.class);
-    ClienteRepository clienteRepo = mock(ClienteRepository.class);
-
-    Cliente participante = new Cliente();
-    participante.setId(42L);
-    when(clienteRepo.findById(42L)).thenReturn(Optional.of(participante));
-
-    Evento evento = new Evento();
-    evento.setId(10L);
-    when(repo.findById(10L)).thenReturn(Optional.of(evento));
-
-    var service = new EventoService(repo, clienteRepo);
-    var dto = new EventoAdd(10L, 42L);
-
-    var v = service.addParticipante(dto);
-
-    assertEquals(10L, v.id());
-    assertTrue(v.participantesIds().contains(42L));
+    assertEquals(e.getId(), v.id());
+    assertEquals(e.getFecha(), v.fecha());
+    assertEquals(e.getHora(), v.hora());
+    assertEquals(e.getLugar(), v.lugar());
+    assertEquals("es,en", v.idiomasPermitidos());
+    assertEquals(18, v.edadMinima());
+    assertEquals(50, v.maxPersonas());
+    assertEquals("Prueba", v.titulo());
+    assertEquals("desc", v.descripcion());
+    assertEquals(123L, v.idCreador());
   }
 }
