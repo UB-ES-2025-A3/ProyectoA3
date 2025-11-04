@@ -100,6 +100,9 @@ public class Evento {
   public Long getIdCreador() { return idCreador; }
   public void setIdCreador(Long idCreador) { this.idCreador = idCreador; }
 
+  public List<String> getTags() { return tags; }
+  public void setTags(List<String> tags) { this.tags = tags; }
+
   // ---------- JSON POJO ----------
   // Importante: SIN @Embeddable y SIN @Column en sus campos
   public static class Restricciones {
