@@ -124,7 +124,7 @@ curl -X POST http://localhost:8080/api/events \
   },
   "titulo": "Evento desde curl",
   "descripcion": "Probando crear evento desde curl",
-  "idCreador": 83
+  "id_creador": 83
 }'
 
 es necesario que la id sea existente
@@ -315,6 +315,8 @@ Objetivo: levantar Spring de verdad (puerto aleatorio), ejecutar signup → logi
 Poner el test que quieras probar
 
 ```
+mvn -q test
+
 mvn -Dtest=SupabaseSchemaMismatchIT test
 mvn -Dtest=EventoServiceIntegrationTest test
 ```

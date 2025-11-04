@@ -1,18 +1,19 @@
 package com.eventmanager.integration;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest // Usa las credenciales reales de Supabase desde application.yml o env vars
+@SpringBootTest
+@Tag("supabase")
+@EnabledIfEnvironmentVariable(named = "SPRING_DATASOURCE_URL", matches = ".*supabase.*")
 class SupabaseSchemaMismatchIT {
 
   @Autowired
@@ -25,21 +26,19 @@ class SupabaseSchemaMismatchIT {
     try (Connection conn = dataSource.getConnection();
          Statement stmt = conn.createStatement()) {
 
-      // Intentamos leer una columna que NO existe en la tabla evento
       SQLException thrown = assertThrows(SQLException.class, () -> {
-        ResultSet rs = stmt.executeQuery("SELECT columna_inexistente FROM evento LIMIT 1");
-        rs.next();
+        try (ResultSet rs = stmt.executeQuery("SELECT columna_inexistente FROM evento LIMIT 1")) {
+          if (rs.next()) { /* no debería entrar */ }
+        }
       });
 
       String msg = thrown.getMessage().toLowerCase();
-
       System.out.println("Mensaje SQL real: " + msg);
 
-      if (msg.contains("error: relation")){
-        fail("\n\n\nError a la hora de hacer el query: " + msg);
+      if (msg.contains("error: relation")) {
+        fail("\nError de tabla inexistente (queríamos probar columna): " + msg);
       }
 
-      // PostgreSQL suele devolver "column \"columna_inexistente\" does not exist"
       assertTrue(msg.contains("does not exist") || msg.contains("no existe"),
           "El mensaje debe indicar que la columna no existe: " + msg);
 
