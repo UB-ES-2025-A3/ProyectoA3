@@ -24,15 +24,16 @@ public class RestExceptionHandler {
     return ResponseEntity.badRequest().body(Map.of("error", msg));
   }
 
-  // error de esquema controlado (500 con JSON propio)
-  @ExceptionHandler(DatabaseSchemaMismatchException.class)
-  public ResponseEntity<Map<String,String>> handleSchemaMismatch(DatabaseSchemaMismatchException ex) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(Map.of(
-          "code", "SCHEMA_MISMATCH",
-          "error", ex.getMessage()
-        ));
+@ExceptionHandler(DatabaseSchemaMismatchException.class)
+  public ResponseEntity<Map<String, Object>> handleSchemaMismatch(DatabaseSchemaMismatchException ex) {
+    // Aquí podrías generar un correlationId y loguearlo
+    var body = new java.util.LinkedHashMap<String, Object>();
+    body.put("code", "SCHEMA_MISMATCH");
+    body.put("error", "Error de esquema de base de datos.");
+    body.put("details", ex.getMessage()); // ← mensaje claro del servicio
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
   }
+
 
   // Fallback (por si algo se cuela sin envolver)
   @ExceptionHandler(DataAccessException.class)
