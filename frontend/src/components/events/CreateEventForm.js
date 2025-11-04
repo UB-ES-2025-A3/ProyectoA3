@@ -1,6 +1,7 @@
 // src/components/events/CreateEventForm.js
 import React, { useState } from 'react';
 import './CreateEventForm.css';
+import { createEvent } from '../../services/eventService';
 
 export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -9,11 +10,13 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     fecha: '',
     idioma: '',
     plazasDisponibles: '',
-    lugar: ''
+    lugar: '',
+    descripcion: ''
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,6 +30,10 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         ...prev,
         [name]: ''
       }));
+    }
+    // Clear submit error
+    if (submitError) {
+      setSubmitError('');
     }
   };
 
@@ -68,15 +75,25 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     }
 
     setLoading(true);
+    setSubmitError('');
 
     try {
-      // TODO: Implementar llamada al backend cuando esté disponible
-      // Por ahora solo simulamos la creación exitosa
-      console.log('Datos del evento a crear:', formData);
-      
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Llamar al backend para crear el evento
+      const response = await createEvent({
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        etiquetas: formData.etiquetas,
+        fecha: formData.fecha,
+        hora: '10:00', // Hora por defecto (se puede agregar otro campo si es necesario)
+        lugar: formData.lugar,
+        restricciones: {
+          idiomaRequerido: formData.idioma,
+          plazasDisponibles: parseInt(formData.plazasDisponibles)
+        }
+      });
+
+      console.log('Evento creado exitosamente:', response);
+
       // Resetear formulario
       setFormData({
         titulo: '',
@@ -84,7 +101,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         fecha: '',
         idioma: '',
         plazasDisponibles: '',
-        lugar: ''
+        lugar: '',
+        descripcion: ''
       });
 
       // Llamar al callback de éxito
@@ -93,7 +111,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       }
     } catch (error) {
       console.error('Error al crear el evento:', error);
-      alert('Error al crear el evento. Inténtalo de nuevo.');
+      setSubmitError(error.message || 'Error al crear el evento. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -119,6 +137,20 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           <p>Completa el formulario para crear un nuevo evento</p>
         </div>
 
+        {submitError && (
+          <div className="form-error-banner" style={{
+            padding: '12px 16px',
+            backgroundColor: '#fee',
+            border: '1px solid #fcc',
+            borderRadius: '6px',
+            marginBottom: '16px',
+            color: '#c33',
+            fontSize: '14px'
+          }}>
+            {submitError}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="create-event-form">
           <div className="form-group">
             <label htmlFor="titulo">Título del Evento *</label>
@@ -130,8 +162,30 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               onChange={handleChange}
               placeholder="ej: Paseo por el centro histórico"
               className={errors.titulo ? 'error' : ''}
+              disabled={loading}
             />
             {errors.titulo && <span className="error-message">{errors.titulo}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="descripcion">Descripción</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleChange}
+              placeholder="Describe tu evento (opcional)"
+              disabled={loading}
+              rows="3"
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontFamily: 'inherit',
+                fontSize: '14px'
+              }}
+            />
           </div>
 
           <div className="form-group">
@@ -142,6 +196,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               value={formData.etiquetas}
               onChange={handleChange}
               className={errors.etiquetas ? 'error' : ''}
+              disabled={loading}
             >
               <option value="">Selecciona una etiqueta</option>
               <option value="comida">Comida</option>
@@ -162,6 +217,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 value={formData.fecha}
                 onChange={handleChange}
                 className={errors.fecha ? 'error' : ''}
+                disabled={loading}
               />
               {errors.fecha && <span className="error-message">{errors.fecha}</span>}
             </div>
@@ -174,6 +230,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 value={formData.idioma}
                 onChange={handleChange}
                 className={errors.idioma ? 'error' : ''}
+                disabled={loading}
               >
                 <option value="">Selecciona un idioma</option>
                 <option value="es">🇪🇸 Español</option>
@@ -200,6 +257,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 min="1"
                 placeholder="Número de plazas"
                 className={errors.plazasDisponibles ? 'error' : ''}
+                disabled={loading}
               />
               {errors.plazasDisponibles && <span className="error-message">{errors.plazasDisponibles}</span>}
             </div>
@@ -214,6 +272,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 onChange={handleChange}
                 placeholder="Ej: Café Central"
                 className={errors.lugar ? 'error' : ''}
+                disabled={loading}
               />
               {errors.lugar && <span className="error-message">{errors.lugar}</span>}
             </div>
