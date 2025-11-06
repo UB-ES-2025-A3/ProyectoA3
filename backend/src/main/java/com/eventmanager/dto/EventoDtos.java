@@ -2,6 +2,7 @@ package com.eventmanager.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 public class EventoDtos {
 
@@ -11,6 +12,7 @@ public class EventoDtos {
       LocalTime hora,
       String lugar,
       RestriccionesCreate restricciones,
+      List<String> tags,
       String titulo,
       String descripcion,
       Long idCreador
@@ -34,4 +36,3 @@ public class EventoDtos {
           Long idParticipante
   ) {}
 }
-

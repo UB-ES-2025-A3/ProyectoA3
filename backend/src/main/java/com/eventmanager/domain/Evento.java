@@ -24,7 +24,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-
 @Entity
 @Table(name = "evento")
 public class Evento {
@@ -35,6 +34,7 @@ public class Evento {
 
   @NotNull
   private LocalDate fecha;
+
 
   @NotNull
   private LocalTime hora;
@@ -62,7 +62,6 @@ public class Evento {
           inverseJoinColumns = @JoinColumn(name = "cliente_id")
   )
   private Set<Cliente> participantes = new HashSet<>();
-
 
   @Column(name = "id_creador")
   private Long idCreador;
@@ -101,6 +100,8 @@ public class Evento {
   public Long getIdCreador() { return idCreador; }
   public void setIdCreador(Long idCreador) { this.idCreador = idCreador; }
 
+  public List<String> getTags() { return tags; }
+  public void setTags(List<String> tags) { this.tags = tags; }
 
   // ---------- JSON POJO ----------
   // Importante: SIN @Embeddable y SIN @Column en sus campos

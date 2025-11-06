@@ -3,34 +3,24 @@ package com.eventmanager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
-import com.eventmanager.domain.Evento;
-import com.eventmanager.domain.Cliente;
-
-import com.eventmanager.dto.EventoDtos;
 import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.dto.EventoDtos.RestriccionesCreate;
 import com.eventmanager.repository.EventoRepository;
-import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.service.EventoService;
-import com.eventmanager.dto.EventoDtos.EventoCreate;
-import com.eventmanager.dto.EventoDtos.EventoView;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 
 @SpringBootTest
 @Transactional
@@ -47,7 +37,6 @@ public class EventoServiceIntegrationTest {
     r.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.H2Dialect");
     r.add("spring.sql.init.mode", () -> "never");
     r.add("spring.jpa.properties.hibernate.type.preferred_json_mapper", () -> "jackson");
-
   }
 
   @Autowired
@@ -64,6 +53,7 @@ public class EventoServiceIntegrationTest {
         LocalTime.of(18, 0, 0),
         "Sevilla",
         new RestriccionesCreate("es,en", 18, 50),
+        List.of("musica", "verano"),
         "Prueba",
         "Prueba de guardar evento",
         123L // idCreador
@@ -100,6 +90,7 @@ public class EventoServiceIntegrationTest {
         LocalTime.of(20, 0, 0),
         "Granada",
         new RestriccionesCreate("es,en", 16, 30),
+        List.of("musica", "verano"),
         "EventoBorrar",
         "Prueba de borrar evento",
         456L

@@ -71,6 +71,53 @@ export async function getEvents() {
   );
 }
 
+export async function createEvent(eventData) {
+  const config = getConfig();
+  
+  // Obtener el ID del usuario creador del localStorage
+  const idCreador = localStorage.getItem('userId');
+  if (!idCreador) {
+    throw new Error("Usuario no autenticado. Por favor, inicia sesión primero.");
+  }
+
+  // Convertir idCreador a número
+  const creatorId = parseInt(idCreador, 10);
+
+  // Construir el DTO según el modelo del backend
+  const eventoCreateDTO = {
+    titulo: eventData.titulo,
+    descripcion: eventData.descripcion || "",
+    fecha: eventData.fecha, // String en formato YYYY-MM-DD
+    hora: eventData.hora || "10:00", // String en formato HH:mm
+    lugar: eventData.lugar,
+    tags: eventData.etiquetas ? [eventData.etiquetas] : [], // Convertir a array de tags
+    restricciones: eventData.restricciones || {}, // Map de restricciones (puede contener edadMinima, etc.)
+    idCreador: creatorId
+  };
+
+  console.log("Enviando evento al backend:", eventoCreateDTO);
+
+  try {
+    const res = await fetch(`${config.API_BASE_URL}/events`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(eventoCreateDTO)
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Error al crear el evento");
+    }
+
+    const createdEvent = await res.json();
+    console.log("Evento creado exitosamente:", createdEvent);
+    return createdEvent;
+  } catch (error) {
+    console.error("Error en createEvent:", error);
+    throw error;
+  }
+}
+
 export async function joinEvent(eventId) {
   const config = getConfig();
   if (config.USE_MOCKS) {

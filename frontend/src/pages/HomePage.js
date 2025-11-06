@@ -5,6 +5,7 @@ import userService from '../services/userService';
 import { mockEvents } from "../mocks/events.mock";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
+import CreateEventForm from "../components/events/CreateEventForm";
 import MessageBanner from "../components/common/MessageBanner";
 import "../styles/HomePage.css";
 
@@ -33,6 +34,9 @@ export default function HomePage() {
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Estado para el formulario de crear evento
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 
   // Función para aplicar filtros (memoizada para evitar error de dependencias)
   const applyFilters = useCallback(() => {
@@ -153,6 +157,34 @@ export default function HomePage() {
     setSelectedEvent(null);
   };
 
+  // Función para abrir el formulario de creación
+  const handleOpenCreateForm = () => {
+    setIsCreateFormOpen(true);
+  };
+
+  // Función para cerrar el formulario de creación
+  const handleCloseCreateForm = () => {
+    setIsCreateFormOpen(false);
+  };
+
+  // Función para manejar la creación de evento exitosa
+  const handleEventCreated = () => {
+    setIsCreateFormOpen(false);
+    setBanner({ type: "success", message: "Evento creado correctamente!" });
+    setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+    
+    // Recargar eventos
+    const loadEvents = async () => {
+      try {
+        const eventsData = await getEvents();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error recargando eventos:', error);
+      }
+    };
+    loadEvents();
+  };
+
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
@@ -224,8 +256,15 @@ export default function HomePage() {
         <div className="home-left">
           
           <header className="home-main-header">
-            <h1>Encuentra tu próximo evento 👋</h1>
-            <p>Explora intercambios culturales y reuniones cerca de ti.</p>
+            <div className="header-top">
+              <div>
+                <h1>Encuentra tu próximo evento</h1>
+                <p>Explora intercambios culturales y reuniones cerca de ti.</p>
+              </div>
+              <button className="btn btn-primary btn-create" onClick={handleOpenCreateForm}>
+                + Crear Evento
+              </button>
+            </div>
             
             {/* Buscador Principal */}
             <div className="main-search">
@@ -590,6 +629,13 @@ export default function HomePage() {
           }}
         />
       )}
+
+      {/* Modal de Crear Evento */}
+      <CreateEventForm
+        isOpen={isCreateFormOpen}
+        onClose={handleCloseCreateForm}
+        onSuccess={handleEventCreated}
+      />
     </div>
   );
 }

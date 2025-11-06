@@ -100,15 +100,17 @@ public class EventoService {
     evento.setTitulo(dto.titulo());
     evento.setDescripcion(dto.descripcion());
     evento.setIdCreador(dto.idCreador());
+    evento.setTags(dto.tags()); // Etiqueta por defecto
 
     // Si el DTO tiene restricciones, las guardamos tal cual
     RestriccionesCreate restricciones = dto.restricciones();
-    if (restricciones != null){
-      evento.setRestricciones(new Restricciones(
-        restricciones.idiomas_permitidos(),
-        restricciones.edad_minima(), 
-        restricciones.max_personas()
-        ));
+    if (restricciones != null) {
+      Restricciones r = new Restricciones(
+              restricciones.idiomas_permitidos(),
+              restricciones.edad_minima(),
+              restricciones.max_personas()
+      );
+      evento.setRestricciones(r);
     }
 
     // Añadimos automáticamente el creador como participante

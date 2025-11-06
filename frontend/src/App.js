@@ -1,8 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
+import EventPage from './pages/EventPage';
 import ProfilePage from './pages/ProfilePage';
 //import ProfilePage from './pages/ProfilePage';
 import NavBar from './components/layout/NavBar';
@@ -25,17 +27,22 @@ function WithNavLayout() {
 function App() {
   return (
     <div className="App">
+      
       <Routes>
+        {/* Redirigir a /home por defecto */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Rutas CON NavBar */}
         <Route element={<WithNavLayout />}>
-          <Route path="/events" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/events" element={<EventPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>
+    
+
     </div>
   );
 }

@@ -2,8 +2,8 @@
 
 /* Variables de Color para fácil mantenimiento */
 :root {
-    --primary-color: #007bff; /* Azul corporativo */
-    --accent-color: #28a745; /* Verde para acciones */
+    --primary-color: #000000; /* Azul corporativo */
+    --accent-color: #4f4f50; /* Verde para acciones */
     --background-color: #f8f9fa; /* Fondo general suave */
     --surface-color: #ffffff; /* Fondo para elementos (tarjetas, filtros) */
     --text-color: #343a40; /* Texto oscuro */
@@ -11,6 +11,31 @@
     --border-color: #e9ecef;
     --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos de botones */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .home-page {
@@ -46,18 +71,37 @@
     margin-bottom: 20px;
 }
 
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.header-top > div:first-child {
+    flex: 1;
+}
+
 .home-main-header h1 {
-    font-size: 2.2rem;
+    font-size: 2.8rem;
     font-weight: 700;
     color: var(--text-color);
-    line-height: 1.2;
+    line-height: 1.3;
     margin: 0 0 8px 0;
+    font-family: 'Voga', serif;
+    letter-spacing: -0.5px;
 }
 
 .home-main-header p {
     font-size: 1rem;
     color: var(--text-muted);
     margin: 0 0 20px 0;
+}
+
+.btn-create {
+    white-space: nowrap;
+    margin-bottom: 20px;
 }
 
 /* ----------------------------------- */
@@ -442,6 +486,16 @@
 }
 
 @media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-create {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
     .home-main-header h1 {
         font-size: 1.8rem;
     }

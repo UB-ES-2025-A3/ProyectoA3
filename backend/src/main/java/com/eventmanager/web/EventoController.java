@@ -24,13 +24,14 @@ public class EventoController {
     return ResponseEntity.ok(service.listar());
   }
 
-  /* 
+  /*
   @PostMapping
   public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
     var created = service.crear(req);
     return ResponseEntity.ok(created);
   }
-    */
+  */
+  
 
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }

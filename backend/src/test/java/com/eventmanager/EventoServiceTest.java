@@ -28,6 +28,7 @@ class EventoServiceTest {
 
   @Test
   void listar_mapeaRestricciones_a_EventoView() {
+
     Evento e = new Evento();
     e.setId(1L);
     e.setFecha(LocalDate.of(2025, 11, 5));
