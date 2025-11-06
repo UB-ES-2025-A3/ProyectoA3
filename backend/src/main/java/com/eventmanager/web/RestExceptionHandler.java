@@ -14,14 +14,14 @@ import java.util.Map;
 public class RestExceptionHandler {
   @ExceptionHandler(ValidationException.class)
   public ResponseEntity<Map<String,String>> handleValidation(ValidationException ex) {
-    return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<Map<String,String>> handleBind(MethodArgumentNotValidException ex) {
     var msg = ex.getBindingResult().getAllErrors().stream()
         .findFirst().map(e -> e.getDefaultMessage()).orElse("Datos inválidos");
-    return ResponseEntity.badRequest().body(Map.of("error", msg));
+    return ResponseEntity.badRequest().body(Map.of("message", msg));
   }
 
 @ExceptionHandler(DatabaseSchemaMismatchException.class)
