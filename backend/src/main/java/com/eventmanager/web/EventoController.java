@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,12 @@ public class EventoController {
     return ResponseEntity.ok(service.listar());
   }
 
+  @GetMapping("/my-events")
+  public ResponseEntity<List<EventoView>> misEventos(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarMisEventos(userId));
+  }
+
   /*
   @PostMapping
   public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
@@ -39,5 +46,20 @@ public class EventoController {
   @PostMapping
   public EventoView crearEvento(@RequestBody EventoCreate dto) {
     return service.createEvent(dto);
+  }
+
+  private Long extractUserIdFromToken(String authHeader) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new IllegalArgumentException("Token de autenticación inválido");
+    }
+    String token = authHeader.substring(7); // Eliminar "Bearer "
+    if (!token.startsWith("token-")) {
+      throw new IllegalArgumentException("Formato de token inválido");
+    }
+    try {
+      return Long.parseLong(token.substring(6)); // Extraer el ID después de "token-"
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Token de autenticación inválido");
+    }
   }
 }
