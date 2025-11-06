@@ -2,6 +2,7 @@ package com.eventmanager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,6 +53,7 @@ public class EventoServiceIntegrationTest {
         LocalTime.of(18, 0, 0),
         "Sevilla",
         new RestriccionesCreate("es,en", 18, 50),
+        List.of("musica", "verano"),
         "Prueba",
         "Prueba de guardar evento",
         123L // idCreador
@@ -88,6 +90,7 @@ public class EventoServiceIntegrationTest {
         LocalTime.of(20, 0, 0),
         "Granada",
         new RestriccionesCreate("es,en", 16, 30),
+        List.of("musica", "verano"),
         "EventoBorrar",
         "Prueba de borrar evento",
         456L
