@@ -1,4 +1,6 @@
 import { mockEvents } from "../mocks/events.mock";
+// donde transformas la respuesta del backend
+import { chooseImageForTags } from "./imagePicker";
 
 // Función para obtener la configuración en tiempo de ejecución
 function getConfig() {
@@ -30,35 +32,50 @@ function authHeaders() {
 export async function getEvents() {
   const config = getConfig();
   if (config.USE_MOCKS) {
-    console.log("Usando mocks para getEvents");
-    return [...mockEvents].sort((a,b)=>new Date(a.startDate)-new Date(b.startDate));
+    // Asigna imagen aleatoria a cada mock según tag
+    const enriched = await Promise.all(
+      mockEvents
+        .sort((a,b)=>new Date(a.startDate)-new Date(b.startDate))
+        .map(async (ev) => ({
+          ...ev,
+          imageUrl: await chooseImageForTags(ev.tags, ev.imageUrl)
+        }))
+    );
+    return enriched;
   }
-  console.log("Usando backend para getEvents");
-  // backend esperado: GET /api/events
-  const res = await fetch(`${config.API_BASE_URL}/events`, {
-    headers: authHeaders(),
-  });
+
+  const res = await fetch(`${config.API_BASE_URL}/events`, { headers: authHeaders() });
   if (!res.ok) throw new Error("No se pudieron cargar los eventos");
   const data = await res.json();
 
-  // Transformar los datos del backend al formato esperado por el frontend
-  const transformedData = data.map(event => ({
-    id: event.id.toString(),
-    name: event.titulo,
-    location: event.lugar,
-    startDate: `${event.fecha}T${event.hora}:00Z`, // Combinar fecha y hora
-    description: event.descripcion,
-    restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
-    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
-    capacity: event.maxPersonas || 10,
-    participants: [], // Por ahora vacío, se puede implementar después
-    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
-  }));
+  const transformed = await Promise.all(
+    data.map(async (event) => {
+      const tags = Array.isArray(event.tags) ? event.tags : [];
+      const imageUrl = await chooseImageForTags(
+        tags,
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
+      );
 
-  // Ordenar por fecha de inicio ASC (criterio de aceptación 3.0)
-  return transformedData.sort(
-    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      console.log("URL elegida")
+      console.log(imageUrl)
+
+      return {
+        id: event.id.toString(),
+        name: event.titulo,
+        location: event.lugar,
+        startDate: `${event.fecha}T${event.hora}:00Z`,
+        description: event.descripcion,
+        restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+        imageUrl,
+        capacity: event.maxPersonas || 10,
+        participants: [],
+        languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+        tags
+      };
+    })
   );
+
+  return transformed.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 }
 
 export async function createEvent(eventData) {
@@ -169,7 +186,9 @@ export async function getUserEvents() {
     imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
     capacity: event.maxPersonas || 10,
     participants: [],
-    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
+    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+    tags: Array.isArray(event.tags) ? event.tags : []
+
   }));
 
   return transformedData.sort(
