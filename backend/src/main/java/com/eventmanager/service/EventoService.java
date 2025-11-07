@@ -64,6 +64,8 @@ public class EventoService {
       e.setTitulo(req.titulo());
       e.setDescripcion(req.descripcion());
       e.setIdCreador(req.idCreador());
+      e.setTags(req.tags()); 
+
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
           req.restricciones().idiomas_permitidos(),
@@ -100,7 +102,9 @@ public class EventoService {
       r != null ? r.getEdad_minima() : null,
       r != null ? r.getMax_personas() : null,
       e.getTitulo(), e.getDescripcion(),
-      e.getIdCreador()
+      e.getIdCreador(),
+      e.getTags() == null ? List.of() : e.getTags()   // <- AQUI
+
     );
   }
 
