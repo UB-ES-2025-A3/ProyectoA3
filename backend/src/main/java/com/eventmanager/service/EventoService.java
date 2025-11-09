@@ -56,6 +56,10 @@ public class EventoService {
           req.restricciones().plazasDisponibles()
         ));
       }
+      var creador = clienteRepo.findById(req.idCreador())
+                .orElseThrow(() -> new RuntimeException("Cliente creador no encontrado"));
+      e.addParticipante(creador);
+
       var saved = repo.save(e);
       return toView(saved);
     } catch (DataAccessException ex) {
