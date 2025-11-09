@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.dto.EventoDtos.EventoView;
+import com.eventmanager.dto.EventoDtos.EventoAdd;
 import com.eventmanager.service.EventoService;
 
 @RestController
@@ -38,6 +39,12 @@ public class EventoController {
 
   @PostMapping
   public EventoView crearEvento(@RequestBody EventoCreate dto) {
-    return service.createEvent(dto);
+    return service.crear(dto);
   }
+
+  @PostMapping("/join")
+  public EventoView UnirseEvento(@RequestBody EventoAdd dto) {
+    return service.addParticipante(dto);
+  }
+
 }

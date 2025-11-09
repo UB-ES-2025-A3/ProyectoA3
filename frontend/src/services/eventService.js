@@ -60,7 +60,7 @@ export async function getEvents() {
     restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
     imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
     capacity: event.maxPersonas || 10,
-    participants: Array(event.participantesCount || 0).fill({ id: "placeholder" }), // Array con el conteo real
+    participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
     languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
     isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
   }));
@@ -85,13 +85,13 @@ export async function createEvent(eventData) {
 
   // Construir el DTO según el modelo del backend
   const eventoCreateDTO = {
-    titulo: eventData.titulo,
-    descripcion: eventData.descripcion || "",
     fecha: eventData.fecha, // String en formato YYYY-MM-DD
     hora: eventData.hora || "10:00", // String en formato HH:mm
     lugar: eventData.lugar,
-    tags: eventData.etiquetas ? [eventData.etiquetas] : [], // Convertir a array de tags
     restricciones: eventData.restricciones || {}, // Map de restricciones (puede contener edadMinima, etc.)
+    tags: eventData.etiquetas ? [eventData.etiquetas] : [],  // Convertir a array de tags
+    titulo: eventData.titulo,
+    descripcion: eventData.descripcion || "",
     idCreador: creatorId
   };
 
@@ -118,16 +118,31 @@ export async function createEvent(eventData) {
   }
 }
 
-export async function joinEvent(eventId) {
+export async function joinEvent(eventData) {
   const config = getConfig();
   if (config.USE_MOCKS) {
     console.log("Usando mocks para joinEvent");
     return { ok:true };
   }
+
+  const idUser = localStorage.getItem('userId');
+  if (!idUser) {
+    throw new Error("Usuario no autenticado. Por favor, inicia sesión primero.");
+  }
+
+  // Convertir idCreador a número
+  const idParticipante = parseInt(idUser, 10);
+
+  const eventoAddDTO = {
+    idEvento: eventData,
+    idParticipante: idParticipante
+  };
+
   console.log("Usando backend para joinEvent");
-  const res = await fetch(`${config.API_BASE_URL}/events/${eventId}/join`, {
+  const res = await fetch(`${config.API_BASE_URL}/events/join`, {
     method: "POST",
     headers: authHeaders(),
+    body: JSON.stringify(eventoAddDTO)
   });
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");
