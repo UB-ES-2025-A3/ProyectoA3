@@ -132,6 +132,7 @@ public class EventoServiceIntegrationTest {
   }
   @Test
   void unirseYSalir_eventoEnBaseDeDatos() {
+    //Crear participante extra
     Cliente participante = new Cliente();
     participante.setNombre("Participante");
     participante.setApellidos("Prueba");
@@ -141,6 +142,8 @@ public class EventoServiceIntegrationTest {
     participante.setFechaNacimiento(LocalDate.of(1995, 5, 5));
     Cliente savedParticipante = clienteRepo.save(participante);
     Long participanteId = savedParticipante.getId();
+
+    //Crear evento
     var req = new EventoCreate(
         LocalDate.of(2025, 12, 1),
         LocalTime.of(19, 0, 0),
