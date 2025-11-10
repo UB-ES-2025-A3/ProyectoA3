@@ -1,5 +1,6 @@
 import { mockEvents } from "../mocks/events.mock";
 import { mockUserEvents } from "../mocks/profile/events.mock";
+import { chooseImageForTags } from "./imagePicker";
 
 // Función para obtener la configuración en tiempo de ejecución
 function getConfig() {
@@ -55,7 +56,7 @@ export async function getEvents() {
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
       );
 
-      console.log("URL elegida")
+      console.log("URL elegida en get events")
       console.log(imageUrl)
 
       return {
@@ -175,20 +176,31 @@ export async function getUserEvents() {
   if (!res.ok) throw new Error("No se pudieron cargar tus eventos");
   const data = await res.json();
 
-  const transformedData = data.map(event => ({
-    id: event.id.toString(),
-    name: event.titulo,
-    location: event.lugar,
-    startDate: `${event.fecha}T${event.hora}:00Z`, 
-    description: event.descripcion,
-    restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
-    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
-    capacity: event.maxPersonas || 10,
-    participants: [],
-    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
-    tags: Array.isArray(event.tags) ? event.tags : []
+const transformedData = await Promise.all(
+  data.map(async (event) => {  
+    const tags = Array.isArray(event.tags) ? event.tags : [];
+    const imageUrl = await chooseImageForTags(
+      tags,
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
+    );
 
-  }));
+    console.log("URL elegida en get user events")
+    console.log(imageUrl)
+
+    return {
+      id: event.id.toString(),
+      name: event.titulo,
+      location: event.lugar,
+      startDate: `${event.fecha}T${event.hora}:00Z`, 
+      description: event.descripcion,
+      restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+      imageUrl,
+      capacity: event.maxPersonas || 10,
+      participants: [],
+      languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+      tags: Array.isArray(event.tags) ? event.tags : []
+
+  }}));
 
   return transformedData.sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
@@ -217,18 +229,29 @@ export async function getMyCreatedEvents() {
   const data = await res.json();
 
   // 3. Transformación de datos (es la misma que en getEvents y getUserEvents)
-  const transformedData = data.map(event => ({
+const transformedData = await Promise.all(
+  data.map(async (event) => {  
+    const tags = Array.isArray(event.tags) ? event.tags : [];
+    const imageUrl = await chooseImageForTags(
+      tags,
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
+    );
+
+    console.log("URL elegida en get my created events")
+    console.log(imageUrl)
+    
+    return {
     id: event.id.toString(),
     name: event.titulo,
     location: event.lugar,
     startDate: `${event.fecha}T${event.hora}:00Z`, 
     description: event.descripcion,
     restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
-    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
+    imageUrl,
     capacity: event.maxPersonas || 10,
     participants: [],
     languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
-  }));
+  }}));
 
   // 4. Ordenamiento
   return transformedData.sort(
