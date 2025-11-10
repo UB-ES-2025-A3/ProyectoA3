@@ -120,4 +120,15 @@ public class EventoService {
 
     return toView(evento);
   }
+  public EventoView removeParticipante(EventoAdd dto) {
+    var participante = clienteRepo.findById(dto.idParticipante())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    evento.removeParticipante(participante);
+    repo.save(evento);
+
+    return toView(evento);
+  }
 }
