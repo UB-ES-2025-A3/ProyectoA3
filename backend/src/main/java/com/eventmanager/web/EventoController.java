@@ -31,6 +31,12 @@ public class EventoController {
     return ResponseEntity.ok(service.listarMisEventos(userId));
   }
 
+  @GetMapping("/my-created-events")
+  public ResponseEntity<List<EventoView>> misEventosCreados(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarMisEventosCreados(userId));
+  }
+
   /*
   @PostMapping
   public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
