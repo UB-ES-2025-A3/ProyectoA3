@@ -35,4 +35,8 @@ public class EventoDtos {
           Long idEvento,
           Long idParticipante
   ) {}
+  public static record EventoRemove(
+          Long idEvento,
+          Long idParticipante
+  ) {}
 }

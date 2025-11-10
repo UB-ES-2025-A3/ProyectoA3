@@ -67,6 +67,10 @@ public class EventoController {
   public EventoView UnirseEvento(@RequestBody EventoAdd dto) {
     return service.addParticipante(dto);
   }
+  @PostMapping("/leave")
+  public EventoView salirEvento(@RequestBody EventoAdd dto) {
+    return service.removeParticipante(dto);
+  }
 
 
 }
