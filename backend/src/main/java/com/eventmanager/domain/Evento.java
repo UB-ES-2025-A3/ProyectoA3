@@ -81,10 +81,8 @@ public class Evento {
   public String getLugar() { return lugar; }
   public void setLugar(String lugar) { this.lugar = lugar; }
 
-
   public Restricciones getRestricciones() { return restricciones; }
   public void setRestricciones(Restricciones restricciones) { this.restricciones = restricciones; }
-
 
   public String getTitulo() { return titulo; }
   public void setTitulo(String titulo) { this.titulo = titulo; }

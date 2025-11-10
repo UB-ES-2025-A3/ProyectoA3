@@ -75,9 +75,9 @@ public class EventoServiceIntegrationTest {
     assertEquals(req.fecha(), v.fecha());
     assertEquals(req.hora(), v.hora());
     assertEquals(req.lugar(), v.lugar());
-    assertEquals(req.restricciones().idiomas_permitidos(), v.idiomasPermitidos());
+    assertEquals(req.restricciones().idiomaRequerido(), v.idiomasPermitidos());
     assertEquals(req.restricciones().edad_minima(), v.edadMinima());
-    assertEquals(req.restricciones().max_personas(), v.maxPersonas());
+    assertEquals(req.restricciones().plazasDisponibles(), v.maxPersonas());
     assertEquals(req.titulo(), v.titulo());
     assertEquals(req.descripcion(), v.descripcion());
     assertEquals(req.idCreador(), v.idCreador());

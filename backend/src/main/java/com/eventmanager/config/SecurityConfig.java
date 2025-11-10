@@ -43,7 +43,7 @@ public static final String PASSWORD_REGEX =
         : Arrays.stream(allowedOrigins.split(",")).map(String::trim).toList();
     cfg.setAllowedOrigins(origins);
     cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-    cfg.setAllowedHeaders(List.of("Content-Type","Authorization"));
+    cfg.setAllowedHeaders(List.of("Content-Type","Authorization","X-User-Id"));
     cfg.setExposedHeaders(List.of("Authorization"));
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

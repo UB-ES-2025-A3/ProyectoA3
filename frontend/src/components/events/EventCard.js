@@ -13,6 +13,9 @@ export default function EventCard({
   const start = new Date(event.startDate).toLocaleString();
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
+  console.log("Evento:", event);
+  console.log("Participantes:", event.participants);
+  console.log("Current:", currentParticipants, "Available:", availableSpots);
 
   return (
     <article className="event-card" onClick={onClick}>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eventmanager.dto.EventoDtos.EventoAdd;
 import com.eventmanager.dto.EventoDtos.EventoCreate;
 import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.service.EventoService;
@@ -45,7 +46,7 @@ public class EventoController {
 
   @PostMapping
   public EventoView crearEvento(@RequestBody EventoCreate dto) {
-    return service.createEvent(dto);
+    return service.crear(dto);
   }
 
   private Long extractUserIdFromToken(String authHeader) {
@@ -62,4 +63,10 @@ public class EventoController {
       throw new IllegalArgumentException("Token de autenticación inválido");
     }
   }
+  @PostMapping("/join")
+  public EventoView UnirseEvento(@RequestBody EventoAdd dto) {
+    return service.addParticipante(dto);
+  }
+
+
 }

@@ -66,11 +66,15 @@ public class EventoService {
       e.setIdCreador(req.idCreador());
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
-          req.restricciones().idiomas_permitidos(),
+          req.restricciones().idiomaRequerido(),
           req.restricciones().edad_minima(),
-          req.restricciones().max_personas()
+          req.restricciones().plazasDisponibles()
         ));
       }
+      var creador = clienteRepo.findById(req.idCreador())
+                .orElseThrow(() -> new RuntimeException("Cliente creador no encontrado"));
+      e.addParticipante(creador);
+
       var saved = repo.save(e);
       return toView(saved);
     } catch (DataAccessException ex) {
@@ -100,40 +104,10 @@ public class EventoService {
       r != null ? r.getEdad_minima() : null,
       r != null ? r.getMax_personas() : null,
       e.getTitulo(), e.getDescripcion(),
-      e.getIdCreador()
+      e.getIdCreador(), e.getParticipantes().size()
     );
   }
 
-  public EventoView createEvent(EventoCreate dto) {
-    var creador = clienteRepo.findById(dto.idCreador())
-            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-
-    Evento evento = new Evento();
-    evento.setFecha(dto.fecha());
-    evento.setHora(dto.hora());
-    evento.setLugar(dto.lugar());
-    evento.setTitulo(dto.titulo());
-    evento.setDescripcion(dto.descripcion());
-    evento.setIdCreador(dto.idCreador());
-    evento.setTags(dto.tags()); // Etiqueta por defecto
-
-    // Si el DTO tiene restricciones, las guardamos tal cual
-    RestriccionesCreate restricciones = dto.restricciones();
-    if (restricciones != null) {
-      Restricciones r = new Restricciones(
-              restricciones.idiomas_permitidos(),
-              restricciones.edad_minima(),
-              restricciones.max_personas()
-      );
-      evento.setRestricciones(r);
-    }
-
-    // Añadimos automáticamente el creador como participante
-    evento.addParticipante(creador);
-
-    repo.save(evento);
-    return toView(evento);
-  }
 
   public EventoView addParticipante(EventoAdd dto) {
     var participante = clienteRepo.findById(dto.idParticipante())
