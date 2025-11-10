@@ -4,15 +4,23 @@ on:
   push:
     paths:
       - 'backend/**'
-    branches: [ pre_prod ]
+    branches: [ pre_prod, main ]
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        envname: [ preprod, prod ]
     defaults:
       run:
         working-directory: backend
+
+    # Solo ejecuta el job del entorno según la rama
+    if: |
+      (matrix.envname == 'preprod' && startsWith(github.ref, 'refs/heads/pre_prod')) ||
+      (matrix.envname == 'prod' && startsWith(github.ref, 'refs/heads/main'))
 
     steps:
       - name: Checkout
@@ -31,11 +39,13 @@ jobs:
       - name: Build JAR
         run: mvn -q -DskipTests package
 
-
-      # Opcional: lint del Dockerfile, etc. 
-
       - name: Trigger Render Deploy Hook
         env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RENDER_DEPLOY_HOOK_URL_PREPROD: ${{ secrets.RENDER_DEPLOY_HOOK_URL_PREPROD }}
+          RENDER_DEPLOY_HOOK_URL_PROD: ${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}
         run: |
-          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
+          if [ "${{ matrix.envname }}" = "preprod" ]; then
+            curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL_PREPROD"
+          else
+            curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL_PROD"
+          fi
