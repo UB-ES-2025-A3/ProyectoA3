@@ -132,6 +132,15 @@ public class EventoServiceIntegrationTest {
   }
   @Test
   void unirseYSalir_eventoEnBaseDeDatos() {
+    Cliente participante = new Cliente();
+    participante.setNombre("Participante");
+    participante.setApellidos("Prueba");
+    participante.setUsername("participante101");
+    participante.setPasswordHash("12345");
+    participante.setCorreo("participante101@test.com");
+    participante.setFechaNacimiento(LocalDate.of(1995, 5, 5));
+    Cliente savedParticipante = clienteRepo.save(participante);
+    Long participanteId = savedParticipante.getId();
     var req = new EventoCreate(
         LocalDate.of(2025, 12, 1),
         LocalTime.of(19, 0, 0),
@@ -147,13 +156,13 @@ public class EventoServiceIntegrationTest {
     assertNotNull(creado.id());
 
     // Unirse al evento
-    var addDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), 101L);
+    var addDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), participanteId);
     EventoView actualizado = eventoService.addParticipante(addDto);
     assertEquals(2, actualizado.ParticipantesInscritos()); // Creador + nuevo participante
 
     // Salir del evento
-    var removeDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), 101L);
-    EventoView actualizadoDespuesSalir = eventoService.removeParticipante(removeDto);
+    var removeDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), participanteId);
+    EventoView actualizadoDespuesSalir = eventoService.removeParticipante(removeDto); 
     assertEquals(1, actualizadoDespuesSalir.ParticipantesInscritos()); // Solo el creador
   }
 }
