@@ -1,6 +1,5 @@
 import { mockEvents } from "../mocks/events.mock";
-// donde transformas la respuesta del backend
-import { chooseImageForTags } from "./imagePicker";
+import { mockUserEvents } from "../mocks/profile/events.mock";
 
 // Función para obtener la configuración en tiempo de ejecución
 function getConfig() {
@@ -191,6 +190,47 @@ export async function getUserEvents() {
 
   }));
 
+  return transformedData.sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  );
+}
+
+export async function getMyCreatedEvents() {
+  const config = getConfig();
+  
+  // 1. Mocking (opcional, pero mantiene la consistencia)
+  if (config.USE_MOCKS) {
+    console.log("Usando mocks para getMyCreatedEvents");
+    // Aquí podrías filtrar tus mockEvents por un 'creatorId' si lo tuvieras
+    return []; 
+  }
+
+  // 2. Llamada real al backend
+  console.log("Usando backend para getMyCreatedEvents");
+  
+  const res = await fetch(`${config.API_BASE_URL}/events/my-created-events`, {
+    headers: authHeaders(), // <-- Usa las cabeceras de autenticación
+  });
+
+  if (!res.ok) throw new Error("No se pudieron cargar tus eventos creados");
+  
+  const data = await res.json();
+
+  // 3. Transformación de datos (es la misma que en getEvents y getUserEvents)
+  const transformedData = data.map(event => ({
+    id: event.id.toString(),
+    name: event.titulo,
+    location: event.lugar,
+    startDate: `${event.fecha}T${event.hora}:00Z`, 
+    description: event.descripcion,
+    restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
+    capacity: event.maxPersonas || 10,
+    participants: [],
+    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
+  }));
+
+  // 4. Ordenamiento
   return transformedData.sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );

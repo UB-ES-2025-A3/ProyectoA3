@@ -75,26 +75,6 @@ const userService = {
     }
   },
 
-  /**
-   * Eventos creados por el usuario (si existe endpoint)
-   */
-  async getCreatedEvents(userId) {
-    if (USE_MOCKS) {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      return { success: true, data: mockUserEvents };
-    }
-
-    try {
-      const token = getToken();
-      const response = await axios.get(`${API_BASE_URL}/clients/${userId}/events/created`, {
-        headers: { Authorization: token ? `Bearer ${token}` : undefined }
-      });
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'Error al obtener eventos creados' };
-    }
-  },
-
   async updateUserProfile(userId, userData) {
     if (USE_MOCKS) {
       await new Promise(resolve => setTimeout(resolve, 500));
