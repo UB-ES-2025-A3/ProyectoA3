@@ -55,6 +55,21 @@ public class EventoService {
     }
   }
 
+  public List<EventoView> listarMisEventosCreados(Long creadorId) {
+    try {
+      return repo.findByIdCreadorOrderByFechaAscHoraAsc(creadorId)
+        .stream()
+        .map(this::toView)
+        .toList();
+    } catch (DataAccessException ex) {
+      var det = SqlErrorDetails.from(ex);
+      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+    } catch (PersistenceException ex) {
+      var det = SqlErrorDetails.from(ex);
+      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+    }
+  }
+
   public EventoView crear(EventoCreate req) {
     try {
       var e = new Evento();
