@@ -25,4 +25,12 @@ jobs:
           cache: maven
 
       - name: Run tests (perfil test)
-        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
+        run: mvn --batch-mode -Dspring.profiles.active=test -Dsurefire.printSummary=true test
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: warn
