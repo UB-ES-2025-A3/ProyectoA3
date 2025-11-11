@@ -2,11 +2,10 @@ name: Backend • CI (Tests only)
 
 on:
   push:
-    paths: [ 'backend/**' ]
-    branches: [ dev, pre_prod, main ]   # añade aquí las ramas donde quieras tests en cada push
+    paths: [ 'backend/**' ]                 # en push solo si toca backend
+    branches: [ dev, pre_prod, main ]
   pull_request:
-    paths: [ 'backend/**' ]
-    branches: [ dev, pre_prod, main ]   # y en los PR hacia estas ramas
+    branches: [ dev, pre_prod, main ]       # en PR siempre, toque lo que toque
 
 jobs:
   test:
