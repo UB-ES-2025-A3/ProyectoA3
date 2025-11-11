@@ -8,6 +8,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     titulo: '',
     etiquetas: '',
     fecha: '',
+    hora: '',
     idioma: '',
     plazasDisponibles: '',
     lugar: '',
@@ -49,6 +50,10 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.fecha = 'La fecha es requerida';
     }
 
+    if (!formData.hora) {
+      newErrors.hora = 'La hora es requerida';
+    }
+
     if (!formData.idioma) {
       newErrors.idioma = 'Debes seleccionar un idioma';
     }
@@ -84,7 +89,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         descripcion: formData.descripcion,
         etiquetas: formData.etiquetas,
         fecha: formData.fecha,
-        hora: '10:00', // Hora por defecto (se puede agregar otro campo si es necesario)
+        hora: formData.hora,
         lugar: formData.lugar,
         restricciones: {
           idiomaRequerido: formData.idioma,
@@ -221,6 +226,21 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               />
               {errors.fecha && <span className="error-message">{errors.fecha}</span>}
             </div>
+
+            <div className="form-group">
+              <label htmlFor="hora">Hora *</label>
+              <input
+                type="time"
+                id="hora"
+                name="hora"
+                value={formData.hora}
+                onChange={handleChange}
+                className={errors.hora ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.hora && <span className="error-message">{errors.hora}</span>}
+            </div>
+
 
             <div className="form-group">
               <label htmlFor="idioma">Idioma *</label>
