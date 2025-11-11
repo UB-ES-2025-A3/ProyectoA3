@@ -146,6 +146,24 @@ se espera una respuesta parecida a:
 }
 
 
+# Salirse de un evento
+
+Desde powershell:
+
+
+
+$body = @{
+    idEvento = ***
+    idParticipante = ***
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/api/events/leave" `
+                  -Method Post `
+                  -Body $body `
+                  -ContentType "application/json"
+
+Donde los *** implican id's del evento y participante que ya esten relacionados.
+
 # Como esta estructurado el backend
 
 ```

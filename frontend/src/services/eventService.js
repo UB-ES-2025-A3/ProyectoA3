@@ -64,20 +64,44 @@ export async function getEvents() {
         tags,
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
       );
+  // Obtener el ID del usuario actual para calcular isEnrolled
+  const currentUserId = localStorage.getItem('userId');
+  let userEventsIds = [];
+  
+  // Si hay un usuario logueado, obtener sus eventos para calcular isEnrolled
+  if (currentUserId) {
+    try {
+      const userEventsRes = await fetch(`${config.API_BASE_URL}/events/my-events`, {
+        headers: authHeaders(),
+      });
+      if (userEventsRes.ok) {
+        const userEvents = await userEventsRes.json();
+        userEventsIds = userEvents.map(e => e.id.toString());
+      }
+    } catch (error) {
+      console.warn('No se pudieron cargar los eventos del usuario para calcular isEnrolled:', error);
+    }
+  }
+
   // Transformar los datos del backend al formato esperado por el frontend
-  const transformedData = data.map(event => ({
-    id: event.id.toString(),
-    name: event.titulo,
-    location: event.lugar,
-    startDate: `${event.fecha}T${event.hora}:00Z`, // Combinar fecha y hora
-    description: event.descripcion,
-    restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
-    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
-    capacity: event.maxPersonas || 10,
-    participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
-    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
-    isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
-  }));
+  const transformedData = data.map(event => {
+    const eventId = event.id.toString();
+    const isEnrolled = currentUserId && userEventsIds.includes(eventId);
+    
+    return {
+      id: eventId,
+      name: event.titulo,
+      location: event.lugar,
+      startDate: `${event.fecha}T${event.hora}:00Z`, // Combinar fecha y hora
+      description: event.descripcion,
+      restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+      imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
+      capacity: event.maxPersonas || 10,
+      participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
+      languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+      isEnrolled: isEnrolled // Calcular basándose en si el evento está en la lista de eventos del usuario
+    };
+  });
 
       console.log("URL elegida en get events")
       console.log(imageUrl)
@@ -175,8 +199,29 @@ export async function joinEvent(eventData) {
     body: JSON.stringify(eventoAddDTO)
   });
   if (!res.ok) {
-    const errorText = await res.text().catch(() => "");
-    throw new Error(errorText || "No se pudo apuntar al evento");
+    let errorMessage = "No se pudo apuntar al evento";
+    try {
+      const errorData = await res.json().catch(() => null);
+      if (errorData && errorData.error) {
+        errorMessage = errorData.error;
+      } else {
+        const errorText = await res.text().catch(() => "");
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      }
+    } catch (e) {
+      // Si no se puede parsear el error, usar el mensaje por defecto
+    }
+    
+    // Detectar si el error es porque ya está apuntado
+    const errorLower = errorMessage.toLowerCase();
+    if (errorLower.includes('ya está apuntado') || errorLower.includes('already') || 
+        errorLower.includes('duplicate') || errorLower.includes('existe')) {
+      throw new Error("Ya estás apuntado a este evento");
+    }
+    
+    throw new Error(errorMessage);
   }
   return { ok: true };
 }
@@ -187,10 +232,25 @@ export async function leaveEvent(eventId) {
     console.log("Usando mocks para leaveEvent");
     return { ok:true };
   }
+
+  const idUser = localStorage.getItem('userId');
+  if (!idUser) {
+    throw new Error("Usuario no autenticado. Por favor, inicia sesión primero.");
+  }
+
+  // Convertir idUser a número
+  const idParticipante = parseInt(idUser, 10);
+
+  const eventoLeaveDTO = {
+    idEvento: parseInt(eventId, 10),
+    idParticipante: idParticipante
+  };
+
   console.log("Usando backend para leaveEvent");
-  const res = await fetch(`${config.API_BASE_URL}/events/${eventId}/leave`, {
+  const res = await fetch(`${config.API_BASE_URL}/events/leave`, {
     method: "POST",
     headers: authHeaders(),
+    body: JSON.stringify(eventoLeaveDTO)
   });
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");

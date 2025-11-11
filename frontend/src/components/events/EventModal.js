@@ -118,7 +118,7 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           )}
 
           {isEnrolled && (
-            <button className="btn btn-outline btn-large" onClick={onLeave}>
+            <button className="btn btn-primary btn-large" onClick={onLeave}>
               Desapuntarse del Evento
             </button>
           )}
