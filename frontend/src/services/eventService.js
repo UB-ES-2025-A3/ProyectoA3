@@ -116,7 +116,7 @@ export async function getEvents() {
     } else {
       console.warn('Evento sin fecha o hora:', event.id, 'fecha:', event.fecha, 'hora:', event.hora);
     }
-    
+    console.log("Evento recibido del backend:", event.participantesIds);
     return {
       id: event.id.toString(),
       name: event.titulo,
@@ -126,7 +126,7 @@ export async function getEvents() {
       restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
       imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
       capacity: event.maxPersonas || 10,
-      participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
+      participants: event.participantesIds || [], // Array con el conteo real
       languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
       isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
     };
@@ -144,7 +144,7 @@ export async function getEvents() {
         restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
         imageUrl,
         capacity: event.maxPersonas || 10,
-        participants: [],
+        participants: event.participantesIds || [],
         languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
         tags
       };
@@ -327,7 +327,7 @@ const transformedData = await Promise.all(
       restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
       imageUrl,
       capacity: event.maxPersonas || 10,
-      participants: [],
+      participants: event.participantesIds || [],
       languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
       tags: Array.isArray(event.tags) ? event.tags : []
 
@@ -379,8 +379,7 @@ const transformedData = await Promise.all(
     description: event.descripcion,
     restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
     imageUrl,
-    capacity: event.maxPersonas || 10,
-    participants: [],
+    capacity: event.maxPersonas || 10, participants: event.participantesIds || [],
     languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"]
   }}));
 

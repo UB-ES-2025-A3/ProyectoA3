@@ -161,11 +161,11 @@ public class EventoServiceIntegrationTest {
     // Unirse al evento
     var addDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), participanteId);
     EventoView actualizado = eventoService.addParticipante(addDto);
-    assertEquals(2, actualizado.ParticipantesInscritos()); // Creador + nuevo participante
+    assertEquals(2, actualizado.participantesIds().size()); // Creador + nuevo participante
 
     // Salir del evento
     var removeDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), participanteId);
     EventoView actualizadoDespuesSalir = eventoService.removeParticipante(removeDto); 
-    assertEquals(1, actualizadoDespuesSalir.ParticipantesInscritos()); // Solo el creador
+    assertEquals(1, actualizadoDespuesSalir.participantesIds().size()); // Solo el creador
   }
 }

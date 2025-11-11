@@ -114,6 +114,7 @@ public class EventoService {
 
   private EventoView toView(Evento e) {
     var r = e.getRestricciones();
+    System.err.printf("Participantes: ", e.getParticipantes().stream().map(p -> p.getId()).toList());
     return new EventoView(
       e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
       r != null ? r.getIdiomas_permitidos() : null,
@@ -122,7 +123,7 @@ public class EventoService {
       e.getTitulo(), e.getDescripcion(),
       e.getIdCreador(),
       e.getTags() == null ? List.of() : e.getTags(),   // <- AQUI
-      e.getParticipantes().size()
+      e.getParticipantes().stream().map(p -> p.getId()).toList()
     );
   }
 
