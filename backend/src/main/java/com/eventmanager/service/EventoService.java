@@ -127,8 +127,13 @@ public class EventoService {
   public EventoView addParticipante(EventoAdd dto) {
     var participante = clienteRepo.findById(dto.idParticipante())
             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-    var evento = repo.findById(dto.idEvento())
+    var evento = repo.findByIdWithParticipantes(dto.idEvento())
             .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    // Verificar que el participante no esté ya apuntado
+    if (evento.getParticipantes().contains(participante)) {
+      throw new RuntimeException("El usuario ya está apuntado a este evento");
+    }
 
     evento.addParticipante(participante);
     repo.save(evento);
@@ -138,8 +143,13 @@ public class EventoService {
   public EventoView removeParticipante(EventoAdd dto) {
     var participante = clienteRepo.findById(dto.idParticipante())
             .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-    var evento = repo.findById(dto.idEvento())
+    var evento = repo.findByIdWithParticipantes(dto.idEvento())
             .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    // Verificar que el participante esté realmente apuntado al evento
+    if (!evento.getParticipantes().contains(participante)) {
+      throw new RuntimeException("El usuario no está apuntado a este evento");
+    }
 
     evento.removeParticipante(participante);
     repo.save(evento);

@@ -158,10 +158,25 @@ export async function leaveEvent(eventId) {
     console.log("Usando mocks para leaveEvent");
     return { ok:true };
   }
+
+  const idUser = localStorage.getItem('userId');
+  if (!idUser) {
+    throw new Error("Usuario no autenticado. Por favor, inicia sesión primero.");
+  }
+
+  // Convertir idUser a número
+  const idParticipante = parseInt(idUser, 10);
+
+  const eventoLeaveDTO = {
+    idEvento: parseInt(eventId, 10),
+    idParticipante: idParticipante
+  };
+
   console.log("Usando backend para leaveEvent");
-  const res = await fetch(`${config.API_BASE_URL}/events/${eventId}/leave`, {
+  const res = await fetch(`${config.API_BASE_URL}/events/leave`, {
     method: "POST",
     headers: authHeaders(),
+    body: JSON.stringify(eventoLeaveDTO)
   });
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");
