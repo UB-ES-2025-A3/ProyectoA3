@@ -188,7 +188,15 @@ export default function HomePage() {
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
-      const event = events.find(e => e.id === eventId);
+      // Primero recargar eventos para tener el estado más actualizado
+      const currentEvents = await getEvents();
+      const event = currentEvents.find(e => e.id === eventId);
+      
+      if (!event) {
+        setBanner({ type: "error", message: "Evento no encontrado." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
       
       // Verificar si ya está lleno
       if (event.participants.length >= event.capacity) {
@@ -215,7 +223,14 @@ export default function HomePage() {
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     } catch (error) {
       console.error('Error al apuntarse al evento:', error);
-      setBanner({ type: "error", message: error.message || "Error al apuntarse al evento." });
+      // Si el error es que ya está apuntado, mostrar mensaje apropiado
+      const errorMessage = error.message || '';
+      if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
+          errorMessage.toLowerCase().includes('apuntado')) {
+        setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
+      } else {
+        setBanner({ type: "error", message: errorMessage || "Error al apuntarse al evento." });
+      }
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
     }
   };
@@ -611,8 +626,9 @@ export default function HomePage() {
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
-            // Recargar el evento seleccionado
+            // Recargar eventos y actualizar el evento seleccionado
             const updatedEvents = await getEvents();
+            setEvents(updatedEvents);
             const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
             if (updatedEvent) {
               setSelectedEvent(updatedEvent);

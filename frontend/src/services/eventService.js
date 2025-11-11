@@ -179,8 +179,30 @@ export async function joinEvent(eventData) {
     body: JSON.stringify(eventoAddDTO)
   });
   if (!res.ok) {
-    const errorText = await res.text().catch(() => "");
-    throw new Error(errorText || "No se pudo apuntar al evento");
+    let errorMessage = "No se pudo apuntar al evento";
+    try {
+      const errorData = await res.json().catch(() => null);
+      if (errorData && errorData.error) {
+        errorMessage = errorData.error;
+      } else {
+        const errorText = await res.text().catch(() => "");
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      }
+    } catch (e) {
+      // Si no se puede parsear el error, usar el mensaje por defecto
+    }
+    
+    // Detectar si el error es porque ya está apuntado
+    const errorLower = errorMessage.toLowerCase();
+    if (errorLower.includes('ya') || errorLower.includes('already') || 
+        errorLower.includes('duplicate') || errorLower.includes('existe') ||
+        res.status === 409) {
+      throw new Error("Ya estás apuntado a este evento");
+    }
+    
+    throw new Error(errorMessage);
   }
   return { ok: true };
 }

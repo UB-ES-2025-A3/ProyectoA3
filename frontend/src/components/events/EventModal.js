@@ -131,9 +131,22 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           )}
 
           {isEnrolled && (
-            <button className="btn btn-outline btn-large" onClick={onLeave}>
-              Desapuntarse del Evento
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+              <div style={{ 
+                padding: '12px 16px', 
+                backgroundColor: '#e8f5e9', 
+                color: '#2e7d32', 
+                borderRadius: '6px', 
+                fontSize: '15px',
+                textAlign: 'center',
+                fontWeight: '500'
+              }}>
+                ✓ Ya estás apuntado a este evento
+              </div>
+              <button className="btn btn-outline btn-large" onClick={onLeave}>
+                Desapuntarse del Evento
+              </button>
+            </div>
           )}
         </div>
       </div>

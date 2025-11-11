@@ -74,15 +74,29 @@ export default function EventCard({
             )}
 
             {isEnrolled && (
-              <button 
-                className="btn btn-outline" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLeave();
-                }}
-              >
-                Desapuntarse
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                <p style={{ 
+                  margin: 0, 
+                  padding: '8px 12px', 
+                  backgroundColor: '#e8f5e9', 
+                  color: '#2e7d32', 
+                  borderRadius: '4px', 
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  fontWeight: '500'
+                }}>
+                  ✓ Ya estás apuntado a este evento
+                </p>
+                <button 
+                  className="btn btn-outline" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLeave();
+                  }}
+                >
+                  Desapuntarse
+                </button>
+              </div>
             )}
           </footer>
         </div>
