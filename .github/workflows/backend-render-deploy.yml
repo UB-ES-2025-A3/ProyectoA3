@@ -15,10 +15,9 @@ jobs:
         include:
           - envname: preprod
             branch: refs/heads/pre_prod
-            hook_secret: RENDER_DEPLOY_HOOK_URL_PREPROD
           - envname: prod
             branch: refs/heads/main
-            hook_secret: RENDER_DEPLOY_HOOK_URL_PROD
+
     defaults:
       run:
         working-directory: backend
@@ -44,9 +43,20 @@ jobs:
         if: ${{ github.ref == matrix.branch }}
         run: mvn -q -DskipTests package
 
+      # Selecciona el hook correcto y lo expone como RENDER_DEPLOY_HOOK_URL
+      - name: Select deploy hook URL
+        if: ${{ github.ref == matrix.branch }}
+        run: |
+          if [ "${{ matrix.envname }}" = "preprod" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL=${{ secrets.RENDER_DEPLOY_HOOK_URL }}" >> "$GITHUB_ENV"
+          else
+            echo "RENDER_DEPLOY_HOOK_URL=${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}" >> "$GITHUB_ENV"
+          fi
+          # Para depurar sin filtrar el secreto, mostramos solo el entorno
+          echo "Selected environment: ${{ matrix.envname }}"
+
       - name: Trigger Render Deploy Hook
         if: ${{ github.ref == matrix.branch }}
-        env:
-          RENDER_DEPLOY_HOOK_URL: ${{ secrets[matrix.hook_secret] }}
         run: |
+          echo "Triggering Render deploy for '${{ matrix.envname }}'..."
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"

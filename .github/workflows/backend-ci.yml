@@ -1,0 +1,29 @@
+name: Backend • CI (Tests only)
+
+on:
+  push:
+    paths: [ 'backend/**' ]
+    branches: [ dev, pre_prod, main ]   # añade aquí las ramas donde quieras tests en cada push
+  pull_request:
+    paths: [ 'backend/**' ]
+    branches: [ dev, pre_prod, main ]   # y en los PR hacia estas ramas
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests (perfil test)
+        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
