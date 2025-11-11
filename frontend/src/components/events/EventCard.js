@@ -10,7 +10,20 @@ export default function EventCard({
   onLeave,
   onClick,
 }) {
-  const start = new Date(event.startDate).toLocaleString();
+  // Formatear fecha de manera segura
+  let start = "Fecha no disponible";
+  if (event.startDate) {
+    const date = new Date(event.startDate);
+    if (!isNaN(date.getTime())) {
+      start = date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
   console.log("Evento:", event);
@@ -61,18 +74,30 @@ export default function EventCard({
             )}
 
             {isEnrolled && (
-              <p style={{ 
-                margin: 0, 
-                padding: '8px 12px', 
-                backgroundColor: '#e8f5e9', 
-                color: '#2e7d32', 
-                borderRadius: '4px', 
-                fontSize: '14px',
-                textAlign: 'center',
-                fontWeight: '500'
-              }}>
-                ✓ Ya estás apuntado
-              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                <p style={{ 
+                  margin: 0, 
+                  padding: '8px 12px', 
+                  backgroundColor: '#e8f5e9', 
+                  color: '#2e7d32', 
+                  borderRadius: '4px', 
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  fontWeight: '500'
+                }}>
+                  ✓ Ya estás apuntado a este evento
+                </p>
+                <button 
+                  className="btn btn-outline" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLeave();
+                  }}
+                >
+                  Desapuntarse
+                </button>
+              </div>
             )}
           </footer>
         </div>

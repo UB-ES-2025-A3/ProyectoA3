@@ -60,7 +60,15 @@ export default function EventPage() {
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
-      const event = events.find(e => e.id === eventId);
+      // Primero recargar eventos para tener el estado más actualizado
+      const currentEvents = await getEvents();
+      const event = currentEvents.find(e => e.id === eventId);
+      
+      if (!event) {
+        setBanner({ type: 'error', message: 'Evento no encontrado.' });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
+        return;
+      }
       
       if (!event) {
         setBanner({ type: 'error', message: 'Evento no encontrado.' });
@@ -85,33 +93,15 @@ export default function EventPage() {
       // Recargar eventos para obtener el estado actualizado
       const updatedEvents = await getEvents();
       setEvents(updatedEvents);
-      
-      // Actualizar el evento seleccionado si está abierto el modal
-      if (selectedEvent && selectedEvent.id === eventId) {
-        const updatedEvent = updatedEvents.find(e => e.id === eventId);
-        if (updatedEvent) {
-          setSelectedEvent(updatedEvent);
-        }
-      }
-      
-      setBanner({ type: 'success', message: 'Te has apuntado al evento correctamente!' });
+      setBanner({ type: 'success', message: '¡Te has apuntado al evento correctamente!' });
       setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
     } catch (error) {
       console.error('Error al apuntarse al evento:', error);
+      // Si el error es que ya está apuntado, mostrar mensaje apropiado
       const errorMessage = error.message || '';
-      // Si el error es que ya está apuntado, mostrar mensaje de advertencia en lugar de error
       if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
           errorMessage.toLowerCase().includes('apuntado')) {
         setBanner({ type: 'warning', message: 'Ya estás apuntado a este evento.' });
-        // Recargar eventos para actualizar el estado
-        const updatedEvents = await getEvents();
-        setEvents(updatedEvents);
-        if (selectedEvent && selectedEvent.id === eventId) {
-          const updatedEvent = updatedEvents.find(e => e.id === eventId);
-          if (updatedEvent) {
-            setSelectedEvent(updatedEvent);
-          }
-        }
       } else {
         setBanner({ type: 'error', message: errorMessage || 'Error al apuntarse al evento.' });
       }
@@ -227,6 +217,13 @@ export default function EventPage() {
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
+            // Recargar eventos y actualizar el evento seleccionado
+            const updatedEvents = await getEvents();
+            setEvents(updatedEvents);
+            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
+            if (updatedEvent) {
+              setSelectedEvent(updatedEvent);
+            }
           }}
           onLeave={async () => {
             await handleLeaveEvent(selectedEvent.id);

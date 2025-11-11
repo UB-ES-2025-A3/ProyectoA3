@@ -85,21 +85,50 @@ export async function getEvents() {
 
   // Transformar los datos del backend al formato esperado por el frontend
   const transformedData = data.map(event => {
-    const eventId = event.id.toString();
-    const isEnrolled = currentUserId && userEventsIds.includes(eventId);
+    // Validar y formatear fecha y hora
+    let startDate = null;
+    if (event.fecha && event.hora) {
+      try {
+        // Asegurar que la fecha esté en formato YYYY-MM-DD
+        const fechaStr = event.fecha.toString().split('T')[0]; // Tomar solo la parte de la fecha si viene con hora
+        
+        // Asegurar que la hora esté en formato HH:mm (sin segundos si los tiene)
+        let horaStr = event.hora.toString();
+        // Si la hora viene en formato HH:mm:ss o HH:mm:ss.SSS, tomar solo HH:mm
+        if (horaStr.includes(':')) {
+          const horaParts = horaStr.split(':');
+          horaStr = `${horaParts[0].padStart(2, '0')}:${horaParts[1].padStart(2, '0')}`;
+        }
+        
+        // Construir la fecha en formato ISO 8601
+        startDate = `${fechaStr}T${horaStr}:00Z`;
+        
+        // Validar que la fecha sea válida
+        const testDate = new Date(startDate);
+        if (isNaN(testDate.getTime())) {
+          console.warn('Fecha inválida para evento:', event.id, 'fecha:', event.fecha, 'hora:', event.hora, 'startDate construido:', startDate);
+          startDate = null;
+        }
+      } catch (error) {
+        console.error('Error al formatear fecha/hora para evento:', event.id, error);
+        startDate = null;
+      }
+    } else {
+      console.warn('Evento sin fecha o hora:', event.id, 'fecha:', event.fecha, 'hora:', event.hora);
+    }
     
     return {
-      id: eventId,
+      id: event.id.toString(),
       name: event.titulo,
       location: event.lugar,
-      startDate: `${event.fecha}T${event.hora}:00Z`, // Combinar fecha y hora
+      startDate: startDate || new Date().toISOString(), // Fallback a fecha actual si hay error
       description: event.descripcion,
       restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
       imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
       capacity: event.maxPersonas || 10,
       participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
       languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
-      isEnrolled: isEnrolled // Calcular basándose en si el evento está en la lista de eventos del usuario
+      isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
     };
   });
 
@@ -216,8 +245,14 @@ export async function joinEvent(eventData) {
     
     // Detectar si el error es porque ya está apuntado
     const errorLower = errorMessage.toLowerCase();
+<<<<<<< HEAD
     if (errorLower.includes('ya está apuntado') || errorLower.includes('already') || 
         errorLower.includes('duplicate') || errorLower.includes('existe')) {
+=======
+    if (errorLower.includes('ya') || errorLower.includes('already') || 
+        errorLower.includes('duplicate') || errorLower.includes('existe') ||
+        res.status === 409) {
+>>>>>>> unirse-a-un-evento
       throw new Error("Ya estás apuntado a este evento");
     }
     

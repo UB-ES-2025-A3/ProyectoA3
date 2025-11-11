@@ -336,13 +336,18 @@ export default function ProfilePage() {
                       <p className="event-location">{event.location}</p>
                       <div className="event-info">
                         <span className="event-date">
-                          {new Date(event.startDate).toLocaleDateString('es-ES', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          {(() => {
+                            if (!event.startDate) return "Fecha no disponible";
+                            const date = new Date(event.startDate);
+                            if (isNaN(date.getTime())) return "Fecha no disponible";
+                            return date.toLocaleDateString('es-ES', { 
+                              day: 'numeric', 
+                              month: 'short', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            });
+                          })()}
                         </span>
                         <span className="event-participants">
                           {event.participants.length} / {event.capacity} participantes
