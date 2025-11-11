@@ -22,10 +22,19 @@ function getConfig() {
 }
 
 function authHeaders() {
-  const token = localStorage.getItem("authToken"); // misma clave que guardas al hacer login
-  return token
-    ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json", Accept: "application/json" }
-    : { "Content-Type": "application/json", Accept: "application/json" };
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  const headers = { "Content-Type": "application/json" };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  if (userId) {
+    headers["X-User-Id"] = userId;
+  }
+  
+  return headers;
 }
 
 
@@ -55,6 +64,20 @@ export async function getEvents() {
         tags,
         "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
       );
+  // Transformar los datos del backend al formato esperado por el frontend
+  const transformedData = data.map(event => ({
+    id: event.id.toString(),
+    name: event.titulo,
+    location: event.lugar,
+    startDate: `${event.fecha}T${event.hora}:00Z`, // Combinar fecha y hora
+    description: event.descripcion,
+    restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000", // Imagen por defecto
+    capacity: event.maxPersonas || 10,
+    participants: Array.from({ length: event.ParticipantesInscritos || 0 }, (_, i) => ({ id: i })), // Array con el conteo real
+    languages: event.idiomasPermitidos ? event.idiomasPermitidos.split(',').map(lang => lang.trim()) : ["es"],
+    isEnrolled: event.isEnrolled || false // Estado de inscripción del usuario actual
+  }));
 
       console.log("URL elegida en get events")
       console.log(imageUrl)
@@ -92,13 +115,13 @@ export async function createEvent(eventData) {
 
   // Construir el DTO según el modelo del backend
   const eventoCreateDTO = {
-    titulo: eventData.titulo,
-    descripcion: eventData.descripcion || "",
     fecha: eventData.fecha, // String en formato YYYY-MM-DD
     hora: eventData.hora || "10:00", // String en formato HH:mm
     lugar: eventData.lugar,
-    tags: eventData.etiquetas ? [eventData.etiquetas] : [], // Convertir a array de tags
     restricciones: eventData.restricciones || {}, // Map de restricciones (puede contener edadMinima, etc.)
+    tags: eventData.etiquetas ? [eventData.etiquetas] : [],  // Convertir a array de tags
+    titulo: eventData.titulo,
+    descripcion: eventData.descripcion || "",
     idCreador: creatorId
   };
 
@@ -125,22 +148,37 @@ export async function createEvent(eventData) {
   }
 }
 
-export async function joinEvent(eventId) {
+export async function joinEvent(eventData) {
   const config = getConfig();
   if (config.USE_MOCKS) {
     console.log("Usando mocks para joinEvent");
     return { ok:true };
   }
+
+  const idUser = localStorage.getItem('userId');
+  if (!idUser) {
+    throw new Error("Usuario no autenticado. Por favor, inicia sesión primero.");
+  }
+
+  // Convertir idCreador a número
+  const idParticipante = parseInt(idUser, 10);
+
+  const eventoAddDTO = {
+    idEvento: eventData,
+    idParticipante: idParticipante
+  };
+
   console.log("Usando backend para joinEvent");
-  const res = await fetch(`${config.API_BASE_URL}/events/${eventId}/join`, {
+  const res = await fetch(`${config.API_BASE_URL}/events/join`, {
     method: "POST",
     headers: authHeaders(),
+    body: JSON.stringify(eventoAddDTO)
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "No se pudo apuntar al evento");
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo apuntar al evento");
   }
-  return res.json();
+  return { ok: true };
 }
 
 export async function leaveEvent(eventId) {
@@ -155,10 +193,10 @@ export async function leaveEvent(eventId) {
     headers: authHeaders(),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "No se pudo desapuntar del evento");
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo desapuntar del evento");
   }
-  return res.json();
+  return { ok: true };
 }
 
 export async function getUserEvents() {
