@@ -654,8 +654,6 @@ export default function HomePage() {
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
-<<<<<<< HEAD
-=======
             // Recargar eventos y actualizar el evento seleccionado
             const updatedEvents = await getEvents();
             setEvents(updatedEvents);
@@ -663,7 +661,6 @@ export default function HomePage() {
             if (updatedEvent) {
               setSelectedEvent(updatedEvent);
             }
->>>>>>> unirse-a-un-evento
           }}
           onLeave={async () => {
             await handleLeaveEvent(selectedEvent.id);

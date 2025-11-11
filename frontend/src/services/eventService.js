@@ -256,6 +256,7 @@ export async function joinEvent(eventData) {
     throw new Error(errorMessage);
   }
   return { ok: true };
+  }
 }
 
 export async function leaveEvent(eventId) {
