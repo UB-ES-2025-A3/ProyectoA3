@@ -6,6 +6,7 @@ function resolveApiBase() {
   return 'http://localhost:8080/api';
 }
 const API_BASE_URL = resolveApiBase();
+console.log('[authService] API_BASE_URL =', API_BASE_URL);
 
 const authService = {
   // Registro de usuario
@@ -33,9 +34,23 @@ const authService = {
         data: response.data
       };
     } catch (error) {
+      let errorMessage = 'Error al iniciar sesión';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Servicio no disponible. Verifica que el servidor esté funcionando.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Error del servidor. Inténtalo de nuevo más tarde.';
+      } else if (error.message === 'Network Error') {
+        errorMessage = 'Error de conexión. Verifica tu conexión a internet o que el servidor esté activo.';
+      }
+      
       return {
         success: false,
-        error: error.response?.data?.message || 'Error al iniciar sesión'
+        error: errorMessage
       };
     }
   }

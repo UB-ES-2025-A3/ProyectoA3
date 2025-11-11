@@ -1,146 +1,101 @@
 import axios from 'axios';
 import { mockUser, mockUserStats, mockUserEvents } from '../mocks/profile';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-const USE_MOCKS = process.env.REACT_APP_USE_MOCKS === 'true' || true; // Temporalmente en true para usar mocks
+const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.REACT_APP_API_URL) || process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+// habilita mocks solo si la variable de entorno lo indica explícitamente
+const USE_MOCKS = process.env.REACT_APP_USE_MOCKS === 'true';
+
+function getToken() {
+  return localStorage.getItem('token') || localStorage.getItem('authToken') || null;
+}
 
 const userService = {
   /**
    * Obtiene el perfil del usuario por su ID
-   * @param {number} userId - ID del usuario
-   * @returns {Promise} - Datos del usuario
+   * @param {number|string} userId - ID del usuario
    */
   async getUserProfile(userId) {
     if (USE_MOCKS) {
-      // Simular delay de red
       await new Promise(resolve => setTimeout(resolve, 500));
-      return {
-        success: true,
-        data: mockUser
-      };
+      return { success: true, data: mockUser };
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.get(`${API_BASE_URL}/users/${userId}`, {
+      const token = getToken();
+      const response = await axios.get(`${API_BASE_URL}/clients/${userId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: token ? `Bearer ${token}` : undefined
         }
       });
-      return {
-        success: true,
-        data: response.data
-      };
+      return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Error al obtener el perfil del usuario'
-      };
+      return { success: false, error: error.response?.data?.message || 'Error al obtener el perfil del usuario' };
     }
   },
 
   /**
    * Actualiza el perfil del usuario
-   * @param {number} userId - ID del usuario
-   * @param {Object} userData - Datos a actualizar
-   * @returns {Promise} - Usuario actualizado
    */
   async updateUserProfile(userId, userData) {
     if (USE_MOCKS) {
-      // Simular delay de red
       await new Promise(resolve => setTimeout(resolve, 500));
-      return {
-        success: true,
-        data: { ...mockUser, ...userData }
-      };
+      return { success: true, data: { ...mockUser, ...userData } };
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData, {
+      const token = getToken();
+      const response = await axios.put(`${API_BASE_URL}/clients/${userId}`, userData, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: token ? `Bearer ${token}` : undefined
         }
       });
-      return {
-        success: true,
-        data: response.data
-      };
+      return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Error al actualizar el perfil'
-      };
+      return { success: false, error: error.response?.data?.message || 'Error al actualizar el perfil' };
     }
   },
 
   /**
-   * Obtiene las estadísticas del usuario
-   * @param {number} userId - ID del usuario
-   * @returns {Promise} - Estadísticas del usuario
+   * Estadísticas del usuario (si existe endpoint)
    */
   async getUserStats(userId) {
     if (USE_MOCKS) {
-      // Simular delay de red
       await new Promise(resolve => setTimeout(resolve, 300));
-      return {
-        success: true,
-        data: mockUserStats
-      };
+      return { success: true, data: mockUserStats };
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.get(`${API_BASE_URL}/users/${userId}/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const token = getToken();
+      const response = await axios.get(`${API_BASE_URL}/clients/${userId}/stats`, {
+        headers: { Authorization: token ? `Bearer ${token}` : undefined }
       });
-      return {
-        success: true,
-        data: response.data
-      };
+      return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Error al obtener estadísticas'
-      };
+      return { success: false, error: error.response?.data?.message || 'Error al obtener estadísticas' };
     }
   },
 
-  /**
-   * Obtiene los eventos creados por el usuario
-   * @param {number} userId - ID del usuario
-   * @returns {Promise} - Lista de eventos creados
-   */
-  async getCreatedEvents(userId) {
+  async updateUserProfile(userId, userData) {
     if (USE_MOCKS) {
-      // Simular delay de red
-      await new Promise(resolve => setTimeout(resolve, 400));
-      return {
-        success: true,
-        data: mockUserEvents
-      };
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return { success: true, data: { ...mockUser, ...userData } };
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.get(`${API_BASE_URL}/users/${userId}/events/created`, {
+      const token = getToken();
+      const response = await axios.put(`${API_BASE_URL}/clients/${userId}`, userData, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: token ? `Bearer ${token}` : undefined,
+          'Content-Type': 'application/json'
         }
       });
-      return {
-        success: true,
-        data: response.data
-      };
+      // Normaliza: unwrap { data: {...} } si el backend lo envolviera
+      const payload = response.data?.data ?? response.data;
+      return { success: true, data: payload };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || 'Error al obtener eventos creados'
-      };
+      return { success: false, error: error.response?.data?.message || 'Error al actualizar el perfil' };
     }
-  }
+  },
 };
 
 export default userService;

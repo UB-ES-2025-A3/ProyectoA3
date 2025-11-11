@@ -150,6 +150,7 @@ coverage/
 *.jks
 application-local.yml
 application-local.properties
+package-lock.json
 
 # ════════════════════════════════════════════════════════════
 # ═══ Spring Boot ════════════════════════════════════════════

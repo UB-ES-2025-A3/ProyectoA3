@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import userService from '../services/userService';
+import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
 
 export default function ProfilePage() {
@@ -26,36 +27,46 @@ export default function ProfilePage() {
           return;
         }
 
-        // Cargar perfil
-        const profileResult = await userService.getUserProfile(userId);
+        // --- Carga de datos en paralelo ---
+        // Llamamos a todo a la vez para mejorar la velocidad de carga
+        const [profileResult, statsResult, createdEventsData] = await Promise.all([
+          userService.getUserProfile(userId),
+          userService.getUserStats(userId),
+          getMyCreatedEvents()
+        ]);
+
+        // --- Procesar resultados ---
+        
+        // 1. Perfil
         if (profileResult.success) {
-          setUserData(profileResult.data);
-          setEditData(profileResult.data);
+          const user = profileResult.data?.data ?? profileResult.data;
+          setUserData(user);
+          setEditData(user);
         } else {
           setBanner({ type: "error", message: profileResult.error });
         }
 
-        // Cargar estadísticas
-        const statsResult = await userService.getUserStats(userId);
+        // 2. Estadísticas
         if (statsResult.success) {
           setStats(statsResult.data);
         }
 
-        // Cargar eventos creados
-        const eventsResult = await userService.getCreatedEvents(userId);
-        if (eventsResult.success) {
-          setUserEvents(eventsResult.data);
-        }
+        // 3. Eventos Creados
+        // No necesitamos "if (success)" porque si getMyCreatedEvents falla,
+        // saltará directamente al 'catch'
+        setUserEvents(createdEventsData);
+
       } catch (error) {
         console.error('Error cargando datos del usuario:', error);
-        setBanner({ type: "error", message: "Error al cargar los datos del usuario" });
+        // Usamos error.message para dar un feedback más específico
+        setBanner({ type: "error", message: `Error al cargar los datos: ${error.message || 'Error desconocido'}` });
       } finally {
         setLoading(false);
       }
     };
 
     loadUserData();
-  }, []);
+  }, []); // El array vacío asegura que solo se ejecute una vez
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -66,12 +77,21 @@ export default function ProfilePage() {
     try {
       setSaving(true);
       const userId = localStorage.getItem('userId');
-      
+
       const result = await userService.updateUserProfile(userId, editData);
-      
+
       if (result.success) {
-        setUserData(result.data);
+        // Normaliza respuesta y actualiza estado
+        const updated = result.data?.data ?? result.data;
+        setUserData(updated);
+        setEditData(updated);
         setIsEditing(false);
+
+        // Actualiza username en localStorage si ha cambiado (opcional)
+        if (updated.username) {
+          localStorage.setItem('username', updated.username);
+        }
+
         setBanner({ type: "success", message: "Perfil actualizado correctamente" });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
       } else {

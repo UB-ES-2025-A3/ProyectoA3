@@ -6,37 +6,55 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.eventmanager.domain.Evento;
+import com.eventmanager.domain.Evento.Restricciones;
+import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.repository.EventoRepository;
 import com.eventmanager.service.EventoService;
- 
-//Este test no comprueba en base de datos, solo la funcionalidad
-public class EventoServiceTest {
+
+@org.junit.jupiter.api.extension.ExtendWith(MockitoExtension.class)
+class EventoServiceTest {
+
+  @Mock
+  EventoRepository repo;
+
+  @InjectMocks
+  EventoService service;
+
   @Test
-  void listar_mapea_campos() {
-    EventoRepository repo = mock(EventoRepository.class);
+  void listar_mapeaRestricciones_a_EventoView() {
+
     Evento e = new Evento();
-    e.setId(10L);
+    e.setId(1L);
     e.setFecha(LocalDate.of(2025, 11, 5));
     e.setHora(LocalTime.of(18, 0));
-    e.setLugar("Madrid");
-    e.setIdiomasPermitidos("es,en");
-    e.setEdadMinima(18);
-    e.setMaxPersonas(50);
-    e.setTitulo("Paseo");
-    e.setDescripcion("Ruta");
+    e.setLugar("Sevilla");
+    e.setTitulo("Prueba");
+    e.setDescripcion("desc");
+    e.setIdCreador(123L);
+    // restricciones JSON 
+    e.setRestricciones(new Restricciones("es,en", 18, 50));
+
     when(repo.findAll()).thenReturn(List.of(e));
 
-    var service = new EventoService(repo);
-    var lista = service.listar();
+    List<EventoView> lista = service.listar();
     assertEquals(1, lista.size());
     var v = lista.get(0);
-    assertEquals(10L, v.id());
-    assertEquals("Madrid", v.lugar());
-    assertEquals("Paseo", v.titulo());
+
+    assertEquals(e.getId(), v.id());
+    assertEquals(e.getFecha(), v.fecha());
+    assertEquals(e.getHora(), v.hora());
+    assertEquals(e.getLugar(), v.lugar());
+    assertEquals("es,en", v.idiomasPermitidos());
+    assertEquals(18, v.edadMinima());
+    assertEquals(50, v.maxPersonas());
+    assertEquals("Prueba", v.titulo());
+    assertEquals("desc", v.descripcion());
+    assertEquals(123L, v.idCreador());
   }
 }
-

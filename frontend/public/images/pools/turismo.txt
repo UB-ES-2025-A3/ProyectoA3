@@ -1,0 +1,3 @@
+turismo_canal.jpg
+turismo_catedral.jpg
+turismo_pueblo.jpg
