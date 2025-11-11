@@ -43,20 +43,24 @@ jobs:
         if: ${{ github.ref == matrix.branch }}
         run: mvn -q -DskipTests package
 
-      # Selecciona el hook correcto y lo expone como RENDER_DEPLOY_HOOK_URL
-      - name: Select deploy hook URL
+      - name: Diagnose secrets availability (temporary)
         if: ${{ github.ref == matrix.branch }}
         run: |
-          if [ "${{ matrix.envname }}" = "preprod" ]; then
-            echo "RENDER_DEPLOY_HOOK_URL=${{ secrets.RENDER_DEPLOY_HOOK_URL }}" >> "$GITHUB_ENV"
-          else
-            echo "RENDER_DEPLOY_HOOK_URL=${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}" >> "$GITHUB_ENV"
-          fi
-          # Para depurar sin filtrar el secreto, mostramos solo el entorno
-          echo "Selected environment: ${{ matrix.envname }}"
+          echo "Matrix envname: ${{ matrix.envname }}"
+          # Si el secreto no está disponible, estas condiciones imprimirán 'EMPTY'
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then echo "preprod secret: EMPTY"; else echo "preprod secret: PRESENT"; fi
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}" ]; then echo "prod secret: EMPTY"; else echo "prod secret: PRESENT"; fi
+
 
       - name: Trigger Render Deploy Hook
         if: ${{ github.ref == matrix.branch }}
+        env:
+          # Selecciona el secreto según el item de la matriz, sin usar $GITHUB_ENV
+          RENDER_DEPLOY_HOOK_URL: ${{ matrix.envname == 'preprod' && secrets.RENDER_DEPLOY_HOOK_URL || secrets.RENDER_DEPLOY_HOOK_URL_PROD }}
         run: |
           echo "Triggering Render deploy for '${{ matrix.envname }}'..."
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "ERROR: RENDER_DEPLOY_HOOK_URL está vacío. Revisa que el secreto exista y sea accesible en este workflow."
+            exit 1
+          fi
           curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
