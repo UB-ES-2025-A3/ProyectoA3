@@ -2,8 +2,7 @@ name: Backend • Build & Deploy to Render
 
 on:
   push:
-    paths:
-      - 'backend/**'
+    paths: [ 'backend/**', '.github/workflows/backend-deploy.yml' ]
     branches: [ pre_prod, main ]
   workflow_dispatch:
 
