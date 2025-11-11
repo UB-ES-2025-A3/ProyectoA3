@@ -245,14 +245,11 @@ export async function joinEvent(eventData) {
     
     // Detectar si el error es porque ya está apuntado
     const errorLower = errorMessage.toLowerCase();
-<<<<<<< HEAD
     if (errorLower.includes('ya está apuntado') || errorLower.includes('already') || 
         errorLower.includes('duplicate') || errorLower.includes('existe')) {
-=======
     if (errorLower.includes('ya') || errorLower.includes('already') || 
         errorLower.includes('duplicate') || errorLower.includes('existe') ||
         res.status === 409) {
->>>>>>> unirse-a-un-evento
       throw new Error("Ya estás apuntado a este evento");
     }
     
