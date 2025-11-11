@@ -12,21 +12,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        envname: [ preprod, prod ]
+        include:
+          - envname: preprod
+            branch: refs/heads/pre_prod
+            hook_secret: RENDER_DEPLOY_HOOK_URL_PREPROD
+          - envname: prod
+            branch: refs/heads/main
+            hook_secret: RENDER_DEPLOY_HOOK_URL_PROD
     defaults:
       run:
         working-directory: backend
 
-    # Solo ejecuta el job del entorno según la rama
-    if: |
-      (matrix.envname == 'preprod' && startsWith(github.ref, 'refs/heads/pre_prod')) ||
-      (matrix.envname == 'prod' && startsWith(github.ref, 'refs/heads/main'))
-
     steps:
       - name: Checkout
+        if: ${{ github.ref == matrix.branch }}
         uses: actions/checkout@v4
 
       - name: Set up Java
+        if: ${{ github.ref == matrix.branch }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -34,18 +37,16 @@ jobs:
           cache: maven
 
       - name: Run tests (perfil test)
+        if: ${{ github.ref == matrix.branch }}
         run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
 
       - name: Build JAR
+        if: ${{ github.ref == matrix.branch }}
         run: mvn -q -DskipTests package
 
       - name: Trigger Render Deploy Hook
+        if: ${{ github.ref == matrix.branch }}
         env:
-          RENDER_DEPLOY_HOOK_URL_PREPROD: ${{ secrets.RENDER_DEPLOY_HOOK_URL_PREPROD }}
-          RENDER_DEPLOY_HOOK_URL_PROD: ${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets[matrix.hook_secret] }}
         run: |
-          if [ "${{ matrix.envname }}" = "preprod" ]; then
-            curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL_PREPROD"
-          else
-            curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL_PROD"
-          fi
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
