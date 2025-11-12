@@ -72,7 +72,10 @@ export default function MyEventsPage() {
     <div className="my-events-page">
       <div className="my-events-content">
         <header className="my-events-header">
-          <h1>Mi Agenda de Eventos 📅</h1>
+          <h1>
+            <span className="header-icon" aria-hidden="true">📅</span>
+            Mi Agenda de Eventos
+          </h1>
           <p>Aquí puedes ver todos los eventos en los que estás inscrito</p>
         </header>
 
