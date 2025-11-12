@@ -150,9 +150,6 @@ export default function ProfilePage() {
             <div className="profile-avatar">
               {userData.nombre.charAt(0).toUpperCase()}
             </div>
-            <button className="avatar-edit-btn" title="Cambiar foto">
-              <FaEdit />
-            </button>
           </div>
           <div className="profile-header-info">
             <h1>{fullName}</h1>
