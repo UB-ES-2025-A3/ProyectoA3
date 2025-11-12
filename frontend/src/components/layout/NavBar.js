@@ -7,7 +7,6 @@ export default function NavBar() {
     <nav className="nav">
       <div className="nav__brand">Trips & Events</div>
       <div className="nav__links">
-        <NavLink to="/home" end>Inicio</NavLink>
         <NavLink to="/events">Eventos</NavLink>
         <NavLink to="/profile">Perfil</NavLink>
         <NavLink to="/my-events">Mis eventos</NavLink>

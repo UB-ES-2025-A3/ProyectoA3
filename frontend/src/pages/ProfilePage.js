@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
@@ -150,9 +150,6 @@ export default function ProfilePage() {
             <div className="profile-avatar">
               {userData.nombre.charAt(0).toUpperCase()}
             </div>
-            <button className="avatar-edit-btn" title="Cambiar foto">
-              <FaEdit />
-            </button>
           </div>
           <div className="profile-header-info">
             <h1>{fullName}</h1>
@@ -282,7 +279,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Bio Section */}
+          {/* Bio Section oculto temporalmente
           <div className="profile-section">
             <h2 className="section-title">Sobre Mí</h2>
             <div className="bio-section">
@@ -299,6 +296,7 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+          */}
 
           {/* Languages Section */}
           {userData.languages && userData.languages.length > 0 && (
@@ -336,13 +334,18 @@ export default function ProfilePage() {
                       <p className="event-location">{event.location}</p>
                       <div className="event-info">
                         <span className="event-date">
-                          {new Date(event.startDate).toLocaleDateString('es-ES', { 
-                            day: 'numeric', 
-                            month: 'short', 
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          {(() => {
+                            if (!event.startDate) return "Fecha no disponible";
+                            const date = new Date(event.startDate);
+                            if (isNaN(date.getTime())) return "Fecha no disponible";
+                            return date.toLocaleDateString('es-ES', { 
+                              day: 'numeric', 
+                              month: 'short', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            });
+                          })()}
                         </span>
                         <span className="event-participants">
                           {event.participants.length} / {event.capacity} participantes

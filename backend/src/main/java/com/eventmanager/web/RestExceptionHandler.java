@@ -35,6 +35,19 @@ public class RestExceptionHandler {
   }
 
 
+  // Manejar RuntimeException (errores de negocio)
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<Map<String,String>> handleRuntime(RuntimeException ex) {
+    String message = ex.getMessage();
+    // Si el mensaje indica un error de negocio (ya apuntado, no apuntado, etc.), usar 400
+    if (message != null && (message.contains("apuntado") || message.contains("no encontrado"))) {
+      return ResponseEntity.badRequest().body(Map.of("error", message));
+    }
+    // Para otros RuntimeException, usar 500
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(Map.of("error", message != null ? message : "Error interno del servidor"));
+  }
+
   // Fallback (por si algo se cuela sin envolver)
   @ExceptionHandler(DataAccessException.class)
   public ResponseEntity<Map<String,String>> handleDb(DataAccessException ex) {

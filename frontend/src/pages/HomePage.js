@@ -25,11 +25,14 @@ export default function HomePage() {
     location: "",
     language: "",
     minAge: "",
-    maxPersons: ""
+    maxPersons: "",
+    tags: []
   });
 
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [joiningEventId, setJoiningEventId] = useState(null);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -67,6 +70,15 @@ export default function HomePage() {
       // Filtro por idioma
       if (filters.language) {
         if (!event.languages || !event.languages.includes(filters.language)) {
+          return false;
+        }
+      }
+
+      // Filtro por tags
+      if (filters.tags && filters.tags.length > 0) {
+        const eventTags = Array.isArray(event.tags) ? event.tags : [];
+        const matchesTag = eventTags.some(tag => filters.tags.includes(tag));
+        if (!matchesTag) {
           return false;
         }
       }
@@ -112,6 +124,21 @@ export default function HomePage() {
     })();
   }, []);
 
+  // Calcular tags disponibles según los eventos cargados
+  useEffect(() => {
+    const tagsSet = new Set();
+    events.forEach(event => {
+      if (Array.isArray(event.tags)) {
+        event.tags.forEach(tag => {
+          if (tag && typeof tag === "string") {
+            tagsSet.add(tag);
+          }
+        });
+      }
+    });
+    setAvailableTags(Array.from(tagsSet).sort((a, b) => a.localeCompare(b)));
+  }, [events]);
+
   // Aplicar filtros cuando cambien eventos o filtros
   useEffect(() => {
     applyFilters();
@@ -143,6 +170,21 @@ export default function HomePage() {
   // Función para abrir/cerrar filtros desplegables
   const toggleFilter = (filterType) => {
     setOpenFilter(openFilter === filterType ? null : filterType);
+  };
+
+  const handleTagToggle = (tagValue) => {
+    setFilters(prev => {
+      const currentTags = prev.tags || [];
+      const exists = currentTags.includes(tagValue);
+      const updatedTags = exists
+        ? currentTags.filter(tag => tag !== tagValue)
+        : [...currentTags, tagValue];
+
+      return {
+        ...prev,
+        tags: updatedTags
+      };
+    });
   };
 
   // Función para abrir el modal
@@ -188,7 +230,22 @@ export default function HomePage() {
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
-      const event = events.find(e => e.id === eventId);
+      setJoiningEventId(eventId);
+      // Primero recargar eventos para tener el estado más actualizado
+      const currentEvents = await getEvents();
+      const event = currentEvents.find(e => e.id === eventId);
+      
+      if (!event) {
+        setBanner({ type: "error", message: "Evento no encontrado." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+      
+      if (!event) {
+        setBanner({ type: "error", message: "Evento no encontrado." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
       
       // Verificar si ya está lleno
       if (event.participants.length >= event.capacity) {
@@ -198,7 +255,7 @@ export default function HomePage() {
       }
       
       // Verificar si ya está apuntado
-      if (event.participants.some(p => p.id === "me")) {
+      if (event.isEnrolled) {
         setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
@@ -207,25 +264,34 @@ export default function HomePage() {
       // Llamar al servicio
       await joinEvent(eventId);
       
-      // Actualizar el estado local
-      setEvents(prevEvents => 
-        prevEvents.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              participants: [...event.participants, { id: "me" }]
-            };
-          }
-          return event;
-        })
-      );
+      // Recargar los eventos para obtener el estado actualizado
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents);
+      
+      // Actualizar el evento seleccionado si está abierto el modal
+      if (selectedEvent && selectedEvent.id === eventId) {
+        const updatedEvent = updatedEvents.find(e => e.id === eventId);
+        if (updatedEvent) {
+          setSelectedEvent(updatedEvent);
+        }
+      }
       
       setBanner({ type: "success", message: "¡Te has apuntado al evento correctamente!" });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     } catch (error) {
       console.error('Error al apuntarse al evento:', error);
-      setBanner({ type: "error", message: error.message || "Error al apuntarse al evento." });
+      // Si el error es que ya está apuntado, mostrar mensaje apropiado
+      const errorMessage = error.message || '';
+      if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
+          errorMessage.toLowerCase().includes('apuntado')) {
+        setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
+      } else {
+        setBanner({ type: "error", message: errorMessage || "Error al apuntarse al evento." });
+      }
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
+    finally {
+      setJoiningEventId(null);
     }
   };
 
@@ -234,8 +300,14 @@ export default function HomePage() {
     try {
       const event = events.find(e => e.id === eventId);
       
+      if (!event) {
+        setBanner({ type: "error", message: "Evento no encontrado." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+      
       // Verificar si está apuntado
-      if (!event.participants.some(p => p.id === "me")) {
+      if (!event.isEnrolled) {
         setBanner({ type: "warning", message: "No estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
@@ -244,18 +316,17 @@ export default function HomePage() {
       // Llamar al servicio
       await leaveEvent(eventId);
       
-      // Actualizar el estado local
-      setEvents(prevEvents => 
-        prevEvents.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              participants: event.participants.filter(p => p.id !== "me")
-            };
-          }
-          return event;
-        })
-      );
+      // Recargar los eventos para obtener el estado actualizado
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents);
+      
+      // Actualizar el evento seleccionado si está abierto el modal
+      if (selectedEvent && selectedEvent.id === eventId) {
+        const updatedEvent = updatedEvents.find(e => e.id === eventId);
+        if (updatedEvent) {
+          setSelectedEvent(updatedEvent);
+        }
+      }
       
       setBanner({ type: "success", message: "Te has desapuntado del evento correctamente." });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
@@ -538,10 +609,57 @@ export default function HomePage() {
                     </div>
                   )}
                 </div>
+
+                <div className="filter-dropdown">
+                  <button 
+                    className={`filter-icon-btn ${filters.tags && filters.tags.length ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFilter('tags');
+                    }}
+                    title="Filtrar por etiquetas"
+                  >
+                    <FaFeatherAlt />
+                    <span>Tags</span>
+                  </button>
+
+                  {openFilter === 'tags' && (
+                    <div className="filter-dropdown-content tags-dropdown">
+                      <div className="filter-options">
+                        {availableTags.length === 0 ? (
+                          <p className="filter-empty">No hay etiquetas disponibles todavía.</p>
+                        ) : (
+                          <div className="tags-list">
+                            {availableTags.map(tag => (
+                              <label key={tag} className="tag-option">
+                                <input
+                                  type="checkbox"
+                                  value={tag}
+                                  checked={filters.tags?.includes(tag) || false}
+                                  onChange={() => handleTagToggle(tag)}
+                                />
+                                <span>{tag}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        {filters.tags && filters.tags.length > 0 && (
+                          <button
+                            type="button"
+                            className="tags-clear-btn"
+                            onClick={() => handleFilterChange('tags', [])}
+                          >
+                            Limpiar tags
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               {/* Botón para limpiar filtros */}
-              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons) && (
+              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons || (filters.tags && filters.tags.length > 0)) && (
                 <button 
                   className="clear-filters-btn"
                   onClick={() => setFilters({
@@ -549,7 +667,8 @@ export default function HomePage() {
                     location: "",
                     language: "",
                     minAge: "",
-                    maxPersons: ""
+                    maxPersons: "",
+                    tags: []
                   })}
                 >
                   Limpiar filtros
@@ -566,7 +685,7 @@ export default function HomePage() {
             ) : filteredEvents.length > 0 ? (
               <div className="events-grid">
                 {filteredEvents.map(event => {
-                  const isEnrolled = event.participants.some(p => p.id === "me");
+                  const isEnrolled = event.isEnrolled || false;
                   const isFull = event.participants.length >= event.capacity;
                   
                   return (
@@ -575,6 +694,7 @@ export default function HomePage() {
                       event={event}
                       isEnrolled={isEnrolled}
                       isFull={isFull}
+                      isJoining={joiningEventId === event.id}
                       onJoin={() => handleJoinEvent(event.id)}
                       onLeave={() => handleLeaveEvent(event.id)}
                       onClick={() => handleEventClick(event)}
@@ -592,7 +712,8 @@ export default function HomePage() {
                     location: "",
                     language: "",
                     minAge: "",
-                    maxPersons: ""
+                    maxPersons: "",
+                    tags: []
                   })}
                 >
                   Limpiar filtros
@@ -625,23 +746,20 @@ export default function HomePage() {
           event={selectedEvent}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          isEnrolled={selectedEvent.participants.some(p => p.id === "me")}
+          isEnrolled={selectedEvent.isEnrolled || false}
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
-          onJoin={() => {
-            handleJoinEvent(selectedEvent.id);
-            // Actualizar el evento seleccionado
-            const updatedEvent = events.find(e => e.id === selectedEvent.id);
+          onJoin={async () => {
+            await handleJoinEvent(selectedEvent.id);
+            // Recargar eventos y actualizar el evento seleccionado
+            const updatedEvents = await getEvents();
+            setEvents(updatedEvents);
+            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
             if (updatedEvent) {
               setSelectedEvent(updatedEvent);
             }
           }}
-          onLeave={() => {
-            handleLeaveEvent(selectedEvent.id);
-            // Actualizar el evento seleccionado
-            const updatedEvent = events.find(e => e.id === selectedEvent.id);
-            if (updatedEvent) {
-              setSelectedEvent(updatedEvent);
-            }
+          onLeave={async () => {
+            await handleLeaveEvent(selectedEvent.id);
           }}
         />
       )}

@@ -5,7 +5,20 @@ import "./EventModal.css";
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
   if (!isOpen || !event) return null;
 
-  const start = new Date(event.startDate).toLocaleString();
+  // Formatear fecha de manera segura
+  let start = "Fecha no disponible";
+  if (event.startDate) {
+    const date = new Date(event.startDate);
+    if (!isNaN(date.getTime())) {
+      start = date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
 
@@ -118,9 +131,22 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           )}
 
           {isEnrolled && (
-            <button className="btn btn-outline btn-large" onClick={onLeave}>
-              Desapuntarse del Evento
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+              <div style={{ 
+                padding: '12px 16px', 
+                backgroundColor: '#e8f5e9', 
+                color: '#2e7d32', 
+                borderRadius: '6px', 
+                fontSize: '15px',
+                textAlign: 'center',
+                fontWeight: '500'
+              }}>
+                ✓ Ya estás apuntado a este evento
+              </div>
+              <button className="btn btn-primary btn-large" onClick={onLeave}>
+                Desapuntarse del Evento
+              </button>
+            </div>
           )}
         </div>
       </div>

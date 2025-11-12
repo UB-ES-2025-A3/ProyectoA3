@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EventoRepository extends JpaRepository<Evento, Long> {
   
@@ -14,4 +15,8 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
 
   // No necesita @Query
   List<Evento> findByIdCreadorOrderByFechaAscHoraAsc(Long idCreador);
+
+  // Cargar evento con participantes para operaciones de agregar/remover
+  @Query("SELECT e FROM Evento e LEFT JOIN FETCH e.participantes WHERE e.id = :id")
+  Optional<Evento> findByIdWithParticipantes(@Param("id") Long id);
 }
