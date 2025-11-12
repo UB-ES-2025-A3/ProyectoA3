@@ -9,6 +9,7 @@ export default function EventCard({
   onJoin,
   onLeave,
   onClick,
+  isJoining = false,
 }) {
   // Formatear fecha de manera segura
   let start = "Fecha no disponible";
@@ -64,10 +65,10 @@ export default function EventCard({
                   e.stopPropagation();
                   onJoin();
                 }}
-                disabled={isFull}
-                aria-disabled={isFull}
+                disabled={isFull || isJoining}
+                aria-disabled={isFull || isJoining}
               >
-                {isFull ? "Completo" : "Apuntarse"}
+                {isFull ? "Completo" : isJoining ? "Apuntando..." : "Apuntarse"}
               </button>
             )}
 

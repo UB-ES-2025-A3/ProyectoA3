@@ -32,6 +32,7 @@ export default function HomePage() {
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
   const [availableTags, setAvailableTags] = useState([]);
+  const [joiningEventId, setJoiningEventId] = useState(null);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -229,6 +230,7 @@ export default function HomePage() {
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
+      setJoiningEventId(eventId);
       // Primero recargar eventos para tener el estado más actualizado
       const currentEvents = await getEvents();
       const event = currentEvents.find(e => e.id === eventId);
@@ -287,6 +289,9 @@ export default function HomePage() {
         setBanner({ type: "error", message: errorMessage || "Error al apuntarse al evento." });
       }
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
+    finally {
+      setJoiningEventId(null);
     }
   };
 
@@ -689,6 +694,7 @@ export default function HomePage() {
                       event={event}
                       isEnrolled={isEnrolled}
                       isFull={isFull}
+                      isJoining={joiningEventId === event.id}
                       onJoin={() => handleJoinEvent(event.id)}
                       onLeave={() => handleLeaveEvent(event.id)}
                       onClick={() => handleEventClick(event)}
