@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
@@ -150,9 +150,6 @@ export default function ProfilePage() {
             <div className="profile-avatar">
               {userData.nombre.charAt(0).toUpperCase()}
             </div>
-            <button className="avatar-edit-btn" title="Cambiar foto">
-              <FaEdit />
-            </button>
           </div>
           <div className="profile-header-info">
             <h1>{fullName}</h1>

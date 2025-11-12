@@ -143,7 +143,7 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
               }}>
                 ✓ Ya estás apuntado a este evento
               </div>
-              <button className="btn btn-outline btn-large" onClick={onLeave}>
+              <button className="btn btn-primary btn-large" onClick={onLeave}>
                 Desapuntarse del Evento
               </button>
             </div>

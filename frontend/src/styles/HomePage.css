@@ -284,6 +284,59 @@
     font-size: 0.9rem;
 }
 
+/* Dropdown de Tags */
+.tags-dropdown {
+    min-width: 220px;
+}
+
+.tags-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.tag-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    color: var(--text-color);
+}
+
+.tag-option input[type="checkbox"] {
+    margin: 0;
+    accent-color: var(--primary-color);
+}
+
+.tags-clear-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tags-clear-btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.filter-empty {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
 /* Inputs Numéricos */
 .age-input-section,
 .capacity-input-section {

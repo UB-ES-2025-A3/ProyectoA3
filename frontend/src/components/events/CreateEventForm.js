@@ -48,6 +48,13 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
 
     if (!formData.fecha) {
       newErrors.fecha = 'La fecha es requerida';
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(formData.fecha);
+      if (selectedDate < today) {
+        newErrors.fecha = 'La fecha no puede ser anterior a hoy';
+      }
     }
 
     if (!formData.hora) {
@@ -129,6 +136,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
   };
 
   if (!isOpen) return null;
+
+  const minDate = new Date().toISOString().split('T')[0];
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
@@ -223,6 +232,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 onChange={handleChange}
                 className={errors.fecha ? 'error' : ''}
                 disabled={loading}
+                min={minDate}
               />
               {errors.fecha && <span className="error-message">{errors.fecha}</span>}
             </div>
