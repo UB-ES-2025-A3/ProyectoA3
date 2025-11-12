@@ -25,11 +25,13 @@ export default function HomePage() {
     location: "",
     language: "",
     minAge: "",
-    maxPersons: ""
+    maxPersons: "",
+    tags: []
   });
 
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
+  const [availableTags, setAvailableTags] = useState([]);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -67,6 +69,15 @@ export default function HomePage() {
       // Filtro por idioma
       if (filters.language) {
         if (!event.languages || !event.languages.includes(filters.language)) {
+          return false;
+        }
+      }
+
+      // Filtro por tags
+      if (filters.tags && filters.tags.length > 0) {
+        const eventTags = Array.isArray(event.tags) ? event.tags : [];
+        const matchesTag = eventTags.some(tag => filters.tags.includes(tag));
+        if (!matchesTag) {
           return false;
         }
       }
@@ -112,6 +123,21 @@ export default function HomePage() {
     })();
   }, []);
 
+  // Calcular tags disponibles según los eventos cargados
+  useEffect(() => {
+    const tagsSet = new Set();
+    events.forEach(event => {
+      if (Array.isArray(event.tags)) {
+        event.tags.forEach(tag => {
+          if (tag && typeof tag === "string") {
+            tagsSet.add(tag);
+          }
+        });
+      }
+    });
+    setAvailableTags(Array.from(tagsSet).sort((a, b) => a.localeCompare(b)));
+  }, [events]);
+
   // Aplicar filtros cuando cambien eventos o filtros
   useEffect(() => {
     applyFilters();
@@ -143,6 +169,21 @@ export default function HomePage() {
   // Función para abrir/cerrar filtros desplegables
   const toggleFilter = (filterType) => {
     setOpenFilter(openFilter === filterType ? null : filterType);
+  };
+
+  const handleTagToggle = (tagValue) => {
+    setFilters(prev => {
+      const currentTags = prev.tags || [];
+      const exists = currentTags.includes(tagValue);
+      const updatedTags = exists
+        ? currentTags.filter(tag => tag !== tagValue)
+        : [...currentTags, tagValue];
+
+      return {
+        ...prev,
+        tags: updatedTags
+      };
+    });
   };
 
   // Función para abrir el modal
@@ -563,10 +604,57 @@ export default function HomePage() {
                     </div>
                   )}
                 </div>
+
+                <div className="filter-dropdown">
+                  <button 
+                    className={`filter-icon-btn ${filters.tags && filters.tags.length ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFilter('tags');
+                    }}
+                    title="Filtrar por etiquetas"
+                  >
+                    <FaFeatherAlt />
+                    <span>Tags</span>
+                  </button>
+
+                  {openFilter === 'tags' && (
+                    <div className="filter-dropdown-content tags-dropdown">
+                      <div className="filter-options">
+                        {availableTags.length === 0 ? (
+                          <p className="filter-empty">No hay etiquetas disponibles todavía.</p>
+                        ) : (
+                          <div className="tags-list">
+                            {availableTags.map(tag => (
+                              <label key={tag} className="tag-option">
+                                <input
+                                  type="checkbox"
+                                  value={tag}
+                                  checked={filters.tags?.includes(tag) || false}
+                                  onChange={() => handleTagToggle(tag)}
+                                />
+                                <span>{tag}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        {filters.tags && filters.tags.length > 0 && (
+                          <button
+                            type="button"
+                            className="tags-clear-btn"
+                            onClick={() => handleFilterChange('tags', [])}
+                          >
+                            Limpiar tags
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               
               {/* Botón para limpiar filtros */}
-              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons) && (
+              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons || (filters.tags && filters.tags.length > 0)) && (
                 <button 
                   className="clear-filters-btn"
                   onClick={() => setFilters({
@@ -574,7 +662,8 @@ export default function HomePage() {
                     location: "",
                     language: "",
                     minAge: "",
-                    maxPersons: ""
+                    maxPersons: "",
+                    tags: []
                   })}
                 >
                   Limpiar filtros
@@ -617,7 +706,8 @@ export default function HomePage() {
                     location: "",
                     language: "",
                     minAge: "",
-                    maxPersons: ""
+                    maxPersons: "",
+                    tags: []
                   })}
                 >
                   Limpiar filtros
