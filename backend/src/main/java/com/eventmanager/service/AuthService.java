@@ -33,8 +33,16 @@ public class AuthService {
   public AuthResponse login(LoginRequest req) {
     Optional<Cliente> oc = repo.findByUsernameIgnoreCase(req.usernameOrEmail())
         .or(() -> repo.findByCorreoIgnoreCase(req.usernameOrEmail()));
-    Cliente c = oc.orElseThrow(() -> new ValidationException("Credenciales inválidas."));
-    if (!enc.matches(req.password(), c.getPasswordHash())) throw new ValidationException("Credenciales inválidas.");
+    
+    if (oc.isEmpty()) {
+      throw new ValidationException("Usuario o correo no encontrado. Verifica tus credenciales.");
+    }
+    
+    Cliente c = oc.get();
+    if (!enc.matches(req.password(), c.getPasswordHash())) {
+      throw new ValidationException("Contraseña incorrecta. Inténtalo de nuevo.");
+    }
+    
     return new AuthResponse("token-" + c.getId(), c.getId(), c.getUsername());
   }
 }

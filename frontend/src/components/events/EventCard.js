@@ -9,8 +9,23 @@ export default function EventCard({
   onJoin,
   onLeave,
   onClick,
+  isJoining = false,
 }) {
-  const start = new Date(event.startDate).toLocaleString();
+  // Formatear fecha de manera segura
+  let start = "Fecha no disponible";
+  if (event.startDate) {
+    const date = new Date(event.startDate);
+    if (!isNaN(date.getTime())) {
+      start = date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
+  console.log("particiapntes:", event.participants)
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
 
@@ -50,23 +65,38 @@ export default function EventCard({
                   e.stopPropagation();
                   onJoin();
                 }}
-                disabled={isFull}
-                aria-disabled={isFull}
+                disabled={isFull || isJoining}
+                aria-disabled={isFull || isJoining}
               >
-                {isFull ? "Completo" : "Apuntarse"}
+                {isFull ? "Completo" : isJoining ? "Apuntando..." : "Apuntarse"}
               </button>
             )}
 
             {isEnrolled && (
-              <button 
-                className="btn btn-outline" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLeave();
-                }}
-              >
-                Desapuntarse
-              </button>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+                <p style={{ 
+                  margin: 0, 
+                  padding: '8px 12px', 
+                  backgroundColor: '#e8f5e9', 
+                  color: '#2e7d32', 
+                  borderRadius: '4px', 
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  fontWeight: '500'
+                }}>
+                  ✓ Ya estás apuntado a este evento
+                </p>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLeave();
+                  }}
+                >
+                  Desapuntarse
+                </button>
+              </div>
             )}
           </footer>
         </div>

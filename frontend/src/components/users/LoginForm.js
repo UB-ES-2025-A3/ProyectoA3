@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import authService from '../../services/authService';
 import './LoginForm.css';
+import { Link } from 'react-router-dom';
 
 const LoginForm = ({ onSuccess, onError }) => {
   const [formData, setFormData] = useState({
@@ -63,12 +64,14 @@ const LoginForm = ({ onSuccess, onError }) => {
       if (result.success) {
         onSuccess && onSuccess(result.data);
       } else {
-        setLoginError(result.error || 'Usuario/correo o contraseña incorrectos');
+        // Usar el mensaje de error específico del servidor
+        setLoginError(result.error);
         onError && onError(result.error);
       }
     } catch (error) {
-      setLoginError('Error inesperado al iniciar sesión. Por favor, intenta de nuevo.');
-      onError && onError('Error inesperado al iniciar sesión');
+      const errorMsg = 'Error inesperado al iniciar sesión. Por favor, intenta de nuevo.';
+      setLoginError(errorMsg);
+      onError && onError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +139,7 @@ const LoginForm = ({ onSuccess, onError }) => {
         </form>
 
         <div className="form-footer">
-          <p>¿No tienes una cuenta? <a href="/register">Regístrate aquí</a></p>
+          <p>¿No tienes una cuenta? <Link to="/register">Registrate aqui</Link></p>
         </div>
       </div>
     </div>

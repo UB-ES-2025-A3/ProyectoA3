@@ -1,0 +1,64 @@
+name: Backend • Build & Deploy to Render
+
+on:
+  push:
+    branches: [ pre_prod, main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    # ← Filtra por rama sin usar matrix
+    if: ${{ github.ref == 'refs/heads/pre_prod' || github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - envname: preprod
+            branch: refs/heads/pre_prod
+          - envname: prod
+            branch: refs/heads/main
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        if: ${{ github.ref == matrix.branch }}
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        if: ${{ github.ref == matrix.branch }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests (perfil test)
+        if: ${{ github.ref == matrix.branch }}
+        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
+
+      - name: Build JAR
+        if: ${{ github.ref == matrix.branch }}
+        run: mvn -q -DskipTests package
+
+      - name: Diagnose secrets availability (temporary)
+        if: ${{ github.ref == matrix.branch }}
+        run: |
+          echo "Matrix envname: ${{ matrix.envname }}"
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then echo "preprod secret: EMPTY"; else echo "preprod secret: PRESENT"; fi
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL_PROD }}" ]; then echo "prod secret: EMPTY"; else echo "prod secret: PRESENT"; fi
+
+      - name: Trigger Render Deploy Hook
+        if: ${{ github.ref == matrix.branch }}
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ matrix.envname == 'preprod' && secrets.RENDER_DEPLOY_HOOK_URL || secrets.RENDER_DEPLOY_HOOK_URL_PROD }}
+        run: |
+          echo "Triggering Render deploy for '${{ matrix.envname }}'..."
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "ERROR: RENDER_DEPLOY_HOOK_URL está vacío. Revisa que el secreto exista y sea accesible en este workflow."
+            exit 1
+          fi
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
