@@ -279,7 +279,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Bio Section */}
+          {/* Bio Section oculto temporalmente
           <div className="profile-section">
             <h2 className="section-title">Sobre Mí</h2>
             <div className="bio-section">
@@ -296,6 +296,7 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+          */}
 
           {/* Languages Section */}
           {userData.languages && userData.languages.length > 0 && (
