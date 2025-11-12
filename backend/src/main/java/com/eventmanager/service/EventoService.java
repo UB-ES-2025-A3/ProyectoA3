@@ -1,5 +1,6 @@
 package com.eventmanager.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -16,6 +17,7 @@ import com.eventmanager.service.errors.DatabaseSchemaMismatchException;
 import com.eventmanager.service.errors.SqlErrorDetails;
 
 import jakarta.persistence.PersistenceException;
+import jakarta.validation.ValidationException;
 
 @Service
 public class EventoService {
@@ -71,6 +73,12 @@ public class EventoService {
 
   public EventoView crear(EventoCreate req) {
     try {
+      if (req.fecha() == null) {
+        throw new ValidationException("La fecha del evento es obligatoria");
+      }
+      if (req.fecha().isBefore(LocalDate.now())) {
+        throw new ValidationException("La fecha del evento no puede ser anterior a hoy");
+      }
       var e = new Evento();
       e.setFecha(req.fecha());
       e.setHora(req.hora());          
