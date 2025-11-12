@@ -88,7 +88,7 @@ export default function EventCard({
                   ✓ Ya estás apuntado a este evento
                 </p>
                 <button 
-                  className="btn btn-outline" 
+                  className="btn btn-primary" 
                   onClick={(e) => {
                     e.stopPropagation();
                     onLeave();

@@ -72,7 +72,7 @@ public class EventoServiceIntegrationTest {
   void guardarYListar_eventoEnBaseDeDatos() {
     // Creamos el DTO de entrada (match con el JSON real)
     var req = new EventoCreate(
-        LocalDate.of(2025, 11, 5),
+        LocalDate.of(2027, 11, 5),
         LocalTime.of(18, 0, 0),
         "Sevilla",
         new RestriccionesCreate("es,en", 18, 50),
@@ -109,7 +109,7 @@ public class EventoServiceIntegrationTest {
   @Test
   void borrar_eventoEnBaseDeDatos() {
     var req = new EventoCreate(
-        LocalDate.of(2025, 11, 6),
+        LocalDate.of(2027, 11, 6),
         LocalTime.of(20, 0, 0),
         "Granada",
         new RestriccionesCreate("es,en", 16, 30),
@@ -145,7 +145,7 @@ public class EventoServiceIntegrationTest {
 
     //Crear evento
     var req = new EventoCreate(
-        LocalDate.of(2025, 12, 1),
+        LocalDate.of(2027, 12, 1),
         LocalTime.of(19, 0, 0),
         "Madrid",
         new RestriccionesCreate("es", 21, 100),
