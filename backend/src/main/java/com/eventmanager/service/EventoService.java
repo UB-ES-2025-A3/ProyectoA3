@@ -184,7 +184,7 @@ public class EventoService {
 
       // Calcular edad del usuario
       int edadUsuario = calcularEdad(cliente.getFechaNacimiento());
-      String idiomaUsuario = cliente.getIdioma();
+      List<String> idiomaUsuario = cliente.getIdioma();
 
       // Obtener todos los eventos y filtrar
       List<Evento> todosEventos = repo.findAll();
@@ -233,7 +233,7 @@ public class EventoService {
   /**
    * Verifica si un evento cumple con las restricciones del usuario
    */
-  private boolean cumpleRestricciones(Evento evento, int edadUsuario, String idiomaUsuario) {
+  private boolean cumpleRestricciones(Evento evento, int edadUsuario, List<String> idiomaUsuario) {
     Restricciones restricciones = evento.getRestricciones();
     
     // Si no tiene restricciones en absoluto, el usuario puede unirse
@@ -249,35 +249,30 @@ public class EventoService {
     }
 
     // Verificar restricción de idiomas
-    String idiomasPermitidosStr = restricciones.getIdiomas_permitidos();
+    List<String> idiomasPermitidos = restricciones.getIdiomas_permitidos();
     
     // Si el evento tiene restricción de idiomas especificada (no null y no vacío/blank)
-    if (idiomasPermitidosStr != null && !idiomasPermitidosStr.trim().isEmpty()) {
+    if (idiomasPermitidos != null && !idiomasPermitidos.isEmpty()) {
       // Parsear idiomas (pueden venir como "it" o "es,en,fr")
-      List<String> idiomasLista = Arrays.stream(idiomasPermitidosStr.split(","))
-          .map(String::trim)
+      List<String> idiomasLista = idiomasPermitidos.stream()
+          .filter(s -> s != null && !s.trim().isEmpty()) // Filtrar strings vacíos después del trim
           .map(String::toLowerCase)
-          .filter(s -> !s.isEmpty()) // Filtrar strings vacíos después del trim
           .collect(Collectors.toList());
       
-      // Si no hay idiomas válidos después del parseo, tratar como sin restricción
-      if (idiomasLista.isEmpty()) {
-        // No hay restricción de idioma válida, permitir
-        return verificarCapacidad(restricciones, evento);
-      }
-      
-      // Si el usuario no tiene idioma, no puede unirse a eventos con restricción de idioma
-      if (idiomaUsuario == null || idiomaUsuario.isBlank()) {
-        return false;
-      }
-      
-      // Verificar que el idioma del usuario esté en la lista
-      String idiomaUsuarioLower = idiomaUsuario.trim().toLowerCase();
-      if (!idiomasLista.contains(idiomaUsuarioLower)) {
-        return false; // El idioma del usuario no está permitido
+
+      if(!idiomasLista.isEmpty()){
+        if(idiomaUsuario == null || idiomaUsuario.isEmpty()){
+          return false; // El usuario no tiene idiomas, pero el evento requiere alguno
+        }
+        boolean coincide = idiomaUsuario.stream()
+            .filter(s-> s != null && !s.trim().isEmpty())
+            .map(String::toLowerCase)
+            .anyMatch(idiomasLista::contains);
+        if(!coincide){
+          return false;
+        }
       }
     }
-    // Si el evento NO tiene restricción de idiomas (null o vacío), se permite (no hay restricción)
     
     return verificarCapacidad(restricciones, evento);
   }
