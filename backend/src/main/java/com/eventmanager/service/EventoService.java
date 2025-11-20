@@ -2,6 +2,7 @@ package com.eventmanager.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.time.Period;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -40,28 +41,27 @@ public class EventoService {
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
     }
   }
-
-/*  public List<EventoView> listarEventosSinRestricciones(Long userId) {
-    try {
+  public List<EventoView> listarEventosSinRestricciones(Long userId) {
+     try {
       var usuario = clienteRepo.findById(userId)
               .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
-
-      // var eventos = repo.findEventosPermitidos(userId, usuario.getIdioma());
-
-      System.err.println("❌ ERROR: He llegado aquí, va bien");
-      return List.of();
+      int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
 
 
-//      return eventos.stream()
-  //            .map(this::toView)
-    //          .toList();
+      var eventos = repo.findEventosPermitidos(userId, usuario.getIdioma(), edadUsuario);
 
-    } catch (DataAccessException | PersistenceException ex) {
-      var det = SqlErrorDetails.from(ex);
-      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
-    }
+      System.err.println("❌ NICE: He llegado aquí, va bien");
+
+      return eventos.stream()
+            .map(this::toView)
+            .toList();
+
+     } catch (DataAccessException | PersistenceException ex) {
+       var det = SqlErrorDetails.from(ex);
+       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+     }
   }
- */
+
 
   public List<EventoView> listarMisEventos(Long clienteId) {
     try {
@@ -144,7 +144,7 @@ public class EventoService {
 
   private EventoView toView(Evento e) {
     var r = e.getRestricciones();
-    System.err.printf("Participantes: ", e.getParticipantes().stream().map(p -> p.getId()).toList());
+
     return new EventoView(
       e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
       r != null ? r.getIdiomas_permitidos() : null,

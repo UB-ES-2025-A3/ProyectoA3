@@ -28,20 +28,16 @@ public class EventoController {
   }
 
 
-  @GetMapping("/unrestricted-events")
-  public String eventosSinRestricciones() { return "endpoint-unrestricted-event-ok"; }
-
-
-/*
-@GetMapping("/unrestricted-events")
-  public ResponseEntity<List<EventoView>> eventosSinRestricciones(@RequestParam Long userId) {
+  @GetMapping("/compatible")
+  public ResponseEntity<List<EventoView>> eventosSinRestricciones(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
     return ResponseEntity.ok(service.listarEventosSinRestricciones(userId));
-      }
-*/
+  }
 
   @GetMapping("/my-events")
   public ResponseEntity<List<EventoView>> misEventos(@RequestHeader("Authorization") String authHeader) {
     Long userId = extractUserIdFromToken(authHeader);
+    System.err.println("❌ ERROR: He llegado endpoint, va bien");
     return ResponseEntity.ok(service.listarMisEventos(userId));
   }
 
@@ -50,7 +46,6 @@ public class EventoController {
     Long userId = extractUserIdFromToken(authHeader);
     return ResponseEntity.ok(service.listarMisEventosCreados(userId));
   }
-  
 
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }
