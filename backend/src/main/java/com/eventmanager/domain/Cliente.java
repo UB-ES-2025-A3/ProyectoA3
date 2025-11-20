@@ -16,6 +16,8 @@ public class Cliente {
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
   private String idioma;
+  @Column(columnDefinition = "TEXT")
+  private String descripcion;
   @NotBlank private String passwordHash;
 
   public Cliente() {}
@@ -43,6 +45,9 @@ public class Cliente {
 
   public String getIdioma() { return idioma; }
   public void setIdioma(String idioma) { this.idioma = idioma; }
+
+  public String getDescripcion() { return descripcion; }
+  public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }

@@ -11,6 +11,7 @@ public class ClienteDtos {
     String correo,
     LocalDate fechaNacimiento,
     String ciudad,
-    String idioma
+    String idioma,
+    String descripcion
   ) {}
 }

@@ -10,8 +10,7 @@ public class ClienteUpdateDto {
     private LocalDate fechaNacimiento;
     private String ciudad;
     private String idioma;
-    // campos opcionales que el frontend puede enviar y que ignoraremos si no existen en la entidad
-    private String bio;
+    private String descripcion;
     // getters / setters
 
     public String getNombre() { return nombre; }
@@ -28,6 +27,6 @@ public class ClienteUpdateDto {
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
     public String getIdioma() { return idioma; }
     public void setIdioma(String idioma) { this.idioma = idioma; }
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }
