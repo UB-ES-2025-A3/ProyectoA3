@@ -9,7 +9,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     etiquetas: '',
     fecha: '',
     hora: '',
-    idioma: '',
+    idioma: [],
     plazasDisponibles: '',
     lugar: '',
     descripcion: ''
@@ -111,7 +111,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         titulo: '',
         etiquetas: '',
         fecha: '',
-        idioma: '',
+        idioma: [],
         plazasDisponibles: '',
         lugar: '',
         descripcion: ''
@@ -258,7 +258,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 id="idioma"
                 name="idioma"
                 value={formData.idioma}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, idioma: [e.target.value] })); // <-- convertir a array
+                }}
                 className={errors.idioma ? 'error' : ''}
                 disabled={loading}
               >
