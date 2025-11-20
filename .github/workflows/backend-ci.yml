@@ -25,6 +25,4 @@ jobs:
           cache: maven
 
       - name: Run tests (perfil test)
-        run: mvn clean install -Dspring.profiles.active=test
-
-
+        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
