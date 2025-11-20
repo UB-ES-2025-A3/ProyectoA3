@@ -51,9 +51,9 @@ public class Cliente {
   public String getCiudad() { return ciudad; }
   public void setCiudad(String ciudad) { this.ciudad = ciudad; }
 
-  public List<String> getIdioma() { return idioma; }
-  public void setIdioma(List<String> idioma) { this.idioma = idioma; }
-  public void addIdioma(String idioma){this.idioma.add(idioma);}
+  public List<String> getIdiomas() { return idioma; }
+  public void setIdiomas(List<String> idiomas) { this.idioma = idiomas; }
+  public void addIdiomas(String idioma){this.idioma.add(idioma);}
 
   public String getDescripcion() { return descripcion; }
   public void setDescripcion(String descripcion) { this.descripcion = descripcion; }

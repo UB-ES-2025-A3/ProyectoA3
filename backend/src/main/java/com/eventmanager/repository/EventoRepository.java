@@ -21,16 +21,22 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
             e.restricciones->>'edad_minima' IS NULL
             OR (e.restricciones->>'edad_minima')::int <= :edad
         )
-        AND (
-            e.restricciones->>'idiomas_permitidos' IS NULL
-            OR e.restricciones->>'idiomas_permitidos' = :idioma
-        )
         
+        AND (
+            e.restricciones->'idiomas_permitidos' IS NULL
+            OR EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements_text(e.restricciones->'idiomas_permitidos') elem
+                WHERE elem = ANY(:idiomas)
+            )
+        )
+
         AND (
             e.restricciones->>'max_personas' IS NULL
             OR (
                 (
-                    SELECT COUNT(*) FROM evento_cliente ec 
+                    SELECT COUNT(*)
+                    FROM evento_cliente ec
                     WHERE ec.evento_id = e.id
                 ) < (e.restricciones->>'max_personas')::int
             )
@@ -43,7 +49,7 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
 """, nativeQuery = true)
   List<Evento> findEventosPermitidos(
           @Param("userId") Long userId,
-          @Param("idioma") String idioma,
+          @Param("idiomas") String[] idiomas,
           @Param("edad") Integer edad
   );
 

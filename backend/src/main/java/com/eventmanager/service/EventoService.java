@@ -47,10 +47,10 @@ public class EventoService {
               .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
       int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
 
+      List<String> idiomasList = usuario.getIdiomas();
+      String[] idiomasArray = idiomasList.toArray(new String[0]);
 
-      var eventos = repo.findEventosPermitidos(userId, usuario.getIdioma(), edadUsuario);
-
-      System.err.println("❌ NICE: He llegado aquí, va bien");
+      var eventos = repo.findEventosPermitidos(userId, idiomasArray, edadUsuario);
 
       return eventos.stream()
             .map(this::toView)
@@ -112,7 +112,7 @@ public class EventoService {
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
-          req.restricciones().idiomaRequerido(),
+          req.restricciones().idiomasRequerido(),
           req.restricciones().edad_minima(),
           req.restricciones().plazasDisponibles()
         ));

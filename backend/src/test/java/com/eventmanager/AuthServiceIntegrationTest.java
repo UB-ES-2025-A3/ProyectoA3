@@ -75,7 +75,7 @@ public class AuthServiceIntegrationTest {
         c.setCorreo("luis@ex.com");
         c.setFechaNacimiento(LocalDate.of(1990, 1, 1));
         c.setCiudad("Madrid");
-        c.setIdioma(idiomas);
+        c.setIdiomas(idiomas);
         c.setPasswordHash(new BCryptPasswordEncoder().encode("Secreto!1"));
         clienteRepository.save(c);
 

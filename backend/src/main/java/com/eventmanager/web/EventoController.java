@@ -37,7 +37,6 @@ public class EventoController {
   @GetMapping("/my-events")
   public ResponseEntity<List<EventoView>> misEventos(@RequestHeader("Authorization") String authHeader) {
     Long userId = extractUserIdFromToken(authHeader);
-    System.err.println("❌ ERROR: He llegado endpoint, va bien");
     return ResponseEntity.ok(service.listarMisEventos(userId));
   }
 
