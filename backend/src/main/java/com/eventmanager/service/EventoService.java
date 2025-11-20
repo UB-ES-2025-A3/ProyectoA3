@@ -41,6 +41,28 @@ public class EventoService {
     }
   }
 
+/*  public List<EventoView> listarEventosSinRestricciones(Long userId) {
+    try {
+      var usuario = clienteRepo.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
+
+      // var eventos = repo.findEventosPermitidos(userId, usuario.getIdioma());
+
+      System.err.println("❌ ERROR: He llegado aquí, va bien");
+      return List.of();
+
+
+//      return eventos.stream()
+  //            .map(this::toView)
+    //          .toList();
+
+    } catch (DataAccessException | PersistenceException ex) {
+      var det = SqlErrorDetails.from(ex);
+      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+    }
+  }
+ */
+
   public List<EventoView> listarMisEventos(Long clienteId) {
     try {
       return repo.findEventosByParticipanteId(clienteId)

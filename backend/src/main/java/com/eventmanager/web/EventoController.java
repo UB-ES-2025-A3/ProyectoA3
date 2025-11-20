@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanager.dto.EventoDtos.EventoAdd;
@@ -26,6 +27,18 @@ public class EventoController {
     return ResponseEntity.ok(service.listar());
   }
 
+
+  @GetMapping("/unrestricted-events")
+  public String eventosSinRestricciones() { return "endpoint-unrestricted-event-ok"; }
+
+
+/*
+@GetMapping("/unrestricted-events")
+  public ResponseEntity<List<EventoView>> eventosSinRestricciones(@RequestParam Long userId) {
+    return ResponseEntity.ok(service.listarEventosSinRestricciones(userId));
+      }
+*/
+
   @GetMapping("/my-events")
   public ResponseEntity<List<EventoView>> misEventos(@RequestHeader("Authorization") String authHeader) {
     Long userId = extractUserIdFromToken(authHeader);
@@ -37,14 +50,6 @@ public class EventoController {
     Long userId = extractUserIdFromToken(authHeader);
     return ResponseEntity.ok(service.listarMisEventosCreados(userId));
   }
-
-  /*
-  @PostMapping
-  public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
-    var created = service.crear(req);
-    return ResponseEntity.ok(created);
-  }
-  */
   
 
   @GetMapping("/_ping")

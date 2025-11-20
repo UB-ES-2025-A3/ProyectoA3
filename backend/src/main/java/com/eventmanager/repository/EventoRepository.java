@@ -13,6 +13,9 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
   @Query("SELECT e FROM Evento e JOIN e.participantes p WHERE p.id = :clienteId ORDER BY e.fecha ASC, e.hora ASC")
   List<Evento> findEventosByParticipanteId(@Param("clienteId") Long clienteId);
 
+/*  @Query()
+  List<Evento> findEventosPermitidos();*/
+
   // No necesita @Query
   List<Evento> findByIdCreadorOrderByFechaAscHoraAsc(Long idCreador);
 
