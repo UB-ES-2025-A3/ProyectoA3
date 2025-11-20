@@ -38,6 +38,12 @@ public class EventoController {
     return ResponseEntity.ok(service.listarMisEventosCreados(userId));
   }
 
+  @GetMapping("/compatible")
+  public ResponseEntity<List<EventoView>> eventosCompatibleConUsuario(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarEventosCompatibleConUsuario(userId));
+  }
+
   /*
   @PostMapping
   public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
