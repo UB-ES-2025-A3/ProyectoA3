@@ -19,7 +19,7 @@ public class EventoDtos {
   ) {}
 
   public static record RestriccionesCreate(
-      String idiomaRequerido,
+      List<String> idiomaRequerido,
       Integer edad_minima,
       Integer plazasDisponibles
   ) {}
@@ -27,7 +27,7 @@ public class EventoDtos {
   // View (podemos dejarlo plano para compatibilidad)
   public static record EventoView(
       Long id, LocalDate fecha, LocalTime hora, String lugar,
-      String idiomasPermitidos, Integer edadMinima, Integer maxPersonas,
+      List<String> idiomasPermitidos, Integer edadMinima, Integer maxPersonas,
       String titulo, String descripcion, Long idCreador, List<String> tags, List<Long> participantesIds
   ) {}
 
