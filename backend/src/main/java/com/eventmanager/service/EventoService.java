@@ -1,15 +1,12 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.time.Period;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.eventmanager.domain.Cliente;
 import com.eventmanager.domain.Evento;
 import com.eventmanager.domain.Evento.Restricciones;
 import com.eventmanager.dto.EventoDtos.EventoAdd;
@@ -44,6 +41,27 @@ public class EventoService {
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
     }
   }
+  public List<EventoView> listarEventosSinRestricciones(Long userId) {
+     try {
+      var usuario = clienteRepo.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
+      int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
+
+      List<String> idiomasList = usuario.getIdiomas();
+      String[] idiomasArray = idiomasList.toArray(new String[0]);
+
+      var eventos = repo.findEventosPermitidos(userId, idiomasArray, edadUsuario);
+
+      return eventos.stream()
+            .map(this::toView)
+            .toList();
+
+     } catch (DataAccessException | PersistenceException ex) {
+       var det = SqlErrorDetails.from(ex);
+       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+     }
+  }
+
 
   public List<EventoView> listarMisEventos(Long clienteId) {
     try {
@@ -94,7 +112,7 @@ public class EventoService {
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
-          req.restricciones().idiomaRequerido(),
+          req.restricciones().idiomasRequerido(),
           req.restricciones().edad_minima(),
           req.restricciones().plazasDisponibles()
         ));
@@ -126,7 +144,7 @@ public class EventoService {
 
   private EventoView toView(Evento e) {
     var r = e.getRestricciones();
-    //System.err.printf("Participantes: ", e.getParticipantes().stream().map(p -> p.getId()).toList());
+
     return new EventoView(
       e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
       r != null ? r.getIdiomas_permitidos() : null,
@@ -171,126 +189,5 @@ public class EventoService {
     repo.save(evento);
 
     return toView(evento);
-  }
-
-  /**
-   * Lista eventos filtrados según las restricciones que el usuario cumple.
-   * Solo devuelve eventos a los que el usuario se puede unir.
-   */
-  public List<EventoView> listarEventosCompatibleConUsuario(Long clienteId) {
-    try {
-      Cliente cliente = clienteRepo.findById(clienteId)
-          .orElseThrow(() -> new ValidationException("Cliente no encontrado"));
-
-      // Calcular edad del usuario
-      int edadUsuario = calcularEdad(cliente.getFechaNacimiento());
-      List<String> idiomaUsuario = cliente.getIdioma();
-
-      // Obtener todos los eventos y filtrar
-      List<Evento> todosEventos = repo.findAll();
-      
-      System.err.println("[DEBUG] Total eventos en BD: " + todosEventos.size());
-      
-      return todosEventos.stream()
-          .filter(evento -> {
-            boolean cumple = cumpleRestricciones(evento, edadUsuario, idiomaUsuario);
-            if (!cumple) {
-              System.err.println("[DEBUG] Evento " + evento.getId() + " (" + evento.getTitulo() + ") rechazado");
-              if (evento.getRestricciones() != null) {
-                System.err.println("  - idiomas_permitidos: " + evento.getRestricciones().getIdiomas_permitidos());
-              } else {
-                System.err.println("  - restricciones: null");
-              }
-            } else {
-              System.err.println("[DEBUG] Evento " + evento.getId() + " (" + evento.getTitulo() + ") ACEPTADO");
-              if (evento.getRestricciones() != null) {
-                System.err.println("  - idiomas_permitidos: " + evento.getRestricciones().getIdiomas_permitidos());
-              }
-            }
-            return cumple;
-          })
-          .map(this::toView)
-          .collect(Collectors.toList());
-    } catch (DataAccessException ex) {
-      var det = SqlErrorDetails.from(ex);
-      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
-    } catch (PersistenceException ex) {
-      var det = SqlErrorDetails.from(ex);
-      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
-    }
-  }
-
-  /**
-   * Calcula la edad del usuario desde su fecha de nacimiento
-   */
-  private int calcularEdad(LocalDate fechaNacimiento) {
-    if (fechaNacimiento == null) {
-      return 0; // Si no tiene fecha de nacimiento, se considera que no cumple restricciones de edad
-    }
-    return Period.between(fechaNacimiento, LocalDate.now()).getYears();
-  }
-
-  /**
-   * Verifica si un evento cumple con las restricciones del usuario
-   */
-  private boolean cumpleRestricciones(Evento evento, int edadUsuario, List<String> idiomaUsuario) {
-    Restricciones restricciones = evento.getRestricciones();
-    
-    // Si no tiene restricciones en absoluto, el usuario puede unirse
-    if (restricciones == null) {
-      return true;
-    }
-
-    // Verificar restricción de edad
-    if (restricciones.getEdad_minima() != null) {
-      if (edadUsuario < restricciones.getEdad_minima()) {
-        return false; // No cumple la edad mínima
-      }
-    }
-
-    // Verificar restricción de idiomas
-    List<String> idiomasPermitidos = restricciones.getIdiomas_permitidos();
-    
-    // Si el evento tiene restricción de idiomas especificada (no null y no vacío/blank)
-    if (idiomasPermitidos != null && !idiomasPermitidos.isEmpty()) {
-      // Parsear idiomas (pueden venir como "it" o "es,en,fr")
-      List<String> idiomasLista = idiomasPermitidos.stream()
-          .filter(s -> s != null && !s.trim().isEmpty()) // Filtrar strings vacíos después del trim
-          .map(String::toLowerCase)
-          .collect(Collectors.toList());
-      
-
-      if(!idiomasLista.isEmpty()){
-        if(idiomaUsuario == null || idiomaUsuario.isEmpty()){
-          return false; // El usuario no tiene idiomas, pero el evento requiere alguno
-        }
-        boolean coincide = idiomaUsuario.stream()
-            .filter(s-> s != null && !s.trim().isEmpty())
-            .map(String::toLowerCase)
-            .anyMatch(idiomasLista::contains);
-        if(!coincide){
-          return false;
-        }
-      }
-    }
-    
-    return verificarCapacidad(restricciones, evento);
-  }
-  
-  /**
-   * Verifica si el evento tiene capacidad disponible
-   */
-  private boolean verificarCapacidad(Restricciones restricciones, Evento evento) {
-
-    // Verificar restricción de capacidad
-    if (restricciones.getMax_personas() != null) {
-      int participantesActuales = evento.getParticipantes().size();
-      if (participantesActuales >= restricciones.getMax_personas()) {
-        return false; // El evento está lleno
-      }
-    }
-
-    // Si pasa todas las restricciones, el usuario puede unirse
-    return true;
   }
 }

@@ -13,6 +13,46 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
   @Query("SELECT e FROM Evento e JOIN e.participantes p WHERE p.id = :clienteId ORDER BY e.fecha ASC, e.hora ASC")
   List<Evento> findEventosByParticipanteId(@Param("clienteId") Long clienteId);
 
+  @Query(value = """
+    SELECT e.*
+    FROM evento e
+    WHERE
+        (
+            e.restricciones->>'edad_minima' IS NULL
+            OR (e.restricciones->>'edad_minima')::int <= :edad
+        )
+        
+        AND (
+            e.restricciones->'idiomas_permitidos' IS NULL
+            OR EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements_text(e.restricciones->'idiomas_permitidos') elem
+                WHERE elem = ANY(:idiomas)
+            )
+        )
+
+        AND (
+            e.restricciones->>'max_personas' IS NULL
+            OR (
+                (
+                    SELECT COUNT(*)
+                    FROM evento_cliente ec
+                    WHERE ec.evento_id = e.id
+                ) < (e.restricciones->>'max_personas')::int
+            )
+            OR EXISTS (
+                SELECT 1 FROM evento_cliente ec2
+                WHERE ec2.evento_id = e.id AND ec2.cliente_id = :userId
+            )
+        )
+    ORDER BY e.fecha ASC, e.hora ASC
+""", nativeQuery = true)
+  List<Evento> findEventosPermitidos(
+          @Param("userId") Long userId,
+          @Param("idiomas") String[] idiomas,
+          @Param("edad") Integer edad
+  );
+
   // No necesita @Query
   List<Evento> findByIdCreadorOrderByFechaAscHoraAsc(Long idCreador);
 

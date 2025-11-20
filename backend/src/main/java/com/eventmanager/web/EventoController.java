@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanager.dto.EventoDtos.EventoAdd;
@@ -26,6 +27,13 @@ public class EventoController {
     return ResponseEntity.ok(service.listar());
   }
 
+
+  @GetMapping("/compatible")
+  public ResponseEntity<List<EventoView>> eventosSinRestricciones(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarEventosSinRestricciones(userId));
+  }
+
   @GetMapping("/my-events")
   public ResponseEntity<List<EventoView>> misEventos(@RequestHeader("Authorization") String authHeader) {
     Long userId = extractUserIdFromToken(authHeader);
@@ -37,21 +45,6 @@ public class EventoController {
     Long userId = extractUserIdFromToken(authHeader);
     return ResponseEntity.ok(service.listarMisEventosCreados(userId));
   }
-
-  @GetMapping("/compatible")
-  public ResponseEntity<List<EventoView>> eventosCompatibleConUsuario(@RequestHeader("Authorization") String authHeader) {
-    Long userId = extractUserIdFromToken(authHeader);
-    return ResponseEntity.ok(service.listarEventosCompatibleConUsuario(userId));
-  }
-
-  /*
-  @PostMapping
-  public ResponseEntity<EventoView> crear(@RequestBody EventoCreate req) {
-    var created = service.crear(req);
-    return ResponseEntity.ok(created);
-  }
-  */
-  
 
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }

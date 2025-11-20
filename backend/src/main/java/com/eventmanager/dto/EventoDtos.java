@@ -19,7 +19,7 @@ public class EventoDtos {
   ) {}
 
   public static record RestriccionesCreate(
-      List<String> idiomaRequerido,
+      List<String> idiomasRequerido,
       Integer edad_minima,
       Integer plazasDisponibles
   ) {}
