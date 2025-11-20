@@ -63,7 +63,11 @@ public class ClienteService {
     if (req.getFechaNacimiento() != null) c.setFechaNacimiento(req.getFechaNacimiento());
     if (req.getCiudad() != null) c.setCiudad(req.getCiudad().trim());
     if (req.getIdioma() != null) c.setIdioma(req.getIdioma().trim());
-    // Si hay campos extras como bio/languages y tu entidad los soporta, mapearlos aquí.
+    // Permite actualizar descripcion incluso si viene vacía (para poder borrarla)
+    if (req.getDescripcion() != null) {
+      String descripcionTrimmed = req.getDescripcion().trim();
+      c.setDescripcion(descripcionTrimmed.isEmpty() ? null : descripcionTrimmed);
+    }
 
     Cliente saved = repo.save(c);
 
@@ -75,7 +79,8 @@ public class ClienteService {
       saved.getCorreo(),
       saved.getFechaNacimiento(),
       saved.getCiudad(),
-      saved.getIdioma()
+      saved.getIdioma(),
+      saved.getDescripcion()
     );
   }
 
@@ -89,7 +94,8 @@ public class ClienteService {
       c.getCorreo(),
       c.getFechaNacimiento(),
       c.getCiudad(),
-      c.getIdioma()
+      c.getIdioma(),
+      c.getDescripcion()
     );
   }
 }
