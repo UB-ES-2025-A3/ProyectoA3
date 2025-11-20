@@ -87,48 +87,82 @@ function buildIsoDate(fecha, hora) {
 }
 
 
-export async function getEvents() {
+/**
+ * Obtiene eventos compatibles con las restricciones del usuario logueado.
+ * Solo devuelve eventos a los que el usuario se puede unir.
+ */
+async function getCompatibleEventsFromBackend() {
   const config = getConfig();
-  if (config.USE_MOCKS) {
-    // Asigna imagen aleatoria a cada mock según tag
-    const enriched = await Promise.all(
-      mockEvents
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-        .map(async (ev) => ({
-          ...ev,
-          imageUrl: await chooseImageForTags(ev.tags, ev.imageUrl),
-          isEnrolled: false,
-        }))
-    );
-    return enriched;
+  const userId = localStorage.getItem('userId');
+  
+  if (!userId) {
+    // Si no hay usuario logueado, usar endpoint normal
+    const res = await fetch(`${config.API_BASE_URL}/events`, { headers: authHeaders() });
+    if (!res.ok) throw new Error("No se pudieron cargar los eventos");
+    const data = await res.json();
+    return transformEventData(data);
   }
 
-  const res = await fetch(`${config.API_BASE_URL}/events`, { headers: authHeaders() });
-  if (!res.ok) throw new Error("No se pudieron cargar los eventos");
+  // Si hay usuario logueado, usar endpoint compatible
+  const res = await fetch(`${config.API_BASE_URL}/events/compatible`, {
+    headers: authHeaders(),
+  });
+  
+  if (!res.ok) {
+    // Si falla el endpoint compatible, intentar con el endpoint normal
+    console.warn("No se pudieron cargar eventos compatibles, usando endpoint normal");
+    const fallbackRes = await fetch(`${config.API_BASE_URL}/events`, { headers: authHeaders() });
+    if (!fallbackRes.ok) throw new Error("No se pudieron cargar los eventos");
+    const data = await fallbackRes.json();
+    return transformEventData(data);
+  }
+  
   const data = await res.json();
+  return transformEventData(data);
+}
 
+/**
+ * Transforma los datos de eventos del backend al formato del frontend
+ */
+function transformEventData(data) {
   const currentUserId = localStorage.getItem("userId");
   const currentUserIdStr = currentUserId ? currentUserId.toString() : null;
   let enrolledIds = new Set();
 
+  // Si hay usuario logueado, obtener eventos en los que está inscrito
   if (currentUserIdStr) {
-    try {
-      const userEventsRes = await fetch(`${config.API_BASE_URL}/events/my-events`, {
-        headers: authHeaders(),
-      });
-      if (userEventsRes.ok) {
-        const userEvents = await userEventsRes.json();
+    return fetch(`${getConfig().API_BASE_URL}/events/my-events`, {
+      headers: authHeaders(),
+    })
+      .then((userEventsRes) => {
+        if (userEventsRes.ok) {
+          return userEventsRes.json();
+        }
+        return [];
+      })
+      .then((userEvents) => {
         enrolledIds = new Set(
           userEvents
             .map((evt) => evt.id)
             .filter((id) => id !== undefined && id !== null)
             .map((id) => id.toString())
         );
-      }
-    } catch (error) {
-      console.warn("No se pudieron cargar los eventos del usuario para calcular isEnrolled:", error);
-    }
+        return transformEvents(data, enrolledIds);
+      })
+      .catch((error) => {
+        console.warn("No se pudieron cargar los eventos del usuario para calcular isEnrolled:", error);
+        return transformEvents(data, enrolledIds);
+      });
   }
+
+  return Promise.resolve(transformEvents(data, enrolledIds));
+}
+
+/**
+ * Transforma la lista de eventos al formato del frontend
+ */
+async function transformEvents(data, enrolledIds) {
+  const currentUserIdStr = localStorage.getItem("userId")?.toString();
 
   const transformed = await Promise.all(
     data.map(async (event) => {
@@ -172,6 +206,30 @@ export async function getEvents() {
   return transformed.sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
+}
+
+/**
+ * Obtiene eventos. Si hay usuario logueado, usa el endpoint compatible.
+ * Si no hay usuario logueado, usa el endpoint normal.
+ */
+export async function getEvents() {
+  const config = getConfig();
+  if (config.USE_MOCKS) {
+    // Asigna imagen aleatoria a cada mock según tag
+    const enriched = await Promise.all(
+      mockEvents
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+        .map(async (ev) => ({
+          ...ev,
+          imageUrl: await chooseImageForTags(ev.tags, ev.imageUrl),
+          isEnrolled: false,
+        }))
+    );
+    return enriched;
+  }
+
+  // Usar endpoint compatible si hay usuario logueado, normal si no
+  return getCompatibleEventsFromBackend();
 }
 
 export async function createEvent(eventData) {
