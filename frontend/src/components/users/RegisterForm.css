@@ -260,3 +260,49 @@
 }
 
 
+.multi-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.multi-dropdown-header {
+  padding: 10px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.multi-dropdown-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  width: 100%;
+  z-index: 10;
+  margin-top: 4px;
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* separa cada opción */
+}
+
+.multi-dropdown-menu label {
+  display: flex;
+  align-items: center; /* centra verticalmente checkbox + texto */
+  gap: 8px;            /* separa el checkbox del texto */
+  margin: 0;
+  padding: 4px 0;
+}
+.multi-dropdown-menu input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.arrow {
+  font-size: 12px;
+}

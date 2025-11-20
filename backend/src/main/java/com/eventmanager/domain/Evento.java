@@ -103,21 +103,23 @@ public class Evento {
 
   // ---------- JSON POJO ----------
   // Importante: SIN @Embeddable y SIN @Column en sus campos
+  
   public static class Restricciones {
-    private String idiomas_permitidos;
+    private List<String> idiomas_permitidos;
     private Integer edad_minima;
     private Integer max_personas;
 
     public Restricciones() {}
 
-    public Restricciones(String idiomas_permitidos, Integer edad_minima, Integer max_personas) {
+    public Restricciones(List<String> idiomas_permitidos, Integer edad_minima, Integer max_personas) {
       this.idiomas_permitidos = idiomas_permitidos;
       this.edad_minima = edad_minima;
       this.max_personas = max_personas;
     }
 
-    public String getIdiomas_permitidos() { return idiomas_permitidos; }
-    public void setIdiomas_permitidos(String idiomas_permitidos) { this.idiomas_permitidos = idiomas_permitidos; }
+    public List<String> getIdiomas_permitidos() { return idiomas_permitidos; }
+    public void setIdiomas_permitidos(List<String> idiomas_permitidos) { this.idiomas_permitidos = idiomas_permitidos; }
+    public void addIdiomaPermitido(String idioma){this.idiomas_permitidos.add(idioma);}
 
     public Integer getEdad_minima() { return edad_minima; }
     public void setEdad_minima(Integer edad_minima) { this.edad_minima = edad_minima; }

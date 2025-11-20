@@ -1,6 +1,7 @@
 package com.eventmanager.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ClienteDtos {
   public static record ClienteView(
@@ -11,6 +12,7 @@ public class ClienteDtos {
     String correo,
     LocalDate fechaNacimiento,
     String ciudad,
-    String idioma
+    List<String> idioma,
+    String descripcion
   ) {}
 }

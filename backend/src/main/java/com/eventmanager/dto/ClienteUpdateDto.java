@@ -1,6 +1,7 @@
 package com.eventmanager.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ClienteUpdateDto {
     private String nombre;
@@ -9,9 +10,8 @@ public class ClienteUpdateDto {
     private String correo;
     private LocalDate fechaNacimiento;
     private String ciudad;
-    private String idioma;
-    // campos opcionales que el frontend puede enviar y que ignoraremos si no existen en la entidad
-    private String bio;
+    private List<String> idioma;
+    private String descripcion;
     // getters / setters
 
     public String getNombre() { return nombre; }
@@ -26,8 +26,8 @@ public class ClienteUpdateDto {
     public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
     public String getCiudad() { return ciudad; }
     public void setCiudad(String ciudad) { this.ciudad = ciudad; }
-    public String getIdioma() { return idioma; }
-    public void setIdioma(String idioma) { this.idioma = idioma; }
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
+    public List<String> getIdioma() { return idioma; }
+    public void setIdioma(List<String> idioma) { this.idioma = idioma; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }

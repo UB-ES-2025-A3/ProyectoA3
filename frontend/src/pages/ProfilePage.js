@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
-import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
@@ -279,24 +279,26 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Bio Section oculto temporalmente
+          {/* Descripción Section */}
           <div className="profile-section">
-            <h2 className="section-title">Sobre Mí</h2>
+            <h2 className="section-title">
+              <FaInfoCircle style={{ marginRight: '8px' }} />
+              Descripción
+            </h2>
             <div className="bio-section">
               {isEditing ? (
                 <textarea
-                  value={editData.bio || ''}
-                  onChange={(e) => handleChange('bio', e.target.value)}
+                  value={editData.descripcion || ''}
+                  onChange={(e) => handleChange('descripcion', e.target.value)}
                   className="bio-textarea"
-                  rows="4"
+                  rows="6"
                   placeholder="Cuéntanos un poco sobre ti..."
                 />
               ) : (
-                <p className="bio-text">{userData.bio || 'No hay descripción disponible'}</p>
+                <p className="bio-text">{userData.descripcion || 'No hay descripción disponible'}</p>
               )}
             </div>
           </div>
-          */}
 
           {/* Languages Section */}
           {userData.languages && userData.languages.length > 0 && (

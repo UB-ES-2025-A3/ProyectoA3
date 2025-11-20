@@ -70,12 +70,13 @@ public class EventoServiceIntegrationTest {
 
   @Test
   void guardarYListar_eventoEnBaseDeDatos() {
+    List<String> idiomas = List.of("es", "en");
     // Creamos el DTO de entrada (match con el JSON real)
     var req = new EventoCreate(
         LocalDate.of(2027, 11, 5),
         LocalTime.of(18, 0, 0),
         "Sevilla",
-        new RestriccionesCreate("es,en", 18, 50),
+        new RestriccionesCreate(idiomas, 18, 50),
         List.of("musica", "verano"),
         "Prueba",
         "Prueba de guardar evento",
@@ -108,11 +109,12 @@ public class EventoServiceIntegrationTest {
 
   @Test
   void borrar_eventoEnBaseDeDatos() {
+    List<String> idiomas = List.of("es", "en");
     var req = new EventoCreate(
         LocalDate.of(2027, 11, 6),
         LocalTime.of(20, 0, 0),
         "Granada",
-        new RestriccionesCreate("es,en", 16, 30),
+        new RestriccionesCreate(idiomas, 16, 30),
         List.of("musica", "verano"),
         "EventoBorrar",
         "Prueba de borrar evento",
@@ -144,11 +146,12 @@ public class EventoServiceIntegrationTest {
     Long participanteId = savedParticipante.getId();
 
     //Crear evento
+    List<String> idiomas = List.of("es");
     var req = new EventoCreate(
         LocalDate.of(2027, 12, 1),
         LocalTime.of(19, 0, 0),
         "Madrid",
-        new RestriccionesCreate("es", 21, 100),
+        new RestriccionesCreate(idiomas, 21, 100),
         List.of("deporte"),
         "EventoUnirseSalir",
         "Prueba de unirse y salir evento",
