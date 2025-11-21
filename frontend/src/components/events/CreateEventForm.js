@@ -9,7 +9,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     etiquetas: '',
     fecha: '',
     hora: '',
-    idioma: [],
+    idioma: '',
     plazasDisponibles: '',
     edadMinima: '',
     lugar: '',
@@ -106,7 +106,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         hora: formData.hora,
         lugar: formData.lugar,
         restricciones: {
-          idiomasRequerido: formData.idioma,
+          idiomasRequerido: formData.idioma ? [formData.idioma] : [],
           plazasDisponibles: parseInt(formData.plazasDisponibles),
           edad_minima: formData.edadMinima ? parseInt(formData.edadMinima) : null
         }
@@ -119,7 +119,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         titulo: '',
         etiquetas: '',
         fecha: '',
-        idioma: [],
+        idioma: '',
         plazasDisponibles: '',
         edadMinima: '',
         lugar: '',
@@ -267,9 +267,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 id="idioma"
                 name="idioma"
                 value={formData.idioma}
-                onChange={(e) => {
-                  setFormData(prev => ({ ...prev, idioma: [e.target.value] })); // <-- convertir a array
-                }}
+                onChange={handleChange}
                 className={errors.idioma ? 'error' : ''}
                 disabled={loading}
               >
