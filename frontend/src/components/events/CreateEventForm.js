@@ -11,6 +11,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     hora: '',
     idioma: [],
     plazasDisponibles: '',
+    edadMinima: '',
     lugar: '',
     descripcion: ''
   });
@@ -71,6 +72,12 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.plazasDisponibles = 'Debe haber al menos 1 plaza disponible';
     }
 
+    if (formData.edadMinima && parseInt(formData.edadMinima) < 0) {
+      newErrors.edadMinima = 'La edad mínima debe ser 0 o mayor';
+    } else if (formData.edadMinima && parseInt(formData.edadMinima) > 120) {
+      newErrors.edadMinima = 'La edad mínima debe ser menor a 120';
+    }
+
     if (!formData.lugar.trim()) {
       newErrors.lugar = 'El lugar es requerido';
     }
@@ -99,8 +106,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         hora: formData.hora,
         lugar: formData.lugar,
         restricciones: {
-          idiomaRequerido: formData.idioma,
-          plazasDisponibles: parseInt(formData.plazasDisponibles)
+          idiomasRequerido: formData.idioma,
+          plazasDisponibles: parseInt(formData.plazasDisponibles),
+          edad_minima: formData.edadMinima ? parseInt(formData.edadMinima) : null
         }
       });
 
@@ -113,6 +121,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         fecha: '',
         idioma: [],
         plazasDisponibles: '',
+        edadMinima: '',
         lugar: '',
         descripcion: ''
       });
@@ -294,6 +303,25 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               {errors.plazasDisponibles && <span className="error-message">{errors.plazasDisponibles}</span>}
             </div>
 
+            <div className="form-group">
+              <label htmlFor="edadMinima">Edad Mínima (opcional)</label>
+              <input
+                type="number"
+                id="edadMinima"
+                name="edadMinima"
+                value={formData.edadMinima}
+                onChange={handleChange}
+                min="0"
+                max="120"
+                placeholder="Ej: 18"
+                className={errors.edadMinima ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.edadMinima && <span className="error-message">{errors.edadMinima}</span>}
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="lugar">Lugar *</label>
               <input
