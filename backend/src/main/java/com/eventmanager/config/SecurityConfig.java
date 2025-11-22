@@ -26,7 +26,7 @@ public static final String PASSWORD_REGEX =
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
       .csrf(csrf -> csrf.disable())
-      .cors(cors -> {})  // cambiar por webMvcConfigurer (no el metodo de abajo)
+      .cors(cors -> {})  // usa WebConfig
       .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
     return http.build();
   }
