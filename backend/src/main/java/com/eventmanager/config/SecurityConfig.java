@@ -34,6 +34,8 @@ public static final String PASSWORD_REGEX =
   @Bean
   public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
+
+  /*
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration cfg = new CorsConfiguration();
@@ -50,4 +52,28 @@ public static final String PASSWORD_REGEX =
     source.registerCorsConfiguration("/**", cfg);
     return source;
   }
+  */
+ @Bean
+public CorsConfigurationSource corsConfigurationSource() {
+  CorsConfiguration cfg = new CorsConfiguration();
+  cfg.setAllowCredentials(true);
+
+  // Hardcoded version sin yml 
+  cfg.setAllowedOrigins(List.of(
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://ub-es-2025-a3.github.io",
+      "https://proyecto-a3.vercel.app",
+      "https://proyecto-a3-git-preprod.vercel.app"
+  ));
+
+  cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+  cfg.setAllowedHeaders(List.of("Content-Type","Authorization","X-User-Id"));
+  cfg.setExposedHeaders(List.of("Authorization"));
+
+  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  source.registerCorsConfiguration("/**", cfg);
+  return source;
+}
+
 }
