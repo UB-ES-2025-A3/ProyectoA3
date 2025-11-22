@@ -26,7 +26,7 @@ public static final String PASSWORD_REGEX =
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
       .csrf(csrf -> csrf.disable())
-      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      .cors(cors -> {})  // cambiar por webMvcConfigurer (no el metodo de abajo)
       .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
     return http.build();
   }
@@ -66,6 +66,8 @@ public CorsConfigurationSource corsConfigurationSource() {
       "https://proyecto-a3.vercel.app",
       "https://proyecto-a3-git-preprod.vercel.app"
   ));
+
+  System.out.println("[CORS] Allowed origins = " + cfg.getAllowedOrigins());
 
   cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
   cfg.setAllowedHeaders(List.of("Content-Type","Authorization","X-User-Id"));

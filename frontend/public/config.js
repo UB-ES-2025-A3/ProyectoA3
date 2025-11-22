@@ -5,7 +5,7 @@
   window.APP_CONFIG = {
     REACT_APP_API_URL: isLocal
       ? 'http://localhost:8080/api'
-      : 'https://proyectoa3.onrender.com/api',
+      : undefined, // que no fuerce prod
     REACT_APP_USE_MOCKS: false
   };
 })();
