@@ -1,8 +1,35 @@
 // src/components/events/EventModal.js
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (event?.id) {
+      const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      setIsFavorite(favorites.includes(event.id.toString()));
+    }
+  }, [event?.id]);
+
+  const toggleFavorite = () => {
+    if (!event?.id) return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+    const eventIdStr = event.id.toString();
+    
+    if (isFavorite) {
+      const updated = favorites.filter(id => id !== eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(updated));
+      setIsFavorite(false);
+    } else {
+      favorites.push(eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
+      setIsFavorite(true);
+    }
+  };
+
   if (!isOpen || !event) return null;
 
   // Formatear fecha de manera segura
@@ -33,6 +60,18 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>
           ✕
+        </button>
+        <button 
+          className="modal-favorite-btn" 
+          onClick={toggleFavorite}
+          aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+          title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+        >
+          {isFavorite ? (
+            <FaBookmark className="favorite-icon favorite-icon-filled" />
+          ) : (
+            <FaRegBookmark className="favorite-icon favorite-icon-outline" />
+          )}
         </button>
         
         <div className="modal-header">
