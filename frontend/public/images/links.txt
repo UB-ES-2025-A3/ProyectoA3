@@ -47,3 +47,6 @@ https://pixabay.com/es/photos/arquitectura-brno-ciudad-7838713/
 
 original 
 https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000
+
+
+El resto de imagenes son de pixabay. 
