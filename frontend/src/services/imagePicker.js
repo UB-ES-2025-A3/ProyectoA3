@@ -50,29 +50,38 @@ function pickRandom(arr) {
 
 // Elige una imagen para una lista de tags (puedes ponderar, aquí simple)
 export async function chooseImageForTags(tags = [], fallbackUrl) {
-  console.log("Tags en chooseImageForTags", tags);
+  // Usamos sessionStorage para almacenar el índice aleatorio
+  const cachedImageIndex = sessionStorage.getItem('randomImageIndex');
+  let selectedImage = null;
 
-  const tagsNorm = (Array.isArray(tags) ? tags : [])
-    .map(t => `${t}`.toLowerCase())
-    .filter(Boolean);
-  const tag = pickRandom(tagsNorm);
+  if (cachedImageIndex !== null) {
+    console.log("Imagen seleccionada de la sesión mediante índice");
+    // Si el índice ya existe, obtenemos la imagen de la pool correspondiente
+    const index = parseInt(cachedImageIndex, 10);
+    const pool = await loadPool(tags[0].toLowerCase() || 'general');  // Usamos el primer tag o general
+    selectedImage = pool[index];
+  } else {
+    console.log("Generando una nueva imagen aleatoria");
 
-  if (tag) {
+    // Si no hay índice guardado, seleccionamos una imagen aleatoria y almacenamos el índice
+    const tagsNorm = (Array.isArray(tags) ? tags : [])
+      .map(t => `${t}`.toLowerCase())
+      .filter(Boolean);
+    const tag = pickRandom(tagsNorm) || 'general';  // Si no hay tags, usamos 'general'
+
     const pool = await loadPool(tag);
-    const fromTag = pickRandom(pool);
-    if (fromTag) return fromTag;
+    const randomIndex = Math.floor(Math.random() * pool.length);  // Generamos el índice aleatorio
+    selectedImage = pool[randomIndex];
+
+    // Guardamos el índice en sessionStorage para la próxima vez
+    sessionStorage.setItem('randomImageIndex', randomIndex);
   }
 
-  // Si no hay pool para ese tag (o no hay tags), intenta “general”
-  const generalPool = await loadPool("general");
-  const fromGeneral = pickRandom(generalPool);
-  if (fromGeneral) return fromGeneral;
+  // Si no se encuentra imagen en el pool, usamos la imagen fallback
+  if (!selectedImage) {
+    console.log("No se encontró imagen en pools, usando fallback");
+    selectedImage = fallbackUrl || "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000";
+  }
 
-  console.log("No hay pool general, fallback imagen genérica");
-
-  // Fallback definitivo
-  return (
-    fallbackUrl ||
-    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1000"
-  );
+  return selectedImage;
 }
