@@ -58,14 +58,13 @@ export async function chooseImageForTags(tags = [], fallbackUrl) {
     console.log("Imagen seleccionada de la sesión mediante índice");
     // Si el índice ya existe, obtenemos la imagen de la pool correspondiente
     const index = parseInt(cachedImageIndex, 10);
-    const pool = await loadPool(tags[0].toLowerCase() || 'general');  // Usamos el primer tag o general
+    const pool = await loadPool(tags[0] || 'general');  // Usamos el primer tag o general
     selectedImage = pool[index];
   } else {
     console.log("Generando una nueva imagen aleatoria");
 
     // Si no hay índice guardado, seleccionamos una imagen aleatoria y almacenamos el índice
     const tagsNorm = (Array.isArray(tags) ? tags : [])
-      .map(t => `${t}`.toLowerCase())
       .filter(Boolean);
     const tag = pickRandom(tagsNorm) || 'general';  // Si no hay tags, usamos 'general'
 
