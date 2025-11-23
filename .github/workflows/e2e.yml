@@ -1,0 +1,61 @@
+name: Frontend E2E Tests
+
+on:
+  push:
+    branches: [ main, dev, pre_prod ]
+  pull_request:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------- BACKEND ---------------
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: mvn -U clean package -DskipTests
+
+      - name: Start backend
+        working-directory: ./backend
+        run: mvn spring-boot:run &
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      # --------------- FRONTEND ---------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Start frontend
+        working-directory: ./frontend
+        run: |
+          REACT_APP_API_URL=http://localhost:8080/api \
+          npm start &
+        env:
+          BROWSER: none
+
+      - name: Wait for services
+        run: npx wait-on http://localhost:3000
+
+      # --------------- PLAYWRIGHT ---------------
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        run: npx playwright test
