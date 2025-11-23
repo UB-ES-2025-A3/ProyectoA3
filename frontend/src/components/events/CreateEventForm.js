@@ -213,9 +213,19 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               disabled={loading}
             >
               <option value="">Selecciona una etiqueta</option>
+              <option value="turismo">Turismo</option>
               <option value="comida">Comida</option>
               <option value="excursion">Excursión</option>
-              <option value="turismo">Turismo</option>
+              <option value="cultural">Cultural</option>
+              <option value="social">Social</option>
+              <option value="deporte">Deporte</option>
+              <option value="aventura">Aventura</option>
+              <option value="familiar">Familiar</option>
+              <option value="juegos">Juegos</option>
+              <option value="cine">Cine</option>
+              <option value="relax">Relax</option>
+              <option value="tardeo">Tardeo</option>
+              <option value="noche">Noche</option>
               <option value="otros">Otros</option>
             </select>
             {errors.etiquetas && <span className="error-message">{errors.etiquetas}</span>}
