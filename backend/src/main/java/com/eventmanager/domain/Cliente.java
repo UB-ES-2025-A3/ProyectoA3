@@ -1,13 +1,20 @@
 package com.eventmanager.domain;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +34,16 @@ public class Cliente {
   @Column(columnDefinition = "TEXT")
   private String descripcion;
   @NotBlank private String passwordHash;
+
+
+  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+  @JoinTable(
+          name = "evento_fav",
+          joinColumns = @JoinColumn(name = "cliente_id"),
+          inverseJoinColumns = @JoinColumn(name = "evento_id")
+  )
+  private Set<Evento> favoritos = new HashSet<>();
+
 
   public Cliente() {}
 
@@ -60,4 +77,8 @@ public class Cliente {
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+  public Set<Evento> getFavoritos() { return favoritos; }
+  public void setFavoritos(Set<Evento> favoritos) { this.favoritos = favoritos; }
+  public void addEventoFavorito(Evento evento) { this.favoritos.add(evento); }
 }
