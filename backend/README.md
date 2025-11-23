@@ -198,7 +198,7 @@ Invoke-RestMethod `
     -Body $body `
     -ContentType "application/json"
 
-Donde los *** implican id's del evento y cliente que existan.
+Donde los *** implican id's del evento y cliente que existan y tengan una relacion asociada.
 
 
 # Como esta estructurado el backend
