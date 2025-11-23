@@ -164,6 +164,43 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/events/leave" `
 
 Donde los *** implican id's del evento y participante que ya esten relacionados.
 
+
+
+# Añadir un evento a favoritos
+
+Desde powershell:
+
+$body = @{
+    idEvento = ***
+    idUsuario = ***
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+    -Uri "http://localhost:8080/api/events/addfavorite" `
+    -Method Post `
+    -Body $body `
+    -ContentType "application/json"
+
+Donde los *** implican id's del evento y cliente que existan.
+
+# Eliminar un evento de favoritos
+
+Desde powershell:
+
+$body = @{
+    idEvento = ***
+    idUsuario = ***
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+    -Uri "http://localhost:8080/api/events/removefavorite" `
+    -Method Post `
+    -Body $body `
+    -ContentType "application/json"
+
+Donde los *** implican id's del evento y cliente que existan y tengan una relacion asociada.
+
+
 # Como esta estructurado el backend
 
 ```

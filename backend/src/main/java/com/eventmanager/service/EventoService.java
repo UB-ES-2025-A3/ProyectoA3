@@ -1,8 +1,8 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.time.Period;
+import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import com.eventmanager.domain.Evento;
 import com.eventmanager.domain.Evento.Restricciones;
 import com.eventmanager.dto.EventoDtos.EventoAdd;
 import com.eventmanager.dto.EventoDtos.EventoCreate;
+import com.eventmanager.dto.EventoDtos.EventoFav;
 import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.repository.EventoRepository;
@@ -187,6 +188,38 @@ public class EventoService {
 
     evento.removeParticipante(participante);
     repo.save(evento);
+
+    return toView(evento);
+  }
+
+  public EventoView addEventoFavorito(EventoFav dto){
+    var user = clienteRepo.findById(dto.idUsuario())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    if(user.getFavoritos().contains(evento)){
+      throw new RuntimeException("El evento ya está en favoritos");
+    }
+
+    user.addEventoFavorito(evento);
+    clienteRepo.save(user);
+
+    return toView(evento);
+  }
+
+  public EventoView removeEventoFavorito(EventoFav dto){
+    var user = clienteRepo.findById(dto.idUsuario())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    if(!user.getFavoritos().contains(evento)){
+      throw new RuntimeException("El evento no está en favoritos");
+    }
+
+    user.removeEventoFavorito(evento);
+    clienteRepo.save(user);
 
     return toView(evento);
   }

@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanager.dto.EventoDtos.EventoAdd;
 import com.eventmanager.dto.EventoDtos.EventoCreate;
+import com.eventmanager.dto.EventoDtos.EventoFav;
 import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.service.EventoService;
 
@@ -75,5 +75,15 @@ public class EventoController {
   @PostMapping("/leave")
   public EventoView salirEvento(@RequestBody EventoAdd dto) {
     return service.removeParticipante(dto);
+  }
+
+  @PostMapping("/addfavorite")
+  public EventoView favoriteEvento(@RequestBody EventoFav dto) {
+    return service.addEventoFavorito(dto);
+  }
+
+  @PostMapping("/removefavorite")
+  public EventoView removeFavoriteEvento(@RequestBody EventoFav dto) {
+    return service.removeEventoFavorito(dto);
   }
 }
