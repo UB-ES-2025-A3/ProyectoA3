@@ -176,7 +176,24 @@ $body = @{
 } | ConvertTo-Json
 
 Invoke-RestMethod `
-    -Uri "http://localhost:8080/api/events/favorite" `
+    -Uri "http://localhost:8080/api/events/addfavorite" `
+    -Method Post `
+    -Body $body `
+    -ContentType "application/json"
+
+Donde los *** implican id's del evento y cliente que existan.
+
+# Eliminar un evento de favoritos
+
+Desde powershell:
+
+$body = @{
+    idEvento = ***
+    idUsuario = ***
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+    -Uri "http://localhost:8080/api/events/removefavorite" `
     -Method Post `
     -Body $body `
     -ContentType "application/json"

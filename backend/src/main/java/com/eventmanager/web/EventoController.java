@@ -77,8 +77,13 @@ public class EventoController {
     return service.removeParticipante(dto);
   }
 
-  @PostMapping("/favorite")
+  @PostMapping("/addfavorite")
   public EventoView favoriteEvento(@RequestBody EventoFav dto) {
     return service.addEventoFavorito(dto);
+  }
+
+  @PostMapping("/removefavorite")
+  public EventoView removeFavoriteEvento(@RequestBody EventoFav dto) {
+    return service.removeEventoFavorito(dto);
   }
 }

@@ -81,4 +81,5 @@ public class Cliente {
   public Set<Evento> getFavoritos() { return favoritos; }
   public void setFavoritos(Set<Evento> favoritos) { this.favoritos = favoritos; }
   public void addEventoFavorito(Evento evento) { this.favoritos.add(evento); }
+  public void removeEventoFavorito(Evento evento) { this.favoritos.remove(evento);}
 }

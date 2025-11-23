@@ -173,7 +173,7 @@ public class EventoServiceIntegrationTest {
   }
 
   @Test
-  void favorite_eventoEnBaseDeDatos(){
+  void add_remove_favorite_eventoEnBaseDeDatos(){
     List<String> idiomas = List.of("es");
     var req = new EventoCreate(
         LocalDate.of(2027, 12, 1),
@@ -194,5 +194,10 @@ public class EventoServiceIntegrationTest {
     assertNotNull(favorito.id());
     Cliente cliente = clienteRepo.findById(creadorId).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
     assertTrue(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+
+    EventoView noFavorito = eventoService.removeEventoFavorito(favDto);
+    assertNotNull(noFavorito.id());
+    assertFalse(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+    
   }
 }

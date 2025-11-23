@@ -207,4 +207,20 @@ public class EventoService {
 
     return toView(evento);
   }
+
+  public EventoView removeEventoFavorito(EventoFav dto){
+    var user = clienteRepo.findById(dto.idUsuario())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    if(!user.getFavoritos().contains(evento)){
+      throw new RuntimeException("El evento no está en favoritos");
+    }
+
+    user.removeEventoFavorito(evento);
+    clienteRepo.save(user);
+
+    return toView(evento);
+  }
 }
