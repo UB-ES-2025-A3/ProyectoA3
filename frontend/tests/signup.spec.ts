@@ -82,7 +82,10 @@ test.describe('Registro de usuario', () => {
       (el: HTMLInputElement) => el.validationMessage
     );
 
-    expect(validationMessage).toMatch("Incluye un signo \"@\" en la dirección de correo electrónico. La dirección \"correo-no-valido\" no incluye el signo \"@\".");
+    // No hacer, cambia el idioma y falla
+    //expect(validationMessage).toMatch("Incluye un signo \"@\" en la dirección de correo electrónico. La dirección \"correo-no-valido\" no incluye el signo \"@\".");
+
+    await expect(page.getByText('El correo no es válido')).toBeVisible();
 
   });
 

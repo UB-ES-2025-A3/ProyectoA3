@@ -61,7 +61,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.hora = 'La hora es requerida';
     }
 
-    if (!formData.idioma) {
+    if (!Array.isArray(formData.idioma) || formData.idioma.length === 0 || !formData.idioma[0]) {
       newErrors.idioma = 'Debes seleccionar un idioma';
     }
 
@@ -94,7 +94,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       const response = await createEvent({
         titulo: formData.titulo,
         descripcion: formData.descripcion,
-        etiquetas: formData.etiquetas,
+        etiquetas: formData.etiquetas || 'otros',        
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,

@@ -131,7 +131,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
         <h2>Crear Cuenta</h2>
         <p className="form-subtitle">Únete a nuestra plataforma de eventos</p>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="nombre">

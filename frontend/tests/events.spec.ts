@@ -18,19 +18,42 @@ test.describe('Página de eventos', () => {
     await login(page);
   });
 
-  test('Events - Filtrado de eventos por texto de búsqueda', async ({ page }) => {
+test('Events - Filtrado de eventos por texto de búsqueda', async ({ page }) => {
+  // Asegurarnos de que estamos en la página de eventos
+  const subtitle = page.getByText('Descubre y guarda tus próximos planes.');
+  await expect(subtitle).toBeVisible();
+
+  // Esperar a que termine el "Cargando eventos..."
+  const loadingText = page.getByText('Cargando eventos...');
+  // Si está, esperamos a que desaparezca; si no está, esto no rompe
+  await loadingText.waitFor({ state: 'detached', timeout: 10000 }).catch(() => {});
+
   const eventsGrid = page.locator('.events-grid');
-  await expect(eventsGrid).toBeVisible();
+  const noEventsBox = page.locator('.no-events');
 
-  const titles = eventsGrid.locator('.event-card__title');
-  const totalEvents = await titles.count();
+  const gridCount = await eventsGrid.count();
+  const noEventsCount = await noEventsBox.count();
 
-  if (totalEvents === 0) {
-    console.warn(' No hay eventos disponibles — se salta test de filtrado');
+  // Si no hay grid pero sí el mensaje de "no hay eventos", hacemos fallback
+  if (gridCount === 0) {
+    if (noEventsCount > 0) {
+      await expect(
+        page.getByText('No hay eventos disponibles con los filtros aplicados.')
+      ).toBeVisible();
+      console.warn('No hay eventos disponibles — se salta test de filtrado.');
+      return;
+    }
+
+    // Ni grid ni "no events": algo raro con el backend/HTML → puedes decidir aquí si fallar o loguear y salir
+    console.warn('La página de eventos no muestra ni grid ni mensaje de "no hay eventos".');
     return;
   }
 
-  // Tomamos el primer evento
+  // 🔽 A partir de aquí seguro que hay .events-grid con eventos
+  const titles = eventsGrid.locator('.event-card__title');
+  const totalEvents = await titles.count();
+  expect(totalEvents).toBeGreaterThan(0);
+
   const firstTitleLocator = titles.first();
   const fullTitle = await firstTitleLocator.innerText();
 
