@@ -280,6 +280,33 @@ const RegisterForm = ({ onSuccess, onError }) => {
                       />
                       Alemán
                     </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="it"
+                        checked={formData.idioma.includes('it')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Italiano
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="pt"
+                        checked={formData.idioma.includes('pt')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Portugués
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="ru"
+                        checked={formData.idioma.includes('ru')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Ruso
+                    </label>
                   </div>
                 )}
               </div>

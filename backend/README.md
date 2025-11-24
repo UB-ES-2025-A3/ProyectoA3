@@ -164,6 +164,17 @@ Invoke-RestMethod -Uri "http://localhost:8080/api/events/leave" `
 
 Donde los *** implican id's del evento y participante que ya esten relacionados.
 
+# Devolver Clientes a partir de sus Ids (Lista de participantes de un evento)
+$body = '[***, ***]'
+
+Invoke-RestMethod `
+    -Uri "http://localhost:8080/api/clients/participants" `
+    -Method Post `
+    -Body $body `
+    -ContentType "application/json"
+
+Donde los *** implican id's de clientes que existan.
+
 # Como esta estructurado el backend
 
 ```

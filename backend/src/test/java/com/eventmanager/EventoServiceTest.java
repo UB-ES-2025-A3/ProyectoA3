@@ -38,7 +38,6 @@ class EventoServiceTest {
     e.setDescripcion("desc");
     e.setIdCreador(123L);
     List<String> idiomas = List.of("es", "en");
-    // restricciones JSON 
     e.setRestricciones(new Restricciones(idiomas, 18, 50));
 
     when(repo.findAll()).thenReturn(List.of(e));
