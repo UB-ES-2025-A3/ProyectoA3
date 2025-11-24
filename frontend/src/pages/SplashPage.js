@@ -5,9 +5,12 @@ import '../styles/SplashPage.css';
 function SplashPage() {
   const navigate = useNavigate();
 
-
-  const handleEnter = () => {
+  const handleLogin = () => {
     navigate('/login');
+  };
+
+  const handleSignUp = () => {
+    navigate('/register');
   };
 
   return (
@@ -20,9 +23,14 @@ function SplashPage() {
           Gestiona els teus esdeveniments des d&apos;un sol lloc. Col·labora amb el teu equip i
           inspira a nous participants.
         </p>
-        <button className="splash__cta" onClick={handleEnter}>
-          Entrar ara
-        </button>
+        <div className="splash__buttons">
+          <button className="splash__cta splash__cta--primary" onClick={handleLogin}>
+            Iniciar Sesión
+          </button>
+          <button className="splash__cta splash__cta--secondary" onClick={handleSignUp}>
+            Registrarse
+          </button>
+        </div>
       </div>
     </section>
   );
