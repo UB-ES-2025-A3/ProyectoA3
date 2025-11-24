@@ -2,7 +2,7 @@ name: Frontend E2E Tests
 
 on:
   push:
-    branches: [ main, dev, pre_prod ]
+    branches: [ main, dev, pre_prod ] 
   pull_request:
 
 jobs:
