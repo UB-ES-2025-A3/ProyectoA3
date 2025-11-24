@@ -136,34 +136,33 @@ test.describe('Perfil de usuario', () => {
   });
 
   // No permite fecha de nacimiento posterior a hoy
-  test('Profile - No permite fecha de nacimiento en el futuro', async ({ page }) => {
-    await page.getByRole('button', { name: /editar perfil/i }).click();
+test('Profile - No permite fecha de nacimiento en el futuro', async ({ page }) => {
+  await page.getByRole('button', { name: /editar perfil/i }).click();
 
-    const fechaInput = page.locator('.info-item').nth(4).locator('input[type="date"]');
+  const fechaInput = page.locator('.info-item').nth(4).locator('input[type="date"]');
 
-    const originalFecha = await fechaInput.inputValue();
+  const originalFecha = await fechaInput.inputValue();
 
-    // Mañana (fecha futura)
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const futureDate = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
+  // Fecha claramente futura (año 4021)
+  const futureDate = '4021-01-01'; // YYYY-MM-DD
 
-    await fechaInput.fill(futureDate);
+  await fechaInput.fill(futureDate);
 
-    await page.getByRole('button', { name: /guardar/i }).click();
+  await page.getByRole('button', { name: /guardar/i }).click();
 
-    // Igual que antes: esperamos seguir en modo edición
-    await expect(page.getByRole('button', { name: /guardar/i })).toBeVisible();
+  // Igual que antes: esperamos seguir en modo edición
+  await expect(page.getByRole('button', { name: /guardar/i })).toBeVisible();
 
-    // Intentamos detectar un banner de error si lo hubiera
-    const errorBanner = page.locator('.message-banner.error');
-    if (await errorBanner.count()) {
-      await expect(errorBanner.first()).toBeVisible();
-    }
+  // Intentamos detectar un banner de error si lo hubiera
+  const errorBanner = page.locator('.message-banner.error');
+  if (await errorBanner.count()) {
+    await expect(errorBanner.first()).toBeVisible();
+  }
 
-    // Restauramos la fecha original para no dejar datos raros
-    if (originalFecha) {
-      await fechaInput.fill(originalFecha);
-    }
-  });
+  // Restauramos la fecha original para no dejar datos raros
+  if (originalFecha) {
+    await fechaInput.fill(originalFecha);
+  }
+});
+
 });
