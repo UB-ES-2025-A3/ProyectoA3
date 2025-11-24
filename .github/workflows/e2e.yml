@@ -34,7 +34,7 @@ jobs:
             echo "❌ Backend no arrancó. Logs:"
             cat backend.log
             exit 1
-          fi
+          fi 
         env:
           SPRING_PROFILES_ACTIVE: test
           SPRING_DATASOURCE_URL: ${{ secrets.TEST_DB_URL }}
