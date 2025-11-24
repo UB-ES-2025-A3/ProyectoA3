@@ -52,9 +52,12 @@ public class EventoService {
               .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
       int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
 
+
+
       List<String> idiomasList = usuario.getIdiomas();
 
-// convertir la lista de idiomas a Set para contains() O(1)
+       log.info("UsuarioId={} tiene {}", userId, idiomasList);
+
        Set<String> idiomasPermitidos = new HashSet<>(idiomasList);
 
        var eventos = repo.findEventosPermitidos(userId, edadUsuario);
