@@ -117,52 +117,71 @@ test('Events - Apuntarse y desapuntarse de un evento desde la tarjeta', async ({
 });
 
 
-  // Revisar que los eventos completos no dejen inscribirse
-  test('Events - Muestra correctamente un evento completo (con fallback si no hay ninguno)', async ({ page }) => {
-    const cards = page.locator('.event-card');
-    const totalCards = await cards.count();
+// Revisar que los eventos completos no dejen inscribirse
+test('Events - Muestra correctamente un evento completo (con fallback si no hay ninguno)', async ({ page }) => {
+  const cards = page.locator('.event-card');
+  const totalCards = await cards.count();
 
-    if (totalCards === 0) {
-      console.warn('No hay ningún evento en la página; se salta la comprobación de evento completo.');
-      return; // fallback: no rompemos el test en entornos sin eventos
+  if (totalCards === 0) {
+    console.warn('No hay ningún evento en la página; se salta la comprobación de evento completo.');
+    return; // fallback: no rompemos el test en entornos sin eventos
+  }
+
+  // Buscar la primera card que tenga el badge de COMPLETO
+  let fullCardIndex = -1;
+
+  for (let i = 0; i < totalCards; i++) {
+    const card = cards.nth(i);
+    const fullBadge = card.locator('.status-badge.status-full');
+
+    if (await fullBadge.count() > 0 && await fullBadge.first().isVisible()) {
+      fullCardIndex = i;
+      break;
     }
+  }
 
-    // Buscar la primera card que tenga el badge de COMPLETO
-    let fullCardIndex = -1;
+  if (fullCardIndex === -1) {
+    console.warn('No se encontró ningún evento completo; se omiten las aserciones de este test.');
+    return; // fallback: no hay eventos llenos ahora mismo
+  }
 
-    for (let i = 0; i < totalCards; i++) {
-      const card = cards.nth(i);
-      const fullBadge = card.locator('.status-badge.status-full');
+  const fullCard = cards.nth(fullCardIndex);
 
-      if (await fullBadge.count() > 0 && await fullBadge.first().isVisible()) {
-        fullCardIndex = i;
-        break;
-      }
-    }
+  // 1) El badge debe decir "Completo"
+  const fullBadge = fullCard.locator('.status-badge.status-full');
+  await expect(fullBadge).toHaveText(/completo/i);
 
-    if (fullCardIndex === -1) {
-      console.warn('No se encontró ningún evento completo; se omiten las aserciones de este test.');
-      return; // fallback: no hay eventos llenos ahora mismo
-    }
+  // 2) participantes == capacidad (ej: "1/1")
+  const capacityText = await fullCard.locator('.capacity-number').innerText(); // "1/1"
+  const [currentStr, maxStr] = capacityText.split('/');
+  const current = Number(currentStr.trim());
+  const max = Number(maxStr.trim());
+  expect(current).toBe(max);
 
-    const fullCard = cards.nth(fullCardIndex);
+  // 3) El botón: dos casos válidos
+  //    - Caso A: botón "Completo" deshabilitado (no estás inscrito)
+  //    - Caso B: botón "Desapuntarse" (ya estás dentro del evento)
 
-    // 1) El badge debe decir "Completo"
-    const fullBadge = fullCard.locator('.status-badge.status-full');
-    await expect(fullBadge).toHaveText(/completo/i);
+  const fullButton = fullCard.getByRole('button'); // asumimos un botón principal en la card
+  const buttonText = (await fullButton.innerText()).toLowerCase();
 
-    // 2) participantes == capacidad (ej: "1/1")
-    const capacityText = await fullCard.locator('.capacity-number').innerText(); // "1/1"
-    const [currentStr, maxStr] = capacityText.split('/');
-    const current = Number(currentStr.trim());
-    const max = Number(maxStr.trim());
-    expect(current).toBe(max);
-
-    // 3) El botón debe decir "Completo" y estar deshabilitado (no me deja entrar)
-    const fullButton = fullCard.getByRole('button', { name: /^Completo$/ });
+  if (buttonText.includes('completo')) {
+    // Caso A: evento lleno y no inscrito → no te deja apuntarte
     await expect(fullButton).toBeVisible();
     await expect(fullButton).toBeDisabled();
-  });
+  } else if (buttonText.includes('desapuntarse')) {
+    // Caso B: evento lleno pero ya estás apuntado → también es correcto:
+    // no "inscribirse", sino "salir"
+    await expect(fullButton).toBeVisible();
+    // opcional: puedes comprobar que NO existe ningún botón "Apuntarse"
+    const enrollButton = fullCard.getByRole('button', { name: /apuntarse/i });
+    await expect(enrollButton).toHaveCount(0);
+  } else {
+    // Cualquier otro texto es sospechoso: mejor fallar para detectar cambios
+    throw new Error(`Texto de botón inesperado en evento completo: "${buttonText}"`);
+  }
+});
+
 
 });
 
