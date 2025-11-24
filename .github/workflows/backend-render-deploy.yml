@@ -2,12 +2,14 @@ name: Backend • Build & Deploy to Render
 
 on:
   push:
-    branches: [ pre_prod, main ]
+    branches:
+      - pre_prod
+      - main
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
-    # ← Filtra por rama sin usar matrix
+    # Solo ejecuta el job si la rama es pre_prod o main
     if: ${{ github.ref == 'refs/heads/pre_prod' || github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
 
@@ -28,6 +30,22 @@ jobs:
         if: ${{ github.ref == matrix.branch }}
         uses: actions/checkout@v4
 
+      - name: Create Maven settings with mirrors
+        if: ${{ github.ref == matrix.branch }}
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <mirrors>
+              <mirror>
+                <id>central-repo</id>
+                <mirrorOf>central</mirrorOf>
+                <url>https://repo1.maven.org/maven2/</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
       - name: Set up Java
         if: ${{ github.ref == matrix.branch }}
         uses: actions/setup-java@v4
@@ -38,11 +56,15 @@ jobs:
 
       - name: Run tests (perfil test)
         if: ${{ github.ref == matrix.branch }}
-        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
+        run: |
+          mvn -q -DskipTests=false -Dspring.profiles.active=test test || \
+          (echo "Maven failed — retrying tests..." && sleep 5 && mvn -q -DskipTests=false -Dspring.profiles.active=test test)
 
       - name: Build JAR
         if: ${{ github.ref == matrix.branch }}
-        run: mvn -q -DskipTests package
+        run: |
+          mvn -q -DskipTests package || \
+          (echo "Maven failed — retrying package..." && sleep 5 && mvn -q -DskipTests package)
 
       - name: Diagnose secrets availability (temporary)
         if: ${{ github.ref == matrix.branch }}
