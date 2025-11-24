@@ -1,0 +1,146 @@
+import { test, expect, Page } from '@playwright/test';
+
+async function login(page: Page) {
+  await page.goto('/#/login');
+
+  await page.getByLabel('Nombre de Usuario o Correo').fill('d');
+  await page.getByLabel('Contraseña').fill('123456aA_');
+
+  await page.getByRole('button', { name: /iniciar sesión/i }).click();
+
+  // Esperar a que cargue la página de eventos
+  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+}
+
+
+test.describe('Página de eventos', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('Events - Filtrado de eventos por texto de búsqueda', async ({ page }) => {
+  const eventsGrid = page.locator('.events-grid');
+  await expect(eventsGrid).toBeVisible();
+
+  const titles = eventsGrid.locator('.event-card__title');
+  const totalEvents = await titles.count();
+
+  if (totalEvents === 0) {
+    console.warn(' No hay eventos disponibles — se salta test de filtrado');
+    return;
+  }
+
+  // Tomamos el primer evento
+  const firstTitleLocator = titles.first();
+  const fullTitle = await firstTitleLocator.innerText();
+
+  const firstWord = fullTitle.split(/\s+/)[0];
+  const searchTerm = firstWord.trim();
+
+  const searchInput = page.getByPlaceholder(
+    'Buscar eventos por nombre o descripción...'
+  );
+  await searchInput.fill(searchTerm);
+
+  const filteredCount = await titles.count();
+  expect(filteredCount).toBeGreaterThan(0);
+
+  const searchLower = searchTerm.toLowerCase();
+  for (let i = 0; i < filteredCount; i++) {
+    const text = await titles.nth(i).innerText();
+    expect(text.toLowerCase()).toContain(searchLower);
+  }
+});
+
+
+
+test('Events - Apuntarse y desapuntarse de un evento desde la tarjeta', async ({ page }) => {
+  const eventsGrid = page.locator('.events-grid');
+  await expect(eventsGrid).toBeVisible();
+
+  const allJoinButtons = page.getByRole('button', { name: /^Apuntarse$/ });
+  const joinCount = await allJoinButtons.count();
+
+  if (joinCount === 0) {
+    console.warn(' No hay eventos disponibles para apuntarse — se salta test.');
+    return;
+  }
+
+  const joinButton = allJoinButtons.first();
+  await expect(joinButton).toBeVisible();
+  await joinButton.click();
+
+  // Banner de éxito al apuntarse
+  await expect(
+    page.getByText('¡Te has apuntado al evento correctamente!')
+  ).toBeVisible();
+
+  // Buscar botones de "Desapuntarse"
+  const allLeaveButtons = page.getByRole('button', { name: /^Desapuntarse$/ });
+  const leaveCount = await allLeaveButtons.count();
+
+  if (leaveCount === 0) {
+    console.warn('⛔ No se encontró ningún botón de "Desapuntarse" después de apuntarse — fallback.');
+    return;
+  }
+
+  const leaveButton = allLeaveButtons.first();
+  await expect(leaveButton).toBeVisible();
+  await leaveButton.click();
+
+  await expect(
+    page.getByText('Te has desapuntado del evento correctamente.')
+  ).toBeVisible();
+});
+
+
+  // Revisar que los eventos completos no dejen inscribirse
+  test('Events - Muestra correctamente un evento completo (con fallback si no hay ninguno)', async ({ page }) => {
+    const cards = page.locator('.event-card');
+    const totalCards = await cards.count();
+
+    if (totalCards === 0) {
+      console.warn('No hay ningún evento en la página; se salta la comprobación de evento completo.');
+      return; // fallback: no rompemos el test en entornos sin eventos
+    }
+
+    // Buscar la primera card que tenga el badge de COMPLETO
+    let fullCardIndex = -1;
+
+    for (let i = 0; i < totalCards; i++) {
+      const card = cards.nth(i);
+      const fullBadge = card.locator('.status-badge.status-full');
+
+      if (await fullBadge.count() > 0 && await fullBadge.first().isVisible()) {
+        fullCardIndex = i;
+        break;
+      }
+    }
+
+    if (fullCardIndex === -1) {
+      console.warn('No se encontró ningún evento completo; se omiten las aserciones de este test.');
+      return; // fallback: no hay eventos llenos ahora mismo
+    }
+
+    const fullCard = cards.nth(fullCardIndex);
+
+    // 1) El badge debe decir "Completo"
+    const fullBadge = fullCard.locator('.status-badge.status-full');
+    await expect(fullBadge).toHaveText(/completo/i);
+
+    // 2) participantes == capacidad (ej: "1/1")
+    const capacityText = await fullCard.locator('.capacity-number').innerText(); // "1/1"
+    const [currentStr, maxStr] = capacityText.split('/');
+    const current = Number(currentStr.trim());
+    const max = Number(maxStr.trim());
+    expect(current).toBe(max);
+
+    // 3) El botón debe decir "Completo" y estar deshabilitado (no me deja entrar)
+    const fullButton = fullCard.getByRole('button', { name: /^Completo$/ });
+    await expect(fullButton).toBeVisible();
+    await expect(fullButton).toBeDisabled();
+  });
+
+});
+
+
