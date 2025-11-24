@@ -199,6 +199,7 @@ async function transformEvents(data, enrolledIds) {
         languages: languages.length ? languages : ["es"],
         tags,
         isEnrolled,
+        creatorId: event.idCreador,
       };
     })
   );
@@ -404,6 +405,7 @@ export async function getUserEvents() {
         participants,
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
+        creatorId: event.idCreador,
       };
     })
   );
@@ -452,6 +454,7 @@ export async function getMyCreatedEvents() {
         participants,
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
+        creatorId: event.idCreador,
       };
     })
   );
