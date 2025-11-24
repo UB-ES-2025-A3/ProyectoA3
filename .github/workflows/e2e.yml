@@ -1,0 +1,81 @@
+name: Frontend E2E Tests
+
+on:
+  push:
+    branches: [ main, dev, pre_prod ] 
+  pull_request:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------- BACKEND ---------------
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: |
+          mvn -U -DskipTests clean package
+
+      - name: Start backend
+        working-directory: ./backend
+        run: |
+          mvn spring-boot:run > backend.log 2>&1 &
+          sleep 10
+          if ! pgrep -f "spring-boot:run" > /dev/null; then
+            echo "❌ Backend no arrancó. Logs:"
+            cat backend.log
+            exit 1
+          fi 
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: ${{ secrets.TEST_DB_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_DB_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_PASS }}
+
+      # --------------- FRONTEND ---------------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build frontend (production)
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Start static frontend server
+        working-directory: ./frontend
+        run: |
+          npx serve -s build -l 3000 > frontend.log 2>&1 &
+          sleep 5
+          if ! pgrep -f "serve -s build" > /dev/null; then
+            echo "❌ Frontend no arrancó. Logs:"
+            cat frontend.log
+            exit 1
+          fi
+
+      - name: Wait for services
+        run: npx wait-on http://localhost:3000
+
+      # --------------- PLAYWRIGHT ---------------
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: npx playwright test
