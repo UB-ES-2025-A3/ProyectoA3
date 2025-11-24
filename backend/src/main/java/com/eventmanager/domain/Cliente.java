@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +33,15 @@ public class Cliente {
   @NotBlank @Email @Column(unique = true) private String correo;
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
-  private List<String> idioma;
+
+  @ElementCollection
+  @CollectionTable(
+          name = "cliente_idiomas",
+          joinColumns = @JoinColumn(name = "cliente_id")
+  )
+  @Column(name = "idioma")
+  private List<String> idioma = new ArrayList<>();
+
   @Column(columnDefinition = "TEXT")
   private String descripcion;
   @NotBlank private String passwordHash;
@@ -70,7 +81,7 @@ public class Cliente {
 
   public List<String> getIdiomas() { return idioma; }
   public void setIdiomas(List<String> idiomas) { this.idioma = idiomas; }
-  public void addIdiomas(String idioma){this.idioma.add(idioma);}
+  public void addIdiomas(String idioma){ this.idioma.add(idioma); }
 
   public String getDescripcion() { return descripcion; }
   public void setDescripcion(String descripcion) { this.descripcion = descripcion; }

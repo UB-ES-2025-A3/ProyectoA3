@@ -96,6 +96,44 @@ const userService = {
       return { success: false, error: error.response?.data?.message || 'Error al actualizar el perfil' };
     }
   },
+
+  async getParticipantsByIds(participantIds) {
+    if (USE_MOCKS) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return {
+        success: true,
+        data: participantIds.slice(0, 3).map((id, index) => ({
+          id,
+          nombre: ['María', 'Carlos', 'Ana'][index] || 'Usuario',
+          apellidos: ['García', 'López', 'Martínez'][index] || 'Apellido',
+          username: `user${id}`,
+          ciudad: ['Barcelona', 'Madrid', 'Valencia'][index] || 'Ciudad',
+          idiomas: [['es', 'en'], ['es', 'fr'], ['es', 'en', 'de']][index] || ['es']
+        }))
+      };
+    }
+
+    try {
+      const token = getToken();
+      const response = await axios.post(
+        `${API_BASE_URL}/clients/participants`,
+        participantIds,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : undefined,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Error al obtener participantes:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Error al obtener información de participantes'
+      };
+    }
+  },
 };
 
 export default userService;

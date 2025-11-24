@@ -1,6 +1,7 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
@@ -99,5 +100,9 @@ public class ClienteService {
       c.getIdiomas(),
       c.getDescripcion()
     );
+  }
+
+  public List<Cliente> getParticipantesByIds(List<Long> participantesIds){
+    return repo.findAllById(participantesIds);
   }
 }
