@@ -31,12 +31,15 @@ jobs:
           mvn spring-boot:run > backend.log 2>&1 &
           sleep 10
           if ! pgrep -f "spring-boot:run" > /dev/null; then
-            echo " Backend no arrancó. Logs:"
+            echo "❌ Backend no arrancó. Logs:"
             cat backend.log
             exit 1
           fi
         env:
           SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: ${{ secrets.TEST_DB_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.TEST_DB_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.TEST_DB_PASS }}
 
       # --------------- FRONTEND ---------------
       - name: Setup Node
@@ -48,7 +51,7 @@ jobs:
         working-directory: ./frontend
         run: npm install
 
-      - name: Build frontend (producción)
+      - name: Build frontend (production)
         working-directory: ./frontend
         run: npm run build
 
@@ -58,7 +61,7 @@ jobs:
           npx serve -s build -l 3000 > frontend.log 2>&1 &
           sleep 5
           if ! pgrep -f "serve -s build" > /dev/null; then
-            echo " Frontend no arrancó. Logs:"
+            echo "❌ Frontend no arrancó. Logs:"
             cat frontend.log
             exit 1
           fi
