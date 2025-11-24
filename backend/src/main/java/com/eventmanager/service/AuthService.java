@@ -30,19 +30,24 @@ public class AuthService {
     return new AuthResponse("token-" + c.getId(), c.getId(), c.getUsername());
   }
 
-  public AuthResponse login(LoginRequest req) {
+public AuthResponse login(LoginRequest req) {
+  try {
     Optional<Cliente> oc = repo.findByUsernameIgnoreCase(req.usernameOrEmail())
         .or(() -> repo.findByCorreoIgnoreCase(req.usernameOrEmail()));
-    
+
     if (oc.isEmpty()) {
       throw new ValidationException("Usuario o correo no encontrado. Verifica tus credenciales.");
     }
-    
+
     Cliente c = oc.get();
     if (!enc.matches(req.password(), c.getPasswordHash())) {
       throw new ValidationException("Contraseña incorrecta. Inténtalo de nuevo.");
     }
-    
+
     return new AuthResponse("token-" + c.getId(), c.getId(), c.getUsername());
+  } catch (Exception ex) {
+    ex.printStackTrace(); // o usa log.error
+    throw ex; // deja que lo capture el handler global
   }
+}
 }
