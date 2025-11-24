@@ -10,3 +10,4 @@ npx playwright install
 
 npx playwright test
 npx playwright test --debug
+npx playwright test tests/signup.spec.ts --debug
