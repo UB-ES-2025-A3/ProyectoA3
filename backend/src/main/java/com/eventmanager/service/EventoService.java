@@ -1,8 +1,10 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.time.Period;
+import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,9 @@ import com.eventmanager.service.errors.SqlErrorDetails;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ValidationException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EventoService {
   private final EventoRepository repo;
@@ -48,9 +53,26 @@ public class EventoService {
       int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
 
       List<String> idiomasList = usuario.getIdiomas();
-      String[] idiomasArray = idiomasList.toArray(new String[0]);
 
-      var eventos = repo.findEventosPermitidos(userId, idiomasArray, edadUsuario);
+// convertir la lista de idiomas a Set para contains() O(1)
+       Set<String> idiomasPermitidos = new HashSet<>(idiomasList);
+
+       var eventos = repo.findEventosPermitidos(userId, edadUsuario);
+
+       eventos.removeIf(evento -> {
+         var restricciones = evento.getRestricciones();
+         if (restricciones == null) return false; // o true si quieres excluir sin restricciones
+         List<String> idiomasEvento = restricciones.getIdiomas_permitidos();
+         if (idiomasEvento == null || idiomasEvento.isEmpty()) return false;
+
+         for (String idiomaEvento : idiomasEvento) {
+           if (!idiomasPermitidos.contains(idiomaEvento)) {
+             log.info("Excluyendo eventoId={} por restricción de idiomas", evento.getId());
+             return true; // eliminar este evento
+           }
+         }
+         return false; // mantener
+       });
 
       return eventos.stream()
             .map(this::toView)
