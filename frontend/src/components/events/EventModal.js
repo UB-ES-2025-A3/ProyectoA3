@@ -1,8 +1,55 @@
 // src/components/events/EventModal.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./EventModal.css";
+import userService from "../../services/userService";
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
+  const [participants, setParticipants] = useState([]);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [creatorInfo, setCreatorInfo] = useState(null);
+
+  // Cargar información de participantes cuando se abre el modal
+  useEffect(() => {
+    if (isOpen && event && event.participants && event.participants.length > 0) {
+      loadParticipantsInfo();
+    } else {
+      setParticipants([]);
+    }
+  }, [isOpen, event]);
+
+  const loadParticipantsInfo = async () => {
+    setLoadingParticipants(true);
+    try {
+      const participantIds = event.participants || [];
+      if (participantIds.length === 0) {
+        setParticipants([]);
+        setLoadingParticipants(false);
+        return;
+      }
+
+      const result = await userService.getParticipantsByIds(participantIds);
+      if (result.success) {
+        setParticipants(result.data);
+        
+        // Cargar información del creador si existe
+        if (event.creatorId) {
+          const creatorResult = await userService.getUserProfile(event.creatorId);
+          if (creatorResult.success) {
+            setCreatorInfo(creatorResult.data);
+          }
+        }
+      } else {
+        console.error('Error al cargar participantes:', result.error);
+        setParticipants([]);
+      }
+    } catch (error) {
+      console.error('Error al cargar participantes:', error);
+      setParticipants([]);
+    } finally {
+      setLoadingParticipants(false);
+    }
+  };
+
   if (!isOpen || !event) return null;
 
   // Formatear fecha de manera segura
@@ -116,6 +163,79 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
               </div>
             </div>
           </div>
+
+          {/* Sección de Participantes */}
+          {currentParticipants > 0 && (
+            <div className="modal-section">
+              <h3>
+                Participantes Inscritos ({currentParticipants})
+              </h3>
+              
+              {loadingParticipants ? (
+                <div className="participants-loading">
+                  <div className="loading-spinner"></div>
+                  <p>Cargando participantes...</p>
+                </div>
+              ) : participants.length > 0 ? (
+                <div className="participants-list">
+                  {participants.map((participant) => {
+                    const isCreator = event.creatorId && participant.id === event.creatorId;
+                    const initials = `${participant.nombre?.[0] || ''}${participant.apellidos?.[0] || ''}`.toUpperCase();
+                    
+                    return (
+                      <div key={participant.id} className="participant-card">
+                        <div className="participant-avatar">
+                          {initials || '?'}
+                        </div>
+                        <div className="participant-info">
+                          <div className="participant-name">
+                            {participant.nombre} {participant.apellidos}
+                            {isCreator && (
+                              <span className="creator-badge" title="Creador del evento">
+                                ★ Creador
+                              </span>
+                            )}
+                          </div>
+                          <div className="participant-details">
+                            <span className="participant-username">@{participant.username}</span>
+                            {participant.ciudad && (
+                              <span className="participant-location">
+                                📍 {participant.ciudad}
+                              </span>
+                            )}
+                          </div>
+                          {participant.idiomas && participant.idiomas.length > 0 && (
+                            <div className="participant-languages">
+                              {participant.idiomas.map((lang) => {
+                                const langNames = {
+                                  'es': '🇪🇸 ES',
+                                  'en': '🇬🇧 EN',
+                                  'fr': '🇫🇷 FR',
+                                  'de': '🇩🇪 DE',
+                                  'it': '🇮🇹 IT',
+                                  'pt': '🇵🇹 PT',
+                                  'ru': '🇷🇺 RU'
+                                };
+                                return (
+                                  <span key={lang} className="language-badge">
+                                    {langNames[lang] || lang.toUpperCase()}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="participants-empty">
+                  <p>No se pudo cargar la información de los participantes</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="modal-footer">
