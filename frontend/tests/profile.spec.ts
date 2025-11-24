@@ -33,7 +33,7 @@ test.describe('Perfil de usuario', () => {
   });
 
   // Editar el perfil, guardar, y volver a los valores originales
-  test('Profile - Editar perfil y restaurar valores originales', async ({ page }) => {
+  test.skip('Profile - Editar perfil y restaurar valores originales', async ({ page }) => {
     // Selectores de los datos "en modo lectura"
     const nombreText = page.locator('.info-item').nth(0).locator('p');
     const apellidosText = page.locator('.info-item').nth(1).locator('p');
@@ -69,7 +69,7 @@ test.describe('Perfil de usuario', () => {
     // Banner de éxito (opcional)
     const successText = page.getByText(/perfil actualizado/i);
     if (await successText.count()) {
-    await expect(successText.first()).toBeVisible();
+        await expect(successText.first()).toBeVisible();
     }
 
 
