@@ -34,4 +34,9 @@ spring:
 
 app:
   cors:
-    allowed-origins: "http://localhost:5173,http://localhost:3000,https://ub-es-2025-a3.github.io"
+    allowed-origins: >
+      http://localhost:5173,
+      http://localhost:3000,
+      https://ub-es-2025-a3.github.io,
+      https://proyecto-a3.vercel.app,
+      https://proyecto-a3-git-preprod.vercel.app
