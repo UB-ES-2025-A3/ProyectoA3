@@ -1,5 +1,6 @@
+// src/services/eventService.js
 import { mockEvents } from "../mocks/events.mock";
-import { mockUserEvents } from "../mocks/profile/events.mock";
+// import { mockUserEvents } from "../mocks/profile/events.mock"; // eliminado por lint
 import { chooseImageForTags } from "./imagePicker";
 
 const DEFAULT_EVENT_IMAGE =
