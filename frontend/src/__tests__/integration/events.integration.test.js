@@ -64,7 +64,7 @@ describe('Tests de Integración - Eventos', () => {
 
       // Renderizar EventPage con router
       render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_relativeSplatPath: true }}>
           <EventPage />
         </MemoryRouter>
       );
@@ -105,7 +105,7 @@ describe('Tests de Integración - Eventos', () => {
       global.fetch.mockRejectedValueOnce(new Error('Error de red'));
 
       render(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_relativeSplatPath: true }}>
           <EventPage />
         </MemoryRouter>
       );

@@ -37,7 +37,7 @@ describe('Tests de Integración - Autenticación', () => {
 
       // Renderizar LoginPage con router
       const { container } = render(
-        <MemoryRouter initialEntries={['/login']}>
+        <MemoryRouter initialEntries={['/login']} future={{ v7_relativeSplatPath: true }}>
           <LoginPage />
         </MemoryRouter>
       );
@@ -103,7 +103,7 @@ describe('Tests de Integración - Autenticación', () => {
       axios.post.mockRejectedValue(mockError);
 
       render(
-        <MemoryRouter initialEntries={['/login']}>
+        <MemoryRouter initialEntries={['/login']} future={{ v7_relativeSplatPath: true }}>
           <LoginPage />
         </MemoryRouter>
       );
@@ -160,7 +160,7 @@ describe('Tests de Integración - Autenticación', () => {
       axios.post.mockResolvedValue(mockBackendResponse);
 
       render(
-        <MemoryRouter initialEntries={['/register']}>
+        <MemoryRouter initialEntries={['/register']} future={{ v7_relativeSplatPath: true }}>
           <RegisterPage />
         </MemoryRouter>
       );
