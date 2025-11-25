@@ -31,9 +31,19 @@ const authService = {
         data: response.data
       };
     } catch (error) {
+      // Intentar obtener el mensaje de error del backend
+      let errorMessage = 'Error al registrar usuario';
+      
+      if (error.response?.data) {
+        // El backend puede devolver el mensaje en 'message' o 'error'
+        errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return {
         success: false,
-        error: error.response?.data?.message || 'Error al registrar usuario'
+        error: errorMessage
       };
     }
   },

@@ -143,7 +143,7 @@ test('Registro con usuario ya creado (NO_BORRAR_TESTS_CI)', async ({ page }) => 
 
   const errorBanner = page.locator('.message-banner.error');
   await expect(errorBanner).toBeVisible();
-  await expect(errorBanner).toContainText(/(ya existe|ya registrado|en uso)/i);
+  await expect(errorBanner).toContainText(/(ya existe|ya registrado|en uso|username en uso|correo en uso)/i);
 });
 
 
