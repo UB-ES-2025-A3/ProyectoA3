@@ -314,12 +314,14 @@
   border: 1px solid #e9ecef;
   border-radius: 10px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .participant-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
 }
 
 .participant-avatar {
