@@ -87,9 +87,9 @@ public class EventoServiceIntegrationTest {
 
   @Test
   void guardarYListar_eventoEnBaseDeDatos() {
-/*    assertNotNull(creado.id(), "Debe devolver id");
+    assertNotNull(creado.id(), "Debe devolver id");
 
-    var lista = eventoService.listarEventosSinRestricciones(creadorId);
+    var lista = eventoService.listar();
     assertFalse(lista.isEmpty(), "La lista no debería estar vacía");
 
     var v = lista.stream()
@@ -106,7 +106,7 @@ public class EventoServiceIntegrationTest {
     assertEquals(req.restricciones().plazasDisponibles(), v.maxPersonas());
     assertEquals(req.titulo(), v.titulo());
     assertEquals(req.descripcion(), v.descripcion());
-    assertEquals(req.idCreador(), v.idCreador());*/
+    assertEquals(req.idCreador(), v.idCreador());
   }
 
   @Test

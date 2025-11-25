@@ -1,5 +1,6 @@
+// src/services/eventService.js
 import { mockEvents } from "../mocks/events.mock";
-import { mockUserEvents } from "../mocks/profile/events.mock";
+// import { mockUserEvents } from "../mocks/profile/events.mock"; // eliminado por lint
 import { chooseImageForTags } from "./imagePicker";
 
 const DEFAULT_EVENT_IMAGE =
@@ -7,20 +8,21 @@ const DEFAULT_EVENT_IMAGE =
 
 // Funciones utilitarias ------------------------------------------------------
 function getConfig() {
-  if (window.APP_CONFIG) {
-    console.log("Usando configuración en tiempo de ejecución:", window.APP_CONFIG);
-    return {
-      API_BASE_URL: window.APP_CONFIG.REACT_APP_API_URL || "http://localhost:8080/api",
-      USE_MOCKS: window.APP_CONFIG.REACT_APP_USE_MOCKS === true,
-    };
-  }
+  const API_BASE_URL =
+    (window.APP_CONFIG && window.APP_CONFIG.REACT_APP_API_URL) ||
+    process.env.REACT_APP_API_URL ||
+    "http://localhost:8080/api";
 
-  console.log("Usando variables de entorno como fallback");
-  return {
-    API_BASE_URL: process.env.REACT_APP_API_URL || "http://localhost:8080/api",
-    USE_MOCKS: process.env.REACT_APP_USE_MOCKS === "true",
-  };
+  const USE_MOCKS =
+    process.env.REACT_APP_USE_MOCKS === "true" ||
+    window.APP_CONFIG?.REACT_APP_USE_MOCKS === true;
+
+  console.log("[events] API_BASE_URL =", API_BASE_URL);
+  console.log("[events] USE_MOCKS =", USE_MOCKS);
+
+  return { API_BASE_URL, USE_MOCKS };
 }
+
 
 function authHeaders() {
   const token =

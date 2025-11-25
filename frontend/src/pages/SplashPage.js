@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/SplashPage.css';
+// src/pages/SplashPage.js
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/SplashPage.css";
 
 function SplashPage() {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleSignUp = () => {
-    navigate('/register');
+    navigate("/register");
   };
 
   return (
@@ -37,4 +38,3 @@ function SplashPage() {
 }
 
 export default SplashPage;
-
