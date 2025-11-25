@@ -62,7 +62,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.hora = 'La hora es requerida';
     }
 
-    if (!Array.isArray(formData.idioma) || formData.idioma.length === 0 || !formData.idioma[0]) {
+    if (!formData.idioma || (typeof formData.idioma === 'string' && formData.idioma.trim() === '') || (Array.isArray(formData.idioma) && formData.idioma.length === 0)) {
       newErrors.idioma = 'Debes seleccionar un idioma';
     }
 
@@ -119,6 +119,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         titulo: '',
         etiquetas: '',
         fecha: '',
+        hora: '',
         idioma: '',
         plazasDisponibles: '',
         edadMinima: '',

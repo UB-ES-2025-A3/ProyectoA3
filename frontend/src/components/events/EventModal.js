@@ -18,7 +18,13 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
 
   useEffect(() => {
     if (event?.id) {
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      let favorites;
+      try {
+        favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      } catch (e) {
+        favorites = [];
+        localStorage.setItem('favoriteEvents', JSON.stringify([]));
+      }
       setIsFavorite(favorites.includes(event.id.toString()));
     }
   }, [event?.id]);
@@ -36,7 +42,13 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
   const toggleFavorite = () => {
     if (!event?.id) return;
     
-    const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+    let favorites;
+    try {
+      favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+    } catch (e) {
+      favorites = [];
+      localStorage.setItem('favoriteEvents', JSON.stringify([]));
+    }
     const eventIdStr = event.id.toString();
     
     if (isFavorite) {

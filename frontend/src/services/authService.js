@@ -10,7 +10,9 @@ function resolveApiBase() {
 }
 
 const API_BASE_URL = resolveApiBase();
-console.log('[authService] API_BASE_URL =', API_BASE_URL);
+if (process.env.NODE_ENV !== 'test') {
+  console.log('[authService] API_BASE_URL =', API_BASE_URL);
+}
 
 const authService = {
   // Registro de usuario
@@ -21,17 +23,27 @@ const authService = {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      if (response.data.id) {
-        localStorage.setItem('userId', response.data.id.toString());
+      if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId.toString());
       }
       return {
         success: true,
         data: response.data
       };
     } catch (error) {
+      // Intentar obtener el mensaje de error del backend
+      let errorMessage = 'Error al registrar usuario';
+      
+      if (error.response?.data) {
+        // El backend puede devolver el mensaje en 'message' o 'error'
+        errorMessage = error.response.data.message || error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       return {
         success: false,
-        error: error.response?.data?.message || 'Error al registrar usuario'
+        error: errorMessage
       };
     }
   },
@@ -44,8 +56,8 @@ const authService = {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      if (response.data.id) {
-        localStorage.setItem('userId', response.data.id.toString());
+      if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId.toString());
       }
       return {
         success: true,
