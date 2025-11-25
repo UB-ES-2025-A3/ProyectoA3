@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
+import UserProfileModal from "../users/UserProfileModal";
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -10,6 +11,8 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const notifyFavoritesUpdated = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('favoritesUpdated'));
@@ -247,7 +250,16 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
                     }`.toUpperCase();
 
                     return (
-                      <div key={participant.id} className="participant-card">
+                      <div 
+                        key={participant.id} 
+                        className="participant-card"
+                        onClick={() => {
+                          setSelectedUserId(participant.id);
+                          setIsProfileModalOpen(true);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                        title="Click para ver perfil"
+                      >
                         <div className="participant-avatar">{initials || "?"}</div>
                         <div className="participant-info">
                           <div className="participant-name">
@@ -339,6 +351,16 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           )}
         </div>
       </div>
+
+      {/* Modal de Perfil de Usuario */}
+      <UserProfileModal
+        userId={selectedUserId}
+        isOpen={isProfileModalOpen}
+        onClose={() => {
+          setIsProfileModalOpen(false);
+          setSelectedUserId(null);
+        }}
+      />
     </div>
   );
 }

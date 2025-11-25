@@ -34,7 +34,7 @@ public class Cliente {
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
           name = "cliente_idiomas",
           joinColumns = @JoinColumn(name = "cliente_id")
