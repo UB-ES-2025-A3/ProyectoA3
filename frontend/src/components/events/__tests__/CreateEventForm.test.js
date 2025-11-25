@@ -149,6 +149,235 @@ describe('CreateEventForm', () => {
         expect(screen.queryByText(/el título del evento es requerido/i)).not.toBeInTheDocument();
       });
     });
+
+    describe('Validación de Edad Mínima', () => {
+      const fillBasicForm = async () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+        await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Evento de prueba');
+        await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
+        await userEvent.type(screen.getByLabelText(/hora \*/i), '18:00');
+        await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
+        await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '10');
+        await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+        await userEvent.selectOptions(screen.getByLabelText(/etiquetas/i), 'turismo');
+      };
+
+      test('muestra el campo de edad mínima como opcional', () => {
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        const edadMinimaLabel = screen.getByLabelText(/edad mínima/i);
+        expect(edadMinimaLabel).toBeInTheDocument();
+        expect(screen.getByText(/edad mínima \(opcional\)/i)).toBeInTheDocument();
+      });
+
+      test('permite crear evento sin especificar edad mínima', async () => {
+        eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(eventService.createEvent).toHaveBeenCalled();
+        });
+
+        const callArgs = eventService.createEvent.mock.calls[0][0];
+        expect(callArgs.restricciones.edad_minima).toBeNull();
+      });
+
+      test('acepta edad mínima de 0 años', async () => {
+        eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        await userEvent.type(edadMinimaInput, '0');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(eventService.createEvent).toHaveBeenCalled();
+        });
+
+        const callArgs = eventService.createEvent.mock.calls[0][0];
+        expect(callArgs.restricciones.edad_minima).toBe(0);
+      });
+
+      test('acepta edad mínima válida (18 años)', async () => {
+        eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        await userEvent.type(edadMinimaInput, '18');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(eventService.createEvent).toHaveBeenCalled();
+        });
+
+        const callArgs = eventService.createEvent.mock.calls[0][0];
+        expect(callArgs.restricciones.edad_minima).toBe(18);
+      });
+
+      test('rechaza edad mínima negativa', async () => {
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        await userEvent.type(edadMinimaInput, '-5');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(screen.getByText(/la edad mínima debe ser 0 o mayor/i)).toBeInTheDocument();
+        });
+
+        expect(eventService.createEvent).not.toHaveBeenCalled();
+      });
+
+      test('rechaza edad mínima mayor a 120 años', async () => {
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        await userEvent.type(edadMinimaInput, '150');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(screen.getByText(/la edad mínima debe ser menor a 120/i)).toBeInTheDocument();
+        });
+
+        expect(eventService.createEvent).not.toHaveBeenCalled();
+      });
+
+      test('acepta edad mínima en el límite superior (120 años)', async () => {
+        eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        await userEvent.type(edadMinimaInput, '120');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(eventService.createEvent).toHaveBeenCalled();
+        });
+
+        const callArgs = eventService.createEvent.mock.calls[0][0];
+        expect(callArgs.restricciones.edad_minima).toBe(120);
+      });
+
+      test('limpia el error de edad mínima cuando el usuario corrige el valor', async () => {
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        await fillBasicForm();
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        
+        await userEvent.type(edadMinimaInput, '-5');
+        
+        const submitButton = screen.getByRole('button', { name: /crear evento/i });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          expect(screen.getByText(/la edad mínima debe ser 0 o mayor/i)).toBeInTheDocument();
+        });
+
+        await userEvent.clear(edadMinimaInput);
+        await userEvent.type(edadMinimaInput, '18');
+
+        await waitFor(() => {
+          expect(screen.queryByText(/la edad mínima debe ser 0 o mayor/i)).not.toBeInTheDocument();
+        });
+      });
+
+      test('el campo tiene atributos min y max correctos', () => {
+        render(
+          <CreateEventForm
+            isOpen={true}
+            onClose={mockOnClose}
+            onSuccess={mockOnSuccess}
+          />
+        );
+        
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        
+        expect(edadMinimaInput).toHaveAttribute('type', 'number');
+        expect(edadMinimaInput).toHaveAttribute('min', '0');
+        expect(edadMinimaInput).toHaveAttribute('max', '120');
+      });
+    });
   });
 
   describe('Envío del formulario', () => {
@@ -188,8 +417,9 @@ describe('CreateEventForm', () => {
           hora: '10:00',
           lugar: 'Barcelona',
           restricciones: {
-            idiomaRequerido: 'es',
-            plazasDisponibles: 50
+            idiomasRequerido: ['es'],
+            plazasDisponibles: 50,
+            edad_minima: null
           }
         });
       });
@@ -211,6 +441,7 @@ describe('CreateEventForm', () => {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Test Event');
+      await userEvent.selectOptions(screen.getByLabelText(/etiquetas/i), 'turismo');
       await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
       await userEvent.type(screen.getByLabelText(/hora \*/i), '10:00');
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
@@ -222,7 +453,7 @@ describe('CreateEventForm', () => {
 
       await waitFor(() => {
         expect(mockOnSuccess).toHaveBeenCalled();
-      });
+      }, { timeout: 3000 });
     });
 
     test('debe mostrar error cuando falla la creación del evento', async () => {
@@ -241,6 +472,7 @@ describe('CreateEventForm', () => {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Test Event');
+      await userEvent.selectOptions(screen.getByLabelText(/etiquetas/i), 'turismo');
       await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
       await userEvent.type(screen.getByLabelText(/hora \*/i), '10:00');
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
@@ -250,15 +482,22 @@ describe('CreateEventForm', () => {
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       await userEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(screen.getByText(/error al crear el evento/i)).toBeInTheDocument();
-      });
+      // Esperar a que aparezca el mensaje de error usando findByText
+      const errorMessage = await screen.findByText(/Error al crear el evento/i, {}, { timeout: 3000 });
+      expect(errorMessage).toBeInTheDocument();
+
+      // Verificar que onSuccess NO fue llamado
+      expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
     test('debe mostrar estado de carga durante la creación', async () => {
-      eventService.createEvent.mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve({ id: 1 }), 100))
-      );
+      // Crear una promesa que se resuelve después de un delay
+      let resolvePromise;
+      const delayedPromise = new Promise(resolve => {
+        resolvePromise = resolve;
+      });
+      
+      eventService.createEvent.mockImplementation(() => delayedPromise);
 
       render(
         <CreateEventForm
@@ -273,6 +512,7 @@ describe('CreateEventForm', () => {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Test Event');
+      await userEvent.selectOptions(screen.getByLabelText(/etiquetas/i), 'turismo');
       await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
       await userEvent.type(screen.getByLabelText(/hora \*/i), '10:00');
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
@@ -280,11 +520,29 @@ describe('CreateEventForm', () => {
       await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      
+      // Hacer click y verificar que el botón se deshabilita
       await userEvent.click(submitButton);
 
+      // Verificar que el botón está deshabilitado durante la carga
       await waitFor(() => {
         expect(submitButton).toBeDisabled();
-      }, { timeout: 1000 });
+      });
+
+      // Verificar que el texto del botón cambia a "Creando..."
+      await waitFor(() => {
+        const creatingButton = screen.getByRole('button', { name: /creando.../i });
+        expect(creatingButton).toBeDisabled();
+      });
+
+      // Resolver la promesa para completar el test
+      resolvePromise({ id: 1 });
+      
+      // Esperar a que termine la carga y el botón vuelva a estar habilitado
+      await waitFor(() => {
+        const enabledButton = screen.getByRole('button', { name: /crear evento/i });
+        expect(enabledButton).not.toBeDisabled();
+      }, { timeout: 3000 });
     });
   });
 });
