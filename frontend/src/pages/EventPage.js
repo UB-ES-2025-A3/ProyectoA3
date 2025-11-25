@@ -589,7 +589,7 @@ export default function EventPage() {
                 >
                   <FaBookmark />
                   <span>Solo favoritos</span>
-                  <span className="favorite-count">{favoriteEventIds.length}</span>
+                  <span className="favorite-count">{favoriteEventIds.length - 1}</span>
                 </button>
               </div>
 
