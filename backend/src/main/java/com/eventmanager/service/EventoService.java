@@ -22,9 +22,6 @@ import com.eventmanager.service.errors.SqlErrorDetails;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ValidationException;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
 public class EventoService {
   private final EventoRepository repo;
@@ -52,11 +49,7 @@ public class EventoService {
               .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
       int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
 
-
-
       List<String> idiomasList = usuario.getIdiomas();
-
-       log.info("UsuarioId={} tiene {}", userId, idiomasList);
 
        Set<String> idiomasPermitidos = new HashSet<>(idiomasList);
 
@@ -70,7 +63,6 @@ public class EventoService {
 
          for (String idiomaEvento : idiomasEvento) {
            if (!idiomasPermitidos.contains(idiomaEvento)) {
-             log.info("Excluyendo eventoId={} por restricción de idiomas", evento.getId());
              return true; // eliminar este evento
            }
          }
