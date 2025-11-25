@@ -5,7 +5,7 @@ import EventModal from '../components/events/EventModal';
 import CreateEventForm from '../components/events/CreateEventForm';
 import MessageBanner from '../components/common/MessageBanner';
 import '../styles/EventPage.css';
-import { FaLanguage, FaUsers, FaSearch, FaFeatherAlt } from 'react-icons/fa';
+import { FaLanguage, FaUsers, FaSearch, FaFeatherAlt, FaBookmark } from 'react-icons/fa';
 
 export default function EventPage() {
   const [events, setEvents] = useState([]);
@@ -18,11 +18,27 @@ export default function EventPage() {
     language: '',
     minAge: '',
     maxPersons: '',
-    tags: []
+    tags: [],
+    onlyFavorites: false
   });
   const [openFilter, setOpenFilter] = useState(null);
   const [availableTags, setAvailableTags] = useState([]);
   const [joiningEventId, setJoiningEventId] = useState(null);
+  const [favoriteEventIds, setFavoriteEventIds] = useState([]);
+
+  const getStoredFavoriteIds = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return [];
+    }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      return Array.isArray(stored) ? stored : [];
+    } catch (error) {
+      console.warn('No se pudieron cargar los favoritos almacenados.', error);
+      return [];
+    }
+  }, []);
 
   // Modal states
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -30,6 +46,8 @@ export default function EventPage() {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 
   const applyFilters = useCallback(() => {
+    const favoritesSet = new Set(favoriteEventIds.map(id => id.toString()));
+
     const filtered = events.filter(event => {
       if (filters.searchText) {
         const searchLower = filters.searchText.toLowerCase();
@@ -67,11 +85,17 @@ export default function EventPage() {
         }
       }
 
+      if (filters.onlyFavorites) {
+        if (!favoritesSet.has(event.id?.toString())) {
+          return false;
+        }
+      }
+
       return true;
     });
 
     setFilteredEvents(filtered);
-  }, [events, filters]);
+  }, [events, filters, favoriteEventIds]);
 
   // Cargar eventos al montar el componente
   useEffect(() => {
@@ -96,6 +120,28 @@ export default function EventPage() {
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
+
+  useEffect(() => {
+    setFavoriteEventIds(getStoredFavoriteIds());
+  }, [getStoredFavoriteIds]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const handleFavoritesUpdated = () => {
+      setFavoriteEventIds(getStoredFavoriteIds());
+    };
+
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdated);
+    window.addEventListener('storage', handleFavoritesUpdated);
+
+    return () => {
+      window.removeEventListener('favoritesUpdated', handleFavoritesUpdated);
+      window.removeEventListener('storage', handleFavoritesUpdated);
+    };
+  }, [getStoredFavoriteIds]);
 
   useEffect(() => {
     const tagsSet = new Set();
@@ -158,7 +204,8 @@ export default function EventPage() {
       language: '',
       minAge: '',
       maxPersons: '',
-      tags: []
+      tags: [],
+      onlyFavorites: false
     });
   };
 
@@ -533,12 +580,24 @@ export default function EventPage() {
                     </div>
                   )}
                 </div>
+
+                <button
+                  type="button"
+                  className={`filter-icon-btn favorite-filter-btn ${filters.onlyFavorites ? 'active' : ''}`}
+                  onClick={() => handleFilterChange('onlyFavorites', !filters.onlyFavorites)}
+                  title="Mostrar solo eventos guardados"
+                >
+                  <FaBookmark />
+                  <span>Solo favoritos</span>
+                  <span className="favorite-count">{favoriteEventIds.length}</span>
+                </button>
               </div>
 
               {(filters.searchText ||
                 filters.language ||
                 filters.minAge ||
                 filters.maxPersons ||
+                filters.onlyFavorites ||
                 (filters.tags && filters.tags.length > 0)) && (
                   <button
                     className="clear-filters-btn full-width"
