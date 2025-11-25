@@ -10,6 +10,11 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
+  const notifyFavoritesUpdated = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('favoritesUpdated'));
+    }
+  };
 
   useEffect(() => {
     if (event?.id) {
@@ -38,10 +43,12 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
       const updated = favorites.filter(id => id !== eventIdStr);
       localStorage.setItem('favoriteEvents', JSON.stringify(updated));
       setIsFavorite(false);
+      notifyFavoritesUpdated();
     } else {
       favorites.push(eventIdStr);
       localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
       setIsFavorite(true);
+      notifyFavoritesUpdated();
     }
   };
 
