@@ -1,13 +1,22 @@
 // src/components/events/EventModal.js
 import React, { useState, useEffect } from "react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
+  const [isFavorite, setIsFavorite] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
+
+  useEffect(() => {
+    if (event?.id) {
+      const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      setIsFavorite(favorites.includes(event.id.toString()));
+    }
+  }, [event?.id]);
 
   // Cargar información de participantes cuando se abre el modal
   useEffect(() => {
@@ -18,6 +27,23 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, event]);
+
+  const toggleFavorite = () => {
+    if (!event?.id) return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+    const eventIdStr = event.id.toString();
+    
+    if (isFavorite) {
+      const updated = favorites.filter(id => id !== eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(updated));
+      setIsFavorite(false);
+    } else {
+      favorites.push(eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
+      setIsFavorite(true);
+    }
+  };
 
   const loadParticipantsInfo = async () => {
     setLoadingParticipants(true);
@@ -82,6 +108,18 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>
           ✕
+        </button>
+        <button 
+          className="modal-favorite-btn" 
+          onClick={toggleFavorite}
+          aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+          title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+        >
+          {isFavorite ? (
+            <FaBookmark className="favorite-icon favorite-icon-filled" />
+          ) : (
+            <FaRegBookmark className="favorite-icon favorite-icon-outline" />
+          )}
         </button>
         
         <div className="modal-header">

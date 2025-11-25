@@ -39,4 +39,9 @@ public class EventoDtos {
           Long idEvento,
           Long idParticipante
   ) {}
+
+  public static record EventoFav(
+            Long idEvento,
+            Long idUsuario
+  ) {}
 }

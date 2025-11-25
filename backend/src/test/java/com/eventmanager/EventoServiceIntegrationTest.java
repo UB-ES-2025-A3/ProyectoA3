@@ -146,4 +146,33 @@ public class EventoServiceIntegrationTest {
     EventoView actualizadoDespuesSalir = eventoService.removeParticipante(removeDto); 
     assertEquals(1, actualizadoDespuesSalir.participantesIds().size()); // Solo el creador
   }
+
+  @Test
+  void add_remove_favorite_eventoEnBaseDeDatos(){
+    List<String> idiomas = List.of("es");
+    var req = new EventoCreate(
+        LocalDate.of(2027, 12, 1),
+        LocalTime.of(19, 0, 0),
+        "Madrid",
+        new RestriccionesCreate(idiomas, 21, 100),
+        List.of("deporte"),
+        "EventoUnirseSalir",
+        "Prueba de unirse y salir evento",
+        creadorId 
+    );
+
+    EventoView creado = eventoService.crear(req);
+    assertNotNull(creado.id());
+
+    var favDto = new com.eventmanager.dto.EventoDtos.EventoFav(creado.id(), creadorId);
+    EventoView favorito = eventoService.addEventoFavorito(favDto);
+    assertNotNull(favorito.id());
+    Cliente cliente = clienteRepo.findById(creadorId).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    assertTrue(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+
+    EventoView noFavorito = eventoService.removeEventoFavorito(favDto);
+    assertNotNull(noFavorito.id());
+    assertFalse(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+    
+  }
 }
