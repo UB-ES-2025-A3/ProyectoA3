@@ -1,7 +1,10 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.time.Period;
+import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,9 @@ import com.eventmanager.service.errors.SqlErrorDetails;
 import jakarta.persistence.PersistenceException;
 import jakarta.validation.ValidationException;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class EventoService {
   private final EventoRepository repo;
@@ -40,6 +46,47 @@ public class EventoService {
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
     }
   }
+  public List<EventoView> listarEventosSinRestricciones(Long userId) {
+     try {
+      var usuario = clienteRepo.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
+      int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
+
+
+
+      List<String> idiomasList = usuario.getIdiomas();
+
+       log.info("UsuarioId={} tiene {}", userId, idiomasList);
+
+       Set<String> idiomasPermitidos = new HashSet<>(idiomasList);
+
+       var eventos = repo.findEventosPermitidos(userId, edadUsuario);
+
+       eventos.removeIf(evento -> {
+         var restricciones = evento.getRestricciones();
+         if (restricciones == null) return false; // o true si quieres excluir sin restricciones
+         List<String> idiomasEvento = restricciones.getIdiomas_permitidos();
+         if (idiomasEvento == null || idiomasEvento.isEmpty()) return false;
+
+         for (String idiomaEvento : idiomasEvento) {
+           if (!idiomasPermitidos.contains(idiomaEvento)) {
+             log.info("Excluyendo eventoId={} por restricción de idiomas", evento.getId());
+             return true; // eliminar este evento
+           }
+         }
+         return false; // mantener
+       });
+
+      return eventos.stream()
+            .map(this::toView)
+            .toList();
+
+     } catch (DataAccessException | PersistenceException ex) {
+       var det = SqlErrorDetails.from(ex);
+       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+     }
+  }
+
 
   public List<EventoView> listarMisEventos(Long clienteId) {
     try {
@@ -90,7 +137,7 @@ public class EventoService {
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
-          req.restricciones().idiomaRequerido(),
+          req.restricciones().idiomasRequerido(),
           req.restricciones().edad_minima(),
           req.restricciones().plazasDisponibles()
         ));
@@ -122,7 +169,7 @@ public class EventoService {
 
   private EventoView toView(Evento e) {
     var r = e.getRestricciones();
-    System.err.printf("Participantes: ", e.getParticipantes().stream().map(p -> p.getId()).toList());
+
     return new EventoView(
       e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
       r != null ? r.getIdiomas_permitidos() : null,

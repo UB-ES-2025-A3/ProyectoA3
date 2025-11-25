@@ -37,8 +37,8 @@ class EventoServiceTest {
     e.setTitulo("Prueba");
     e.setDescripcion("desc");
     e.setIdCreador(123L);
-    // restricciones JSON 
-    e.setRestricciones(new Restricciones("es,en", 18, 50));
+    List<String> idiomas = List.of("es", "en");
+    e.setRestricciones(new Restricciones(idiomas, 18, 50));
 
     when(repo.findAll()).thenReturn(List.of(e));
 
@@ -50,7 +50,7 @@ class EventoServiceTest {
     assertEquals(e.getFecha(), v.fecha());
     assertEquals(e.getHora(), v.hora());
     assertEquals(e.getLugar(), v.lugar());
-    assertEquals("es,en", v.idiomasPermitidos());
+    assertEquals(idiomas, v.idiomasPermitidos());
     assertEquals(18, v.edadMinima());
     assertEquals(50, v.maxPersonas());
     assertEquals("Prueba", v.titulo());

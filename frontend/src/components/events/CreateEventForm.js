@@ -9,7 +9,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     etiquetas: '',
     fecha: '',
     hora: '',
-    idioma: '',
+    idioma: [],
     plazasDisponibles: '',
     lugar: '',
     descripcion: ''
@@ -61,7 +61,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.hora = 'La hora es requerida';
     }
 
-    if (!formData.idioma) {
+    if (!Array.isArray(formData.idioma) || formData.idioma.length === 0 || !formData.idioma[0]) {
       newErrors.idioma = 'Debes seleccionar un idioma';
     }
 
@@ -94,7 +94,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       const response = await createEvent({
         titulo: formData.titulo,
         descripcion: formData.descripcion,
-        etiquetas: formData.etiquetas,
+        etiquetas: formData.etiquetas || 'otros',        
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,
@@ -111,7 +111,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         titulo: '',
         etiquetas: '',
         fecha: '',
-        idioma: '',
+        idioma: [],
         plazasDisponibles: '',
         lugar: '',
         descripcion: ''
@@ -213,9 +213,19 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               disabled={loading}
             >
               <option value="">Selecciona una etiqueta</option>
+              <option value="turismo">Turismo</option>
               <option value="comida">Comida</option>
               <option value="excursion">Excursión</option>
-              <option value="turismo">Turismo</option>
+              <option value="cultural">Cultural</option>
+              <option value="social">Social</option>
+              <option value="deporte">Deporte</option>
+              <option value="aventura">Aventura</option>
+              <option value="familiar">Familiar</option>
+              <option value="juegos">Juegos</option>
+              <option value="cine">Cine</option>
+              <option value="relax">Relax</option>
+              <option value="tardeo">Tardeo</option>
+              <option value="noche">Noche</option>
               <option value="otros">Otros</option>
             </select>
             {errors.etiquetas && <span className="error-message">{errors.etiquetas}</span>}
@@ -258,7 +268,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 id="idioma"
                 name="idioma"
                 value={formData.idioma}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, idioma: [e.target.value] })); // <-- convertir a array
+                }}
                 className={errors.idioma ? 'error' : ''}
                 disabled={loading}
               >

@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
-import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
+
+// 👇 IMPORTA AQUÍ TUS IMÁGENES DE AVATAR
+// Asegúrate de crear estos archivos o adaptar las rutas a las que tú tengas
+import avatarDefault from '../assets/avatars/avatar-default.jpg';
+// import avatar1 from '../assets/avatars/avatar-1.jpg';
+// import avatar2 from '../assets/avatars/avatar-2.jpg';
+// import avatar3 from '../assets/avatars/avatar-3.jpg';
+
+import avatar1 from '../assets/avatars/avatar-1.png';
+import avatar2 from '../assets/avatars/avatar-2.png';
+import avatar3 from '../assets/avatars/avatar-3.png';
+import avatar4 from '../assets/avatars/avatar-4.png';
+import avatar5 from '../assets/avatars/avatar-5.png';
+
+// 👇 Opciones de avatar disponibles
+const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
@@ -15,12 +31,28 @@ export default function ProfilePage() {
   const [banner, setBanner] = useState({ type: "success", message: "" });
   const [saving, setSaving] = useState(false);
 
-  // Cargar datos del usuario
+  // 👇 Estado para el avatar seleccionado
+  const [avatar, setAvatar] = useState(avatarDefault);
+
+  // *** NUEVO: COLOR DE FONDO ***
+  const DEFAULT_BG = "#f3f3f3";
+  const [bgColor, setBgColor] = useState(DEFAULT_BG);
+
+  // Cargar datos del usuario + avatar desde localStorage
   useEffect(() => {
     const loadUserData = async () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem('userId');
+
+        // *** NUEVO: COLOR DE FONDO ***
+        const storedColor = localStorage.getItem('profileBgColor');
+        if (storedColor) {
+          setBgColor(storedColor);
+        } else {
+          localStorage.setItem('profileBgColor', DEFAULT_BG);
+        }
+
         
         if (!userId) {
           setBanner({ type: "error", message: "No hay usuario logueado" });
@@ -28,15 +60,12 @@ export default function ProfilePage() {
         }
 
         // --- Carga de datos en paralelo ---
-        // Llamamos a todo a la vez para mejorar la velocidad de carga
         const [profileResult, statsResult, createdEventsData] = await Promise.all([
           userService.getUserProfile(userId),
           userService.getUserStats(userId),
           getMyCreatedEvents()
         ]);
 
-        // --- Procesar resultados ---
-        
         // 1. Perfil
         if (profileResult.success) {
           const user = profileResult.data?.data ?? profileResult.data;
@@ -52,13 +81,20 @@ export default function ProfilePage() {
         }
 
         // 3. Eventos Creados
-        // No necesitamos "if (success)" porque si getMyCreatedEvents falla,
-        // saltará directamente al 'catch'
         setUserEvents(createdEventsData);
+
+        // 4. Avatar desde localStorage
+        const storedAvatar = localStorage.getItem('profileAvatar');
+        if (storedAvatar) {
+          setAvatar(storedAvatar);
+        } else {
+          // si no había nada guardado, dejamos el avatar por defecto y lo guardamos
+          setAvatar(avatarDefault);
+          localStorage.setItem('profileAvatar', avatarDefault);
+        }
 
       } catch (error) {
         console.error('Error cargando datos del usuario:', error);
-        // Usamos error.message para dar un feedback más específico
         setBanner({ type: "error", message: `Error al cargar los datos: ${error.message || 'Error desconocido'}` });
       } finally {
         setLoading(false);
@@ -66,7 +102,7 @@ export default function ProfilePage() {
     };
 
     loadUserData();
-  }, []); // El array vacío asegura que solo se ejecute una vez
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -81,13 +117,11 @@ export default function ProfilePage() {
       const result = await userService.updateUserProfile(userId, editData);
 
       if (result.success) {
-        // Normaliza respuesta y actualiza estado
         const updated = result.data?.data ?? result.data;
         setUserData(updated);
         setEditData(updated);
         setIsEditing(false);
 
-        // Actualiza username en localStorage si ha cambiado (opcional)
         if (updated.username) {
           localStorage.setItem('username', updated.username);
         }
@@ -119,6 +153,24 @@ export default function ProfilePage() {
     }));
   };
 
+  // 👇 Cambio de avatar (sólo entre opciones predefinidas)
+  const handleAvatarChange = (newAvatar) => {
+    setAvatar(newAvatar);
+    localStorage.setItem('profileAvatar', newAvatar);
+  };
+  
+  // *** NUEVO: COLOR DE FONDO ***
+const handleBgColorChange = (newColor) => {
+  setBgColor(newColor);
+  if (newColor === "none") {
+    localStorage.removeItem("profileBgColor"); // quitar valor
+  } else {
+    localStorage.setItem("profileBgColor", newColor);
+  }
+};
+
+
+
   if (loading) {
     return (
       <div className="profile-page">
@@ -143,15 +195,28 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <div className="profile-container">
+      <div className="profile-container" >
         {/* Header with Profile Picture */}
-        <div className="profile-header">
-          <div className="profile-avatar-container">
-            <div className="profile-avatar">
-              {userData.nombre.charAt(0).toUpperCase()}
+        <div className="profile-header" >
+          <div className="profile-avatar-container" >
+            {/* 👇 AQUÍ CAMBIAMOS LA LETRA POR LA IMAGEN */}
+            <div
+              className="profile-avatar"
+              style={{
+                backgroundColor: bgColor === "none" ? "transparent" : bgColor,
+                backgroundImage: "none"
+              }}
+            >
+              <img
+                src={avatar}
+                alt={`Avatar de ${fullName}`}
+                className="profile-avatar-img"
+              />
             </div>
+
+
           </div>
-          <div className="profile-header-info">
+          <div className="profile-header-info" >
             <h1>{fullName}</h1>
             <p className="profile-role">Usuario: {userData.username}</p>
             {!isEditing && (
@@ -169,12 +234,58 @@ export default function ProfilePage() {
                 </button>
               </div>
             )}
+
+            {isEditing && (
+        <div className="profile-section" >
+          <h2 className="section-title">Color de fondo</h2>
+
+          <div className="color-options">
+            {["none","#f3f3f3", "#ffffff", "#d3e5ff", "#ef8325ff", "#4ee8f9ff", "#ca3593ff"].map((color, index) => (
+              <button
+                key={index}
+                type="button"
+                className="color-option-btn"
+                style={{
+                  backgroundColor: color === "none" ? "transparent" : color,
+                  border: bgColor === color ? "3px solid #007bff" : "2px solid #ccc"
+                }}
+                onClick={() => handleBgColorChange(color)}
+              />
+
+            ))}
+          </div>
+        </div>
+      )}
+
           </div>
         </div>
 
+        {/* 👇 Selector de avatar sólo cuando está en modo edición */}
+        {isEditing && (
+          <div className="profile-section">
+            <h2 className="section-title">Cambiar avatar</h2>
+            <div className="avatar-options">
+              {AVATAR_OPTIONS.map((option, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`avatar-option-btn ${avatar === option ? 'selected' : ''}`}
+                  onClick={() => handleAvatarChange(option)}
+                >
+                  <img
+                    src={option}
+                    alt={`Avatar ${index + 1}`}
+                    className="avatar-option-img"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main Profile Content */}
         <div className="profile-content">
-          {/* Personal Information */}
+          {/* Información Personal */}
           <div className="profile-section">
             <h2 className="section-title">Información Personal</h2>
             <div className="info-grid">
@@ -279,26 +390,28 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Bio Section oculto temporalmente
+          {/* Descripción */}
           <div className="profile-section">
-            <h2 className="section-title">Sobre Mí</h2>
+            <h2 className="section-title">
+              <FaInfoCircle style={{ marginRight: '8px' }} />
+              Descripción
+            </h2>
             <div className="bio-section">
               {isEditing ? (
                 <textarea
-                  value={editData.bio || ''}
-                  onChange={(e) => handleChange('bio', e.target.value)}
+                  value={editData.descripcion || ''}
+                  onChange={(e) => handleChange('descripcion', e.target.value)}
                   className="bio-textarea"
-                  rows="4"
+                  rows="6"
                   placeholder="Cuéntanos un poco sobre ti..."
                 />
               ) : (
-                <p className="bio-text">{userData.bio || 'No hay descripción disponible'}</p>
+                <p className="bio-text">{userData.descripcion || 'No hay descripción disponible'}</p>
               )}
             </div>
           </div>
-          */}
 
-          {/* Languages Section */}
+          {/* Idiomas */}
           {userData.languages && userData.languages.length > 0 && (
             <div className="profile-section">
               <h2 className="section-title">Idiomas</h2>
@@ -317,7 +430,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* User Created Events Section */}
+          {/* Eventos Creados */}
           {userEvents && userEvents.length > 0 && (
             <div className="profile-section">
               <h2 className="section-title">Mis Eventos Creados ({userEvents.length})</h2>
@@ -366,7 +479,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Stats Section */}
+          {/* Stats */}
           {stats && (
             <div className="profile-stats">
               <div className="stat-item">

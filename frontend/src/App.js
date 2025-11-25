@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import MyEventsPage from './pages/MyEventsPage';
 import EventPage from './pages/EventPage';
 import ProfilePage from './pages/ProfilePage';
+import SplashPage from './pages/SplashPage';
 import NavBar from './components/layout/NavBar';
 import './styles/App.css';
 
@@ -22,10 +23,8 @@ function WithNavLayout() {
 function App() {
   return (
     <div className="App">
-      
       <Routes>
-        {/* Redirigir a /login por defecto */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<SplashPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -36,7 +35,9 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-events" element={<MyEventsPage />} />
         </Route>
-        </Routes>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }

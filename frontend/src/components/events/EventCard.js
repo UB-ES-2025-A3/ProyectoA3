@@ -25,7 +25,6 @@ export default function EventCard({
       });
     }
   }
-  console.log("particiapntes:", event.participants)
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
 

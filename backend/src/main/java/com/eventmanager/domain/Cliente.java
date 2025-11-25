@@ -1,8 +1,20 @@
 package com.eventmanager.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Cliente {
@@ -15,7 +27,17 @@ public class Cliente {
   @NotBlank @Email @Column(unique = true) private String correo;
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
-  private String idioma;
+
+  @ElementCollection
+  @CollectionTable(
+          name = "cliente_idiomas",
+          joinColumns = @JoinColumn(name = "cliente_id")
+  )
+  @Column(name = "idioma")
+  private List<String> idioma = new ArrayList<>();
+
+  @Column(columnDefinition = "TEXT")
+  private String descripcion;
   @NotBlank private String passwordHash;
 
   public Cliente() {}
@@ -41,8 +63,12 @@ public class Cliente {
   public String getCiudad() { return ciudad; }
   public void setCiudad(String ciudad) { this.ciudad = ciudad; }
 
-  public String getIdioma() { return idioma; }
-  public void setIdioma(String idioma) { this.idioma = idioma; }
+  public List<String> getIdiomas() { return idioma; }
+  public void setIdiomas(List<String> idiomas) { this.idioma = idiomas; }
+  public void addIdiomas(String idioma){ this.idioma.add(idioma); }
+
+  public String getDescripcion() { return descripcion; }
+  public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
