@@ -159,7 +159,7 @@ describe('RegisterForm', () => {
           correo: 'test@example.com',
           fechaNacimiento: '2000-01-01',
           ciudad: '',
-          idioma: '',
+          idioma: [], // El backend espera List<String>, no string
           password: 'Password123!'
         });
       });
