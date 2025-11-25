@@ -17,7 +17,11 @@ jest.mock('../../../services/authService', () => ({
 
 // Wrapper para incluir el router (necesario porque LoginForm usa Link)
 const renderWithRouter = (ui) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
+  return render(
+    <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+      {ui}
+    </BrowserRouter>
+  );
 };
 
 describe('LoginForm', () => {

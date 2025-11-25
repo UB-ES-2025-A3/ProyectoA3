@@ -17,7 +17,11 @@ jest.mock('../../../services/authService', () => ({
 
 // Wrapper para incluir el router (necesario porque RegisterForm usa Link)
 const renderWithRouter = (ui) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
+  return render(
+    <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+      {ui}
+    </BrowserRouter>
+  );
 };
 
 describe('RegisterForm', () => {
@@ -45,7 +49,8 @@ describe('RegisterForm', () => {
       renderWithRouter(<RegisterForm />);
       
       expect(screen.getByLabelText(/ciudad/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/idioma/i)).toBeInTheDocument();
+      // El campo idioma es un dropdown personalizado sin input asociado, buscar por texto del label
+      expect(screen.getByText(/idioma\(s\) hablado\(s\)/i)).toBeInTheDocument();
     });
 
     test('debe mostrar el enlace de login', () => {
