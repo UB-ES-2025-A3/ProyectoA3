@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import userService from '../../services/userService';
 import './UserProfileModal.css';
 
@@ -7,16 +7,7 @@ export default function UserProfileModal({ userId, isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (isOpen && userId) {
-      loadUserProfile();
-    } else {
-      setUserProfile(null);
-      setError(null);
-    }
-  }, [isOpen, userId]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -31,7 +22,16 @@ export default function UserProfileModal({ userId, isOpen, onClose }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (isOpen && userId) {
+      loadUserProfile();
+    } else {
+      setUserProfile(null);
+      setError(null);
+    }
+  }, [isOpen, userId, loadUserProfile]);
 
   const calculateAge = (fechaNacimiento) => {
     if (!fechaNacimiento) return null;
