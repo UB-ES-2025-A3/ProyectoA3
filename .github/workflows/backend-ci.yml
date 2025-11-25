@@ -2,10 +2,17 @@ name: Backend • CI (Tests only)
 
 on:
   push:
-    paths: [ 'backend/**' ]                 # en push solo si toca backend
-    branches: [ dev, pre_prod, main ]
+    paths:
+      - 'backend/**'        # en push solo si toca backend
+    branches:
+      - dev
+      - pre_prod
+      - main
   pull_request:
-    branches: [ dev, pre_prod, main ]       # en PR siempre, toque lo que toque
+    branches:
+      - dev
+      - pre_prod
+      - main               # en PR siempre, toque lo que toque
 
 jobs:
   test:
@@ -13,9 +20,25 @@ jobs:
     defaults:
       run:
         working-directory: backend
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Create Maven settings with mirrors
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <mirrors>
+              <mirror>
+                <id>central-repo</id>
+                <mirrorOf>central</mirrorOf>
+                <url>https://repo1.maven.org/maven2/</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -25,4 +48,12 @@ jobs:
           cache: maven
 
       - name: Run tests (perfil test)
-        run: mvn -q -DskipTests=false -Dspring.profiles.active=test test
+        run: mvn --batch-mode -Dspring.profiles.active=test -Dsurefire.printSummary=true test
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: warn

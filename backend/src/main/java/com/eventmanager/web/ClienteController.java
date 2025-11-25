@@ -1,11 +1,24 @@
 package com.eventmanager.web;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.eventmanager.domain.Cliente;
 import com.eventmanager.dto.ClienteDtos.ClienteView;
 import com.eventmanager.dto.ClienteUpdateDto;
 import com.eventmanager.service.ClienteService;
+
 import jakarta.validation.ValidationException;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -38,4 +51,9 @@ public class ClienteController {
 
   @GetMapping("/_ping")
   public String ping() { return "clients-ok"; }
+
+  @PostMapping("/participants")
+  public List<Cliente> obtenerParticipantes(@RequestBody List<Long> participanteIds){
+    return svc.getParticipantesByIds(participanteIds);
+  }
 }

@@ -1,8 +1,26 @@
 package com.eventmanager.domain;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Cliente {
@@ -15,10 +33,28 @@ public class Cliente {
   @NotBlank @Email @Column(unique = true) private String correo;
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
-  private String idioma;
+
+  @ElementCollection
+  @CollectionTable(
+          name = "cliente_idiomas",
+          joinColumns = @JoinColumn(name = "cliente_id")
+  )
+  @Column(name = "idioma")
+  private List<String> idioma = new ArrayList<>();
+
   @Column(columnDefinition = "TEXT")
   private String descripcion;
   @NotBlank private String passwordHash;
+
+
+  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+  @JoinTable(
+          name = "evento_fav",
+          joinColumns = @JoinColumn(name = "cliente_id"),
+          inverseJoinColumns = @JoinColumn(name = "evento_id")
+  )
+  private Set<Evento> favoritos = new HashSet<>();
+
 
   public Cliente() {}
 
@@ -43,12 +79,18 @@ public class Cliente {
   public String getCiudad() { return ciudad; }
   public void setCiudad(String ciudad) { this.ciudad = ciudad; }
 
-  public String getIdioma() { return idioma; }
-  public void setIdioma(String idioma) { this.idioma = idioma; }
+  public List<String> getIdiomas() { return idioma; }
+  public void setIdiomas(List<String> idiomas) { this.idioma = idiomas; }
+  public void addIdiomas(String idioma){ this.idioma.add(idioma); }
 
   public String getDescripcion() { return descripcion; }
   public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
   public String getPasswordHash() { return passwordHash; }
   public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+  public Set<Evento> getFavoritos() { return favoritos; }
+  public void setFavoritos(Set<Evento> favoritos) { this.favoritos = favoritos; }
+  public void addEventoFavorito(Evento evento) { this.favoritos.add(evento); }
+  public void removeEventoFavorito(Evento evento) { this.favoritos.remove(evento);}
 }

@@ -1,10 +1,14 @@
 import axios from 'axios';
 
 function resolveApiBase() {
+  // 1º: que manden las env vars de Vercel (preview / prod)
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+  // 2º: si por lo que sea no vienen, usar el config.js como fallback
   if (window.APP_CONFIG?.REACT_APP_API_URL) return window.APP_CONFIG.REACT_APP_API_URL;
-  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL; 
+  // 3º: fallback local
   return 'http://localhost:8080/api';
 }
+
 const API_BASE_URL = resolveApiBase();
 console.log('[authService] API_BASE_URL =', API_BASE_URL);
 

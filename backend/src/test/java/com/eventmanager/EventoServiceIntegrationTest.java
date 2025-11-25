@@ -53,6 +53,9 @@ public class EventoServiceIntegrationTest {
 
   private Long creadorId;
 
+  private EventoCreate req;
+  private EventoView creado;
+
   @BeforeEach
   void setUp() {
       Cliente cliente = new Cliente();
@@ -66,24 +69,24 @@ public class EventoServiceIntegrationTest {
 
       // Guardar el ID para usarlo en los tests
       creadorId = saved.getId();
+
+      List<String> idiomas = List.of("es", "en");
+      // Creamos el DTO de entrada (match con el JSON real)
+      req = new EventoCreate(
+              LocalDate.of(2027, 11, 5),
+              LocalTime.of(18, 0, 0),
+              "Sevilla",
+              new RestriccionesCreate(idiomas, 18, 50),
+              List.of("musica", "verano"),
+              "Prueba",
+              "Prueba de guardar evento",
+              creadorId // idCreador
+      );
+      creado = eventoService.crear(req);
   }
 
   @Test
   void guardarYListar_eventoEnBaseDeDatos() {
-    // Creamos el DTO de entrada (match con el JSON real)
-    var req = new EventoCreate(
-        LocalDate.of(2027, 11, 5),
-        LocalTime.of(18, 0, 0),
-        "Sevilla",
-        new RestriccionesCreate("es,en", 18, 50),
-        List.of("musica", "verano"),
-        "Prueba",
-        "Prueba de guardar evento",
-        creadorId // idCreador
-    );
-
-    // Creamos vía servicio (cubre mapping DTO -> entidad -> repo)
-    EventoView creado = eventoService.crear(req);
     assertNotNull(creado.id(), "Debe devolver id");
 
     var lista = eventoService.listar();
@@ -98,7 +101,7 @@ public class EventoServiceIntegrationTest {
     assertEquals(req.fecha(), v.fecha());
     assertEquals(req.hora(), v.hora());
     assertEquals(req.lugar(), v.lugar());
-    assertEquals(req.restricciones().idiomaRequerido(), v.idiomasPermitidos());
+    assertEquals(req.restricciones().idiomasRequerido(), v.idiomasPermitidos());
     assertEquals(req.restricciones().edad_minima(), v.edadMinima());
     assertEquals(req.restricciones().plazasDisponibles(), v.maxPersonas());
     assertEquals(req.titulo(), v.titulo());
@@ -108,18 +111,6 @@ public class EventoServiceIntegrationTest {
 
   @Test
   void borrar_eventoEnBaseDeDatos() {
-    var req = new EventoCreate(
-        LocalDate.of(2027, 11, 6),
-        LocalTime.of(20, 0, 0),
-        "Granada",
-        new RestriccionesCreate("es,en", 16, 30),
-        List.of("musica", "verano"),
-        "EventoBorrar",
-        "Prueba de borrar evento",
-        creadorId 
-    );
-
-    EventoView creado = eventoService.crear(req);
     assertNotNull(creado.id());
 
     var listaAntes = eventoRepository.findAll();
@@ -143,19 +134,6 @@ public class EventoServiceIntegrationTest {
     Cliente savedParticipante = clienteRepo.save(participante);
     Long participanteId = savedParticipante.getId();
 
-    //Crear evento
-    var req = new EventoCreate(
-        LocalDate.of(2027, 12, 1),
-        LocalTime.of(19, 0, 0),
-        "Madrid",
-        new RestriccionesCreate("es", 21, 100),
-        List.of("deporte"),
-        "EventoUnirseSalir",
-        "Prueba de unirse y salir evento",
-        creadorId 
-    );
-
-    EventoView creado = eventoService.crear(req);
     assertNotNull(creado.id());
 
     // Unirse al evento
@@ -167,5 +145,34 @@ public class EventoServiceIntegrationTest {
     var removeDto = new com.eventmanager.dto.EventoDtos.EventoAdd(creado.id(), participanteId);
     EventoView actualizadoDespuesSalir = eventoService.removeParticipante(removeDto); 
     assertEquals(1, actualizadoDespuesSalir.participantesIds().size()); // Solo el creador
+  }
+
+  @Test
+  void add_remove_favorite_eventoEnBaseDeDatos(){
+    List<String> idiomas = List.of("es");
+    var req = new EventoCreate(
+        LocalDate.of(2027, 12, 1),
+        LocalTime.of(19, 0, 0),
+        "Madrid",
+        new RestriccionesCreate(idiomas, 21, 100),
+        List.of("deporte"),
+        "EventoUnirseSalir",
+        "Prueba de unirse y salir evento",
+        creadorId 
+    );
+
+    EventoView creado = eventoService.crear(req);
+    assertNotNull(creado.id());
+
+    var favDto = new com.eventmanager.dto.EventoDtos.EventoFav(creado.id(), creadorId);
+    EventoView favorito = eventoService.addEventoFavorito(favDto);
+    assertNotNull(favorito.id());
+    Cliente cliente = clienteRepo.findById(creadorId).orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    assertTrue(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+
+    EventoView noFavorito = eventoService.removeEventoFavorito(favDto);
+    assertNotNull(noFavorito.id());
+    assertFalse(cliente.getFavoritos().stream().anyMatch(e -> e.getId().equals(creado.id())));
+    
   }
 }
