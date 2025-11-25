@@ -17,8 +17,8 @@ const authService = {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      if (response.data.id) {
-        localStorage.setItem('userId', response.data.id.toString());
+      if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId.toString());
       }
       return {
         success: true,
@@ -40,8 +40,8 @@ const authService = {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      if (response.data.id) {
-        localStorage.setItem('userId', response.data.id.toString());
+      if (response.data.userId) {
+        localStorage.setItem('userId', response.data.userId.toString());
       }
       return {
         success: true,
