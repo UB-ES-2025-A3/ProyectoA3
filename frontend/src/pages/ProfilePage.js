@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const [editData, setEditData] = useState({});
   const [banner, setBanner] = useState({ type: "success", message: "" });
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // 👇 Estado para el avatar seleccionado
   const [avatar, setAvatar] = useState(avatarDefault);
@@ -107,9 +108,92 @@ export default function ProfilePage() {
   const handleEdit = () => {
     setIsEditing(true);
     setEditData({ ...userData });
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validar nombre
+    if (!editData.nombre?.trim()) {
+      newErrors.nombre = 'El nombre es requerido';
+    } else if (editData.nombre.length < 2) {
+      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+    } else if (editData.nombre.length > 50) {
+      newErrors.nombre = 'El nombre no puede tener más de 50 caracteres';
+    }
+
+    // Validar apellidos
+    if (!editData.apellidos?.trim()) {
+      newErrors.apellidos = 'Los apellidos son requeridos';
+    } else if (editData.apellidos.length < 2) {
+      newErrors.apellidos = 'Los apellidos deben tener al menos 2 caracteres';
+    } else if (editData.apellidos.length > 100) {
+      newErrors.apellidos = 'Los apellidos no pueden tener más de 100 caracteres';
+    }
+
+    // Validar correo
+    if (!editData.correo?.trim()) {
+      newErrors.correo = 'El correo electrónico es requerido';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(editData.correo)) {
+        newErrors.correo = 'El correo electrónico no es válido';
+      }
+    }
+
+    // Validar fecha de nacimiento
+    if (editData.fechaNacimiento) {
+      const birthDate = new Date(editData.fechaNacimiento);
+      const today = new Date();
+      
+      // Verificar que la fecha es válida
+      if (isNaN(birthDate.getTime())) {
+        newErrors.fechaNacimiento = 'La fecha de nacimiento no es válida';
+      } else {
+        // Calcular edad
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+
+        // Validar edad mínima (13 años) y máxima (120 años)
+        if (age < 13) {
+          newErrors.fechaNacimiento = 'Debes tener al menos 13 años para usar esta plataforma';
+        } else if (age > 120) {
+          newErrors.fechaNacimiento = 'La fecha de nacimiento no parece válida';
+        }
+
+        // Validar que no sea una fecha futura
+        if (birthDate > today) {
+          newErrors.fechaNacimiento = 'La fecha de nacimiento no puede ser en el futuro';
+        }
+      }
+    }
+
+    // Validar ciudad (opcional pero con límite)
+    if (editData.ciudad && editData.ciudad.length > 100) {
+      newErrors.ciudad = 'El nombre de la ciudad no puede tener más de 100 caracteres';
+    }
+
+    // Validar descripción (opcional pero con límite)
+    if (editData.descripcion && editData.descripcion.length > 500) {
+      newErrors.descripcion = 'La descripción no puede tener más de 500 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSave = async () => {
+    // Validar formulario antes de guardar
+    if (!validateForm()) {
+      setBanner({ type: "error", message: "Por favor, corrige los errores en el formulario" });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      return;
+    }
+
     try {
       setSaving(true);
       const userId = localStorage.getItem('userId');
@@ -144,6 +228,7 @@ export default function ProfilePage() {
   const handleCancel = () => {
     setEditData(userData);
     setIsEditing(false);
+    setErrors({});
   };
 
   const handleChange = (field, value) => {
@@ -151,6 +236,13 @@ export default function ProfilePage() {
       ...prev,
       [field]: value
     }));
+    // Limpiar error del campo cuando el usuario empieza a escribir
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
   // 👇 Cambio de avatar (sólo entre opciones predefinidas)
@@ -296,12 +388,15 @@ const handleBgColorChange = (newColor) => {
                 <div className="info-content">
                   <label>Nombre</label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editData.nombre || ''}
-                      onChange={(e) => handleChange('nombre', e.target.value)}
-                      className="input-field"
-                    />
+                    <>
+                      <input
+                        type="text"
+                        value={editData.nombre || ''}
+                        onChange={(e) => handleChange('nombre', e.target.value)}
+                        className={`input-field ${errors.nombre ? 'error' : ''}`}
+                      />
+                      {errors.nombre && <span className="error-message">{errors.nombre}</span>}
+                    </>
                   ) : (
                     <p>{userData.nombre}</p>
                   )}
@@ -315,12 +410,15 @@ const handleBgColorChange = (newColor) => {
                 <div className="info-content">
                   <label>Apellidos</label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editData.apellidos || ''}
-                      onChange={(e) => handleChange('apellidos', e.target.value)}
-                      className="input-field"
-                    />
+                    <>
+                      <input
+                        type="text"
+                        value={editData.apellidos || ''}
+                        onChange={(e) => handleChange('apellidos', e.target.value)}
+                        className={`input-field ${errors.apellidos ? 'error' : ''}`}
+                      />
+                      {errors.apellidos && <span className="error-message">{errors.apellidos}</span>}
+                    </>
                   ) : (
                     <p>{userData.apellidos}</p>
                   )}
@@ -334,12 +432,15 @@ const handleBgColorChange = (newColor) => {
                 <div className="info-content">
                   <label>Correo Electrónico</label>
                   {isEditing ? (
-                    <input
-                      type="email"
-                      value={editData.correo || ''}
-                      onChange={(e) => handleChange('correo', e.target.value)}
-                      className="input-field"
-                    />
+                    <>
+                      <input
+                        type="email"
+                        value={editData.correo || ''}
+                        onChange={(e) => handleChange('correo', e.target.value)}
+                        className={`input-field ${errors.correo ? 'error' : ''}`}
+                      />
+                      {errors.correo && <span className="error-message">{errors.correo}</span>}
+                    </>
                   ) : (
                     <p>{userData.correo}</p>
                   )}
@@ -353,12 +454,15 @@ const handleBgColorChange = (newColor) => {
                 <div className="info-content">
                   <label>Ciudad</label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editData.ciudad || ''}
-                      onChange={(e) => handleChange('ciudad', e.target.value)}
-                      className="input-field"
-                    />
+                    <>
+                      <input
+                        type="text"
+                        value={editData.ciudad || ''}
+                        onChange={(e) => handleChange('ciudad', e.target.value)}
+                        className={`input-field ${errors.ciudad ? 'error' : ''}`}
+                      />
+                      {errors.ciudad && <span className="error-message">{errors.ciudad}</span>}
+                    </>
                   ) : (
                     <p>{userData.ciudad || 'No especificada'}</p>
                   )}
@@ -372,12 +476,17 @@ const handleBgColorChange = (newColor) => {
                 <div className="info-content">
                   <label>Fecha de Nacimiento</label>
                   {isEditing ? (
-                    <input
-                      type="date"
-                      value={editData.fechaNacimiento || ''}
-                      onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
-                      className="input-field"
-                    />
+                    <>
+                      <input
+                        type="date"
+                        value={editData.fechaNacimiento || ''}
+                        onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
+                        className={`input-field ${errors.fechaNacimiento ? 'error' : ''}`}
+                        max={new Date().toISOString().split('T')[0]}
+                        min={new Date(new Date().getFullYear() - 120, 0, 1).toISOString().split('T')[0]}
+                      />
+                      {errors.fechaNacimiento && <span className="error-message">{errors.fechaNacimiento}</span>}
+                    </>
                   ) : (
                     <p>{userData.fechaNacimiento ? new Date(userData.fechaNacimiento).toLocaleDateString('es-ES', { 
                       year: 'numeric', 
@@ -398,13 +507,22 @@ const handleBgColorChange = (newColor) => {
             </h2>
             <div className="bio-section">
               {isEditing ? (
-                <textarea
-                  value={editData.descripcion || ''}
-                  onChange={(e) => handleChange('descripcion', e.target.value)}
-                  className="bio-textarea"
-                  rows="6"
-                  placeholder="Cuéntanos un poco sobre ti..."
-                />
+                <>
+                  <textarea
+                    value={editData.descripcion || ''}
+                    onChange={(e) => handleChange('descripcion', e.target.value)}
+                    className={`bio-textarea ${errors.descripcion ? 'error' : ''}`}
+                    rows="6"
+                    placeholder="Cuéntanos un poco sobre ti..."
+                    maxLength="500"
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                    {errors.descripcion && <span className="error-message">{errors.descripcion}</span>}
+                    <span style={{ fontSize: '12px', color: '#666', marginLeft: 'auto' }}>
+                      {(editData.descripcion || '').length} / 500
+                    </span>
+                  </div>
+                </>
               ) : (
                 <p className="bio-text">{userData.descripcion || 'No hay descripción disponible'}</p>
               )}
