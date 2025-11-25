@@ -327,9 +327,18 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
     test('maneja correctamente localStorage corrupto', () => {
       localStorage.setItem('favoriteEvents', 'invalid-json');
 
-      expect(() => {
-        render(<EventModal {...mockProps} />);
-      }).toThrow(SyntaxError);
+      // El componente debe renderizar sin crashear y resetear localStorage
+      render(<EventModal {...mockProps} />);
+
+      // Verificar que localStorage se reseteó a un array vacío
+      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
+      expect(favorites).toEqual([]);
+      
+      // Verificar que el botón de favoritos se renderiza correctamente
+      const favoriteButton = screen.getByRole('button', {
+        name: /añadir a favoritos/i,
+      });
+      expect(favoriteButton).toBeInTheDocument();
       
       localStorage.clear();
     });
