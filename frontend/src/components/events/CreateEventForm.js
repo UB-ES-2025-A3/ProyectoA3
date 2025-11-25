@@ -62,8 +62,15 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.hora = 'La hora es requerida';
     }
 
-    if (!Array.isArray(formData.idioma) || formData.idioma.length === 0 || !formData.idioma[0]) {
-      newErrors.idioma = 'Debes seleccionar un idioma';
+    // Validar idioma (puede ser string o array dependiendo del estado)
+    if (Array.isArray(formData.idioma)) {
+      if (formData.idioma.length === 0 || !formData.idioma[0]) {
+        newErrors.idioma = 'Debes seleccionar un idioma';
+      }
+    } else {
+      if (!formData.idioma || formData.idioma.trim() === '') {
+        newErrors.idioma = 'Debes seleccionar un idioma';
+      }
     }
 
     if (!formData.plazasDisponibles) {
@@ -72,10 +79,13 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.plazasDisponibles = 'Debe haber al menos 1 plaza disponible';
     }
 
-    if (formData.edadMinima && parseInt(formData.edadMinima) < 0) {
-      newErrors.edadMinima = 'La edad mínima debe ser 0 o mayor';
-    } else if (formData.edadMinima && parseInt(formData.edadMinima) > 120) {
-      newErrors.edadMinima = 'La edad mínima debe ser menor a 120';
+    if (formData.edadMinima !== '' && formData.edadMinima !== null && formData.edadMinima !== undefined) {
+      const edadNum = parseInt(formData.edadMinima);
+      if (edadNum < 0) {
+        newErrors.edadMinima = 'La edad mínima debe ser 0 o mayor';
+      } else if (edadNum > 120) {
+        newErrors.edadMinima = 'La edad mínima debe ser menor a 120';
+      }
     }
 
     if (!formData.lugar.trim()) {
@@ -108,7 +118,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         restricciones: {
           idiomasRequerido: formData.idioma ? [formData.idioma] : [],
           plazasDisponibles: parseInt(formData.plazasDisponibles),
-          edad_minima: formData.edadMinima ? parseInt(formData.edadMinima) : null
+          edad_minima: (formData.edadMinima !== '' && formData.edadMinima !== null && formData.edadMinima !== undefined) 
+            ? parseInt(formData.edadMinima) 
+            : null
         }
       });
 
