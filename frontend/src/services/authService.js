@@ -10,7 +10,9 @@ function resolveApiBase() {
 }
 
 const API_BASE_URL = resolveApiBase();
-console.log('[authService] API_BASE_URL =', API_BASE_URL);
+if (process.env.NODE_ENV !== 'test') {
+  console.log('[authService] API_BASE_URL =', API_BASE_URL);
+}
 
 const authService = {
   // Registro de usuario

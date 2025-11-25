@@ -6,7 +6,14 @@ import RegisterForm from '../RegisterForm';
 import authService from '../../../services/authService';
 
 // Mock del servicio de autenticación
-jest.mock('../../../services/authService');
+jest.mock('../../../services/authService', () => ({
+  __esModule: true,
+  default: {
+    signUp: jest.fn(),
+    login: jest.fn(),
+    logout: jest.fn()
+  }
+}));
 
 // Wrapper para incluir el router (necesario porque RegisterForm usa Link)
 const renderWithRouter = (ui) => {
