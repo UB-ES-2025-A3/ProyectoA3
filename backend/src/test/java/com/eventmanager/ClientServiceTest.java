@@ -11,21 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.eventmanager.domain.Cliente;
 import com.eventmanager.repository.ClienteRepository;
-import com.eventmanager.repository.EventoRepository;
-import com.eventmanager.service.EventoService;
 
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
 @Transactional
 public class ClientServiceTest {
-    
-    
-  @Autowired
-  private EventoRepository eventoRepository;
-
-  @Autowired
-  private EventoService eventoService;
 
   @Autowired
   private ClienteRepository clienteRepo;

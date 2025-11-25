@@ -9,18 +9,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 public static final String PASSWORD_REGEX =
     "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9\\s]).{6,}$";
-
-  @Value("${app.cors.allowed-origins:}")
-  private String allowedOrigins;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

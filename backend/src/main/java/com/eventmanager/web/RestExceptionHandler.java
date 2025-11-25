@@ -11,6 +11,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -83,7 +84,7 @@ public class RestExceptionHandler {
             SqlErrorDetails.Parsed parsed = SqlErrorDetails.from(psql);
 
             // Cogemos las primeras líneas del stack para que veas dónde peta de verdad
-            String[] stackTop = java.util.Arrays.stream(psql.getStackTrace())
+            String[] stackTop = Arrays.stream(psql.getStackTrace())
                     .limit(5)
                     .map(StackTraceElement::toString)
                     .toArray(String[]::new);
