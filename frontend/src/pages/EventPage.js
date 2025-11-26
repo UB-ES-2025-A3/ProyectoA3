@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { getEvents, joinEvent, leaveEvent } from '../services/eventService';
+import {
+  getEvents,
+  joinEvent,
+  leaveEvent,
+  getFavoriteEventIds,
+  addFavoriteEvent,
+  removeFavoriteEvent
+} from '../services/eventService';
 import EventCard from '../components/events/EventCard';
 import EventModal from '../components/events/EventModal';
 import CreateEventForm from '../components/events/CreateEventForm';
@@ -25,20 +32,6 @@ export default function EventPage() {
   const [availableTags, setAvailableTags] = useState([]);
   const [joiningEventId, setJoiningEventId] = useState(null);
   const [favoriteEventIds, setFavoriteEventIds] = useState([]);
-
-  const getStoredFavoriteIds = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return [];
-    }
-
-    try {
-      const stored = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-      return Array.isArray(stored) ? stored : [];
-    } catch (error) {
-      console.warn('No se pudieron cargar los favoritos almacenados.', error);
-      return [];
-    }
-  }, []);
 
   // Modal states
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -121,27 +114,18 @@ export default function EventPage() {
     applyFilters();
   }, [applyFilters]);
 
-  useEffect(() => {
-    setFavoriteEventIds(getStoredFavoriteIds());
-  }, [getStoredFavoriteIds]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
+  const refreshFavoriteIds = useCallback(async () => {
+    try {
+      const ids = await getFavoriteEventIds();
+      setFavoriteEventIds(ids);
+    } catch (error) {
+      console.error('Error cargando favoritos:', error);
     }
+  }, []);
 
-    const handleFavoritesUpdated = () => {
-      setFavoriteEventIds(getStoredFavoriteIds());
-    };
-
-    window.addEventListener('favoritesUpdated', handleFavoritesUpdated);
-    window.addEventListener('storage', handleFavoritesUpdated);
-
-    return () => {
-      window.removeEventListener('favoritesUpdated', handleFavoritesUpdated);
-      window.removeEventListener('storage', handleFavoritesUpdated);
-    };
-  }, [getStoredFavoriteIds]);
+  useEffect(() => {
+    refreshFavoriteIds();
+  }, [refreshFavoriteIds]);
 
   useEffect(() => {
     const tagsSet = new Set();
@@ -207,6 +191,33 @@ export default function EventPage() {
       tags: [],
       onlyFavorites: false
     });
+  };
+
+  const handleFavoriteToggle = async (eventId) => {
+    const normalizedId = eventId?.toString();
+    if (!normalizedId) {
+      return;
+    }
+
+    const isFavorite = favoriteEventIds.includes(normalizedId);
+
+    try {
+      if (isFavorite) {
+        await removeFavoriteEvent(eventId);
+        setFavoriteEventIds(prev => prev.filter(id => id !== normalizedId));
+      } else {
+        await addFavoriteEvent(eventId);
+        setFavoriteEventIds(prev => [...prev, normalizedId]);
+      }
+    } catch (error) {
+      console.error('Error al actualizar favoritos:', error);
+      setBanner({
+        type: 'error',
+        message: error.message || 'No se pudo actualizar el favorito. Inténtalo de nuevo.'
+      });
+      setTimeout(() => setBanner({ type: 'success', message: '' }), 4000);
+      throw error;
+    }
   };
 
   // Modal helpers
@@ -589,7 +600,7 @@ export default function EventPage() {
                 >
                   <FaBookmark />
                   <span>Solo favoritos</span>
-                  <span className="favorite-count">{favoriteEventIds.length - 1}</span>
+                  <span className="favorite-count">{favoriteEventIds.length}</span>
                 </button>
               </div>
 
@@ -664,12 +675,14 @@ export default function EventPage() {
           onClose={handleCloseModal}
           isEnrolled={selectedEvent.isEnrolled || false}
           isFull={(selectedEvent.participants || []).length >= selectedEvent.capacity}
+          isFavorite={favoriteEventIds.includes(selectedEvent.id?.toString() || '')}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
           }}
           onLeave={async () => {
             await handleLeaveEvent(selectedEvent.id);
           }}
+          onToggleFavorite={handleFavoriteToggle}
         />
       )}
 
