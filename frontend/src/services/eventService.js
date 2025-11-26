@@ -371,6 +371,96 @@ export async function leaveEvent(eventId) {
   return res.json().catch(() => ({ ok: true }));
 }
 
+export async function getFavoriteEventIds() {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+
+  if (!userId) {
+    return [];
+  }
+
+  if (config.USE_MOCKS) {
+    return [];
+  }
+
+  const res = await fetch(`${config.API_BASE_URL}/events/favorites`, {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudieron cargar tus favoritos");
+  }
+
+  const data = await res.json();
+  return (Array.isArray(data) ? data : [])
+    .map(event => event?.id)
+    .filter((id) => id !== undefined && id !== null)
+    .map((id) => id.toString());
+}
+
+export async function addFavoriteEvent(eventId) {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+
+  if (!userId) {
+    throw new Error("Debes iniciar sesión para guardar favoritos.");
+  }
+
+  if (config.USE_MOCKS) {
+    return { ok: true };
+  }
+
+  const payload = {
+    idEvento: parseInt(eventId, 10),
+    idUsuario: parseInt(userId, 10),
+  };
+
+  const res = await fetch(`${config.API_BASE_URL}/events/addfavorite`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo guardar el evento como favorito");
+  }
+
+  return res.json().catch(() => ({ ok: true }));
+}
+
+export async function removeFavoriteEvent(eventId) {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+
+  if (!userId) {
+    throw new Error("Debes iniciar sesión para modificar tus favoritos.");
+  }
+
+  if (config.USE_MOCKS) {
+    return { ok: true };
+  }
+
+  const payload = {
+    idEvento: parseInt(eventId, 10),
+    idUsuario: parseInt(userId, 10),
+  };
+
+  const res = await fetch(`${config.API_BASE_URL}/events/removefavorite`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => "");
+    throw new Error(errorText || "No se pudo eliminar el favorito");
+  }
+
+  return res.json().catch(() => ({ ok: true }));
+}
+
 export async function getUserEvents() {
   const config = getConfig();
   if (config.USE_MOCKS) {
