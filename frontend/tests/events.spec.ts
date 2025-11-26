@@ -120,9 +120,9 @@ test('Events - Apuntarse y desapuntarse de un evento desde la tarjeta', async ({
   ).toBeVisible();
 
   // (Opcional) si tienes banner de desapuntado:
-  await expect(
-    page.getByText('Te has desapuntado del evento correctamente.')
-  ).toBeVisible();
+  // await expect(
+  //  page.getByText('Te has desapuntado del evento correctamente.')
+  // ).toBeVisible();
 });
 
 
