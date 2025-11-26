@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eventmanager.domain.Evento;
 import com.eventmanager.domain.Evento.Restricciones;
@@ -109,6 +110,17 @@ public class EventoService {
       var det = SqlErrorDetails.from(ex);
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
     }
+  }
+
+  @Transactional(readOnly = true)
+  public List<EventoView> listarFavoritos(Long userId) {
+    var usuario = clienteRepo.findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
+
+    return usuario.getFavoritos()
+        .stream()
+        .map(this::toView)
+        .toList();
   }
 
   public EventoView crear(EventoCreate req) {
