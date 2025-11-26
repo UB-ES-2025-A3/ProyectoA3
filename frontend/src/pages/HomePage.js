@@ -330,10 +330,6 @@ export default function HomePage() {
     setPinnedEvent(null);
   }, []);
 
-  // Función para abrir el formulario de creación
-  const handleOpenCreateForm = () => {
-    setIsCreateFormOpen(true);
-  };
 
   // Función para cerrar el formulario de creación
   const handleCloseCreateForm = () => {
@@ -516,10 +512,10 @@ export default function HomePage() {
               <div>
                 <h1>Encuentra tu próximo evento</h1>
                 <p>Explora intercambios culturales y reuniones cerca de ti.</p>
+                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '8px' }}>
+                  💡 Haz clic en el mapa para crear un nuevo evento
+                </p>
               </div>
-              <button className="btn btn-primary btn-create" onClick={handleOpenCreateForm}>
-                + Crear Evento
-              </button>
             </div>
             
             {/* Buscador Principal */}
