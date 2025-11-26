@@ -46,6 +46,12 @@ public class EventoController {
     return ResponseEntity.ok(service.listarMisEventosCreados(userId));
   }
 
+  @GetMapping("/favorites")
+  public ResponseEntity<List<EventoView>> misFavoritos(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarFavoritos(userId));
+  }
+
   @GetMapping("/_ping")
   public String ping() { return "events-ok"; }
 
