@@ -67,7 +67,7 @@ test('CreateEvent - muestra errores cuando los campos obligatorios están vacío
 
     // Rellenamos todos los campos con datos válidos salvo la fecha
     await page.getByLabel('Título del Evento *').fill('Evento pasado E2E');
-    await page.getByLabel('Etiquetas *').selectOption('turismo');
+    await page.getByLabel('Etiquetas').selectOption('turismo');
     await page.getByLabel('Hora *').fill('10:00');
     await page.getByLabel('Plazas Disponibles *').fill('5');
     await page.getByLabel('Lugar *').fill('Sitio de prueba');
