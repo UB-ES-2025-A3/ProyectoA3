@@ -1,11 +1,12 @@
 // src/pages/HomePage.js
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { joinEvent, leaveEvent } from "../services/eventService";
 import { homePageMockEvents } from "../mocks/homePageEvents.mock";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
 import CreateEventForm from "../components/events/CreateEventForm";
 import MessageBanner from "../components/common/MessageBanner";
+import EventMap from "../components/map/EventMap";
 import "../styles/HomePage.css";
 
 // Iconos
@@ -13,7 +14,6 @@ import { FaLanguage, FaUsers, FaSearch, FaMapMarkerAlt, FaFeatherAlt, FaBookmark
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [banner, setBanner] = useState({ type: "success", message: "" });
   
@@ -30,13 +30,18 @@ export default function HomePage() {
 
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
-  const [availableTags, setAvailableTags] = useState([]);
   const [joiningEventId, setJoiningEventId] = useState(null);
   const [favoriteEventIds, setFavoriteEventIds] = useState([]);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Estado para el evento que está siendo hover (para centrar el mapa)
+  const [hoveredEvent, setHoveredEvent] = useState(null);
+  
+  // Estado para el evento fijado en el mapa (se mantiene incluso al cerrar el modal)
+  const [pinnedEvent, setPinnedEvent] = useState(null);
   
   // Estado para el formulario de crear evento
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
@@ -56,11 +61,102 @@ export default function HomePage() {
     }
   }, []);
 
-  // Función para aplicar filtros (memoizada para evitar error de dependencias)
-  const applyFilters = useCallback(() => {
+
+  // Cargar eventos mock al montar el componente (solo para HomePage)
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        setLoading(true);
+        // Usar mocks con coordenadas para el mapa
+        // Transformar los eventos mock al formato del frontend (similar a eventService.transformEvents)
+        const eventsData = homePageMockEvents.map(event => {
+          // Construir startDate desde fecha y hora
+          const startDate = event.fecha && event.hora 
+            ? `${event.fecha}T${event.hora}Z`
+            : event.startDate || new Date().toISOString();
+          
+          // Normalizar tags
+          const tags = Array.isArray(event.tags) ? event.tags : [];
+          
+          // Normalizar languages desde idiomas_permitidos
+          const languages = event.idiomas_permitidos 
+            ? event.idiomas_permitidos.split(',').map(l => l.trim()).filter(l => l)
+            : event.languages || [];
+          
+          // Normalizar participants
+          const participants = event.participants 
+            ? event.participants.map(p => typeof p === 'object' ? p.id : p)
+            : [];
+          
+          // Construir restrictions string
+          let restrictions = "";
+          if (event.restricciones) {
+            if (typeof event.restricciones === 'object') {
+              if (event.restricciones.edad_minima) {
+                restrictions = `Edad mínima: ${event.restricciones.edad_minima} años`;
+              } else if (event.restricciones.requisitos) {
+                restrictions = event.restricciones.requisitos;
+              } else if (event.restricciones.max_personas) {
+                restrictions = `Grupo máx. ${event.restricciones.max_personas}`;
+              }
+            } else {
+              restrictions = event.restricciones;
+            }
+          }
+          
+          return {
+            id: event.id?.toString() || `mock-${Math.random()}`,
+            name: event.titulo || event.name || "Evento sin título",
+            location: event.lugar || event.location || "Ubicación por confirmar",
+            startDate,
+            description: event.descripcion || event.description || "",
+            restrictions,
+            imageUrl: event.imageUrl || "",
+            capacity: event.max_personas || event.capacity || 10,
+            participants,
+            languages: languages.length ? languages : ["es"],
+            tags,
+            isEnrolled: event.isEnrolled || false,
+            id_creador: event.id_creador,
+            creatorId: event.id_creador, // Alias para compatibilidad
+            latitude: event.latitude,
+            longitude: event.longitude,
+          };
+        });
+        
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error cargando eventos:', error);
+        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
+  // Calcular tags disponibles según los eventos cargados (memoizado)
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set();
+    events.forEach(event => {
+      if (Array.isArray(event.tags)) {
+        event.tags.forEach(tag => {
+          if (tag && typeof tag === "string") {
+            tagsSet.add(tag);
+          }
+        });
+      }
+    });
+    return Array.from(tagsSet).sort((a, b) => a.localeCompare(b));
+  }, [events]);
+
+  // Calcular eventos filtrados usando useMemo para optimización
+  const filteredEvents = useMemo(() => {
     const favoritesSet = new Set(favoriteEventIds.map(id => id.toString()));
 
-    let filtered = events.filter(event => {
+    return events.filter(event => {
       // Filtro por texto (título o descripción)
       if (filters.searchText) {
         const searchLower = filters.searchText.toLowerCase();
@@ -109,54 +205,7 @@ export default function HomePage() {
 
       return true;
     });
-
-   setFilteredEvents(filtered);
-}, [events, filters, favoriteEventIds]);
-
-  // Cargar eventos mock al montar el componente (solo para HomePage)
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoading(true);
-        // Usar mocks con coordenadas para el mapa
-        const eventsData = homePageMockEvents.map(event => ({
-          ...event,
-          // Asegurar que participants sea un array de strings para compatibilidad
-          participants: event.participants.map(p => p.id),
-        }));
-        setEvents(eventsData);
-        setFilteredEvents(eventsData);
-      } catch (error) {
-        console.error('Error cargando eventos:', error);
-        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
-
-  // Calcular tags disponibles según los eventos cargados
-  useEffect(() => {
-    const tagsSet = new Set();
-    events.forEach(event => {
-      if (Array.isArray(event.tags)) {
-        event.tags.forEach(tag => {
-          if (tag && typeof tag === "string") {
-            tagsSet.add(tag);
-          }
-        });
-      }
-    });
-    setAvailableTags(Array.from(tagsSet).sort((a, b) => a.localeCompare(b)));
-  }, [events]);
-
-  // Aplicar filtros cuando cambien eventos o filtros
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
+  }, [events, filters, favoriteEventIds]);
 
   // Cargar favoritos al montar el componente
   useEffect(() => {
@@ -238,17 +287,39 @@ export default function HomePage() {
     });
   };
 
-  // Función para abrir el modal
+  // Función para abrir el modal (click en la tarjeta)
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
+    // Fijar el evento en el mapa cuando se hace click
+    if (event && event.latitude && event.longitude) {
+      setPinnedEvent(event);
+    }
+  };
+  
+  // Función para centrar el mapa cuando se hace hover sobre un evento
+  const handleEventHover = (event) => {
+    if (event && event.latitude && event.longitude) {
+      setHoveredEvent(event);
+    }
+  };
+  
+  // Función para quitar el hover del mapa
+  const handleEventHoverLeave = () => {
+    setHoveredEvent(null);
   };
 
   // Función para cerrar el modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
+    // No se quita pinnedEvent, así el mapa mantiene la ubicación
   };
+  
+  // Función para desfijar el evento del mapa
+  const handleUnpinEvent = useCallback(() => {
+    setPinnedEvent(null);
+  }, []);
 
   // Función para abrir el formulario de creación
   const handleOpenCreateForm = () => {
@@ -761,6 +832,8 @@ export default function HomePage() {
                       onJoin={() => handleJoinEvent(event.id)}
                       onLeave={() => handleLeaveEvent(event.id)}
                       onClick={() => handleEventClick(event)}
+                      onMouseEnter={() => handleEventHover(event)}
+                      onMouseLeave={handleEventHoverLeave}
                     />
                   );
                 })}
@@ -779,19 +852,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* MITAD DERECHA: Mapa (placeholder por ahora) */}
+        {/* MITAD DERECHA: Mapa */}
         <div className="home-right">
-          <div className="map-placeholder">
-            <h3>🗺️ Mapa de Eventos</h3>
-            <p>Aquí se mostrará un mapa interactivo con la ubicación de los eventos.</p>
-            <p><strong>Próximas implementaciones:</strong></p>
-            <ul>
-              <li>Integración con Google Maps API</li>
-              <li>Marcadores de eventos en el mapa</li>
-              <li>Filtrado en tiempo real</li>
-              <li>Información de eventos al hacer clic en marcadores</li>
-            </ul>
-          </div>
+          <EventMap 
+            selectedEvent={hoveredEvent || pinnedEvent || selectedEvent} 
+            events={filteredEvents}
+            onUnpin={handleUnpinEvent}
+            isPinned={!!pinnedEvent}
+          />
         </div>
       </div>
       {banner.message && <MessageBanner type={banner.type} message={banner.message} />}
