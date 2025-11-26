@@ -30,32 +30,22 @@ const getAvatarForUser = (userId) => {
 };
 
 
-export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+export default function EventModal({
+  event,
+  isOpen,
+  onClose,
+  isEnrolled,
+  isFull,
+  onJoin,
+  onLeave,
+  isFavorite = false,
+  onToggleFavorite,
+}) {
   const [participants, setParticipants] = useState([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const notifyFavoritesUpdated = () => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('favoritesUpdated'));
-    }
-  };
-
-  useEffect(() => {
-    if (event?.id) {
-      let favorites;
-      try {
-        favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-      } catch (e) {
-        favorites = [];
-        localStorage.setItem('favoriteEvents', JSON.stringify([]));
-      }
-      setIsFavorite(favorites.includes(event.id.toString()));
-    }
-  }, [event?.id]);
+  const [updatingFavorite, setUpdatingFavorite] = useState(false);
 
   // Cargar información de participantes cuando se abre el modal
   useEffect(() => {
@@ -67,28 +57,18 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, event]);
 
-  const toggleFavorite = () => {
-    if (!event?.id) return;
-    
-    let favorites;
-    try {
-      favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-    } catch (e) {
-      favorites = [];
-      localStorage.setItem('favoriteEvents', JSON.stringify([]));
+  const handleFavoriteClick = async () => {
+    if (!event?.id || !onToggleFavorite) {
+      return;
     }
-    const eventIdStr = event.id.toString();
-    
-    if (isFavorite) {
-      const updated = favorites.filter(id => id !== eventIdStr);
-      localStorage.setItem('favoriteEvents', JSON.stringify(updated));
-      setIsFavorite(false);
-      notifyFavoritesUpdated();
-    } else {
-      favorites.push(eventIdStr);
-      localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
-      setIsFavorite(true);
-      notifyFavoritesUpdated();
+
+    try {
+      setUpdatingFavorite(true);
+      await onToggleFavorite(event.id);
+    } catch (error) {
+      console.error("Error al actualizar favorito desde el modal:", error);
+    } finally {
+      setUpdatingFavorite(false);
     }
   };
 
@@ -162,9 +142,11 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
         </button>
         <button 
           className="modal-favorite-btn" 
-          onClick={toggleFavorite}
+          onClick={handleFavoriteClick}
           aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
           title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+          disabled={updatingFavorite}
+          aria-disabled={updatingFavorite}
         >
           {isFavorite ? (
             <FaBookmark className="favorite-icon favorite-icon-filled" />
