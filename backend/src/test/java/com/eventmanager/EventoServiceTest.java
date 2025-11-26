@@ -42,7 +42,7 @@ class EventoServiceTest {
     evento_create = new EventoDtos.EventoCreate(
         LocalDate.of(LocalDate.now().getYear() + 1, 3, 7),
         LocalTime.of(0, 0),
-        "Sala Principal",
+        "Reus",
         new EventoDtos.RestriccionesCreate(
             List.of("es", "en"),
             18,
@@ -51,7 +51,10 @@ class EventoServiceTest {
         List.of("Música", "Concierto"),
         "Concierto de Navidad",
         "Un evento especial para celebrar la Navidad con música en vivo.",
-        1L
+        1L,
+        41.155,
+        1.10686
+
     );
   }
 
@@ -90,7 +93,7 @@ class EventoServiceTest {
 
     assertEquals(10L, v.id());
     assertEquals("Concierto de Navidad", v.titulo());
-    assertEquals("Sala Principal", v.lugar());
+    assertEquals("Reus", v.lugar());
     assertEquals(List.of("es", "en"), v.idiomasPermitidos());
   }
 
@@ -105,7 +108,9 @@ class EventoServiceTest {
             evento_create.tags(),
             evento_create.titulo(),
             evento_create.descripcion(),
-            evento_create.idCreador()
+            evento_create.idCreador(),
+            evento_create.latitud(),
+            evento_create.longitud()
     );
 
     var err = assertThrowsExactly(
@@ -128,7 +133,9 @@ class EventoServiceTest {
             evento_create.tags(),
             evento_create.titulo(),
             evento_create.descripcion(),
-            evento_create.idCreador()
+            evento_create.idCreador(),
+            evento_create.latitud(),
+            evento_create.longitud()
     );
 
     var err = assertThrowsExactly(

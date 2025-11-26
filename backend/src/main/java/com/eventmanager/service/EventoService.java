@@ -126,7 +126,9 @@ public class EventoService {
       e.setTitulo(req.titulo());
       e.setDescripcion(req.descripcion());
       e.setIdCreador(req.idCreador());
-      e.setTags(req.tags()); 
+      e.setTags(req.tags());
+      e.setLatitud(req.latitud());
+      e.setLongitud(req.longitud());
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
@@ -164,14 +166,15 @@ public class EventoService {
     var r = e.getRestricciones();
 
     return new EventoView(
-      e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
-      r != null ? r.getIdiomas_permitidos() : null,
-      r != null ? r.getEdad_minima() : null,
-      r != null ? r.getMax_personas() : null,
-      e.getTitulo(), e.getDescripcion(),
-      e.getIdCreador(),
-      e.getTags() == null ? List.of() : e.getTags(),   // <- AQUI
-      e.getParticipantes().stream().map(p -> p.getId()).toList()
+            e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
+            r != null ? r.getIdiomas_permitidos() : null,
+            r != null ? r.getEdad_minima() : null,
+            r != null ? r.getMax_personas() : null,
+            e.getTitulo(), e.getDescripcion(),
+            e.getIdCreador(),
+            e.getTags() == null ? List.of() : e.getTags(),
+            e.getParticipantes().stream().map(p -> p.getId()).toList(),
+            e.getLatitud(), e.getLongitud()
     );
   }
 

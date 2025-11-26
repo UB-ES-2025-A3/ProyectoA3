@@ -54,6 +54,8 @@ public class Evento {
 
   private List<String> tags = new ArrayList<>();
 
+  private double latitud;
+  private double longitud;
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
   @JoinTable(
@@ -100,6 +102,11 @@ public class Evento {
 
   public List<String> getTags() { return tags; }
   public void setTags(List<String> tags) { this.tags = tags; }
+
+  public double getLatitud() { return latitud; }
+  public void setLatitud(double latitud) { this.latitud = latitud; }
+  public double getLongitud() { return longitud; }
+  public void setLongitud(double longitud) { this.longitud = longitud; }
 
   // ---------- JSON POJO ----------
   // Importante: SIN @Embeddable y SIN @Column en sus campos
