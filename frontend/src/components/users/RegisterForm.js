@@ -111,7 +111,13 @@ const RegisterForm = ({ onSuccess, onError }) => {
     setIsLoading(true);
     
     try {
-      const result = await authService.signUp(formData);
+      // El backend espera List<String> idioma (array), no string
+      // Mantener como array, enviar array vacío si no hay selección
+      const payload = {
+        ...formData,
+        idioma: Array.isArray(formData.idioma) ? formData.idioma : []
+      };
+      const result = await authService.signUp(payload);
       
       if (result.success) {
         onSuccess && onSuccess(result.data);

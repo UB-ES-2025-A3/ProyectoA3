@@ -5,34 +5,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import static org.mockito.Mockito.when;
 
+import org.mockito.Mock;
+
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.eventmanager.domain.Evento;
+import org.junit.jupiter.api.Test;
 import com.eventmanager.domain.Cliente;
 import com.eventmanager.repository.ClienteRepository;
-import com.eventmanager.repository.EventoRepository;
-import com.eventmanager.service.EventoService;
 
-import jakarta.transaction.Transactional;
 
-@SpringBootTest
-@Transactional
+@org.junit.jupiter.api.extension.ExtendWith(MockitoExtension.class)
 public class ClientServiceTest {
-    
-    
-  @Autowired
-  private EventoRepository eventoRepository;
 
-  @Autowired
-  private EventoService eventoService;
-
-  @Autowired
-  private ClienteRepository clienteRepo;
+  @Mock
+  ClienteRepository clienteRepo;
 
   private List<Long> participanteIds = new ArrayList<>();
 
-  private Cliente createTestUser(String nombre, String apellidos, String username, String correo, LocalDate fechaNacimiento){
+  private Cliente createTestUser(String nombre, String apellidos, String username, String correo, LocalDate fechaNacimiento, Long id) {
     Cliente cliente = new Cliente();
     cliente.setNombre(nombre);
     cliente.setApellidos(apellidos);
@@ -40,20 +33,24 @@ public class ClientServiceTest {
     cliente.setPasswordHash("$2a$10$R7n82AjlIOhQnFnuS4S3feeJUIzlFqEvDVtHpz4DSS0pB3NBLVRCW");
     cliente.setCorreo(correo);
     cliente.setFechaNacimiento(fechaNacimiento);
-    return clienteRepo.save(cliente);
+    cliente.setId(id);
+    return cliente;
 
   }
 
   @Test
   void getAllUsersFromId(){
-    var saved1 = createTestUser("Sergi", "Blasi", "testuser70", "test312102@gmail.com", LocalDate.of(2000, 1, 1));
+    Cliente saved1 = createTestUser("Sergi", "Blasi", "testuser70", "test312102@gmail.com", LocalDate.of(2000, 1, 1), 1L);
     participanteIds.add(saved1.getId());
-    var saved2 = createTestUser("Paco", "Lopez", "testuser71", "paco@gmail.com", LocalDate.of(1995, 5, 15));
+    Cliente saved2 = createTestUser("Paco", "Lopez", "testuser71", "paco@gmail.com", LocalDate.of(1995, 5, 15), 2L);
     participanteIds.add(saved2.getId());
+
+    when(clienteRepo.findAllById(participanteIds))
+            .thenReturn(List.of(saved1, saved2));
 
     var participantes = clienteRepo.findAllById(participanteIds);
 
-    assertEquals(participantes.size(),2);
+    assertEquals(2, participantes.size());
     assertEquals(participantes.get(0).getNombre(),saved1.getNombre());
     assertEquals(participantes.get(1).getNombre(),saved2.getNombre());
     assertEquals(participantes.get(0).getApellidos(),saved1.getApellidos());

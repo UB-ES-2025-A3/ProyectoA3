@@ -119,7 +119,9 @@ const userService = {
       return {
         success: false,
         error:
-          error.response?.data?.message || "Error al obtener información de participantes",
+          error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : "Error al obtener información de participantes",
       };
     }
   },

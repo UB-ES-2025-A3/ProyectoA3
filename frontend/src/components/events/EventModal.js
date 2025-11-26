@@ -1,13 +1,61 @@
 // src/components/events/EventModal.js
 import React, { useState, useEffect } from "react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
+import UserProfileModal from "../users/UserProfileModal";
+
+// src/components/events/EventModal.js
+import avatarDefault from "../../assets/avatars/avatar-default.jpg";
+import avatar1 from "../../assets/avatars/avatar-1.png";
+import avatar2 from "../../assets/avatars/avatar-2.png";
+import avatar3 from "../../assets/avatars/avatar-3.png";
+import avatar4 from "../../assets/avatars/avatar-4.png";
+import avatar5 from "../../assets/avatars/avatar-5.png";
+
+const AVATAR_OPTIONS = [avatar1, avatar2, avatar3, avatar4, avatar5, avatarDefault];
+
+const getAvatarForUser = (userId) => {
+  if (!userId) return avatarDefault;
+
+  const idStr = userId.toString();
+  let sum = 0;
+
+  for (let i = 0; i < idStr.length; i++) {
+    sum += idStr.charCodeAt(i);
+  }
+
+  const index = sum % AVATAR_OPTIONS.length;
+  return AVATAR_OPTIONS[index];
+};
+
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
+  const [isFavorite, setIsFavorite] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const notifyFavoritesUpdated = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('favoritesUpdated'));
+    }
+  };
+
+  useEffect(() => {
+    if (event?.id) {
+      let favorites;
+      try {
+        favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      } catch (e) {
+        favorites = [];
+        localStorage.setItem('favoriteEvents', JSON.stringify([]));
+      }
+      setIsFavorite(favorites.includes(event.id.toString()));
+    }
+  }, [event?.id]);
 
   // Cargar información de participantes cuando se abre el modal
   useEffect(() => {
@@ -18,6 +66,31 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, event]);
+
+  const toggleFavorite = () => {
+    if (!event?.id) return;
+    
+    let favorites;
+    try {
+      favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+    } catch (e) {
+      favorites = [];
+      localStorage.setItem('favoriteEvents', JSON.stringify([]));
+    }
+    const eventIdStr = event.id.toString();
+    
+    if (isFavorite) {
+      const updated = favorites.filter(id => id !== eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(updated));
+      setIsFavorite(false);
+      notifyFavoritesUpdated();
+    } else {
+      favorites.push(eventIdStr);
+      localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
+      setIsFavorite(true);
+      notifyFavoritesUpdated();
+    }
+  };
 
   const loadParticipantsInfo = async () => {
     setLoadingParticipants(true);
@@ -30,9 +103,13 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
       }
 
       const result = await userService.getParticipantsByIds(participantIds);
+
+      console.log("[EventModal] Respuesta bruta de getParticipantsByIds:", result);
+
       if (result.success) {
         setParticipants(result.data);
-        
+        console.log("PARTICIPANTS FROM API", result.data); // mira aquí en la consola
+    
         // Cargar información del creador si existe
         if (event.creatorId) {
           const creatorResult = await userService.getUserProfile(event.creatorId);
@@ -82,6 +159,18 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>
           ✕
+        </button>
+        <button 
+          className="modal-favorite-btn" 
+          onClick={toggleFavorite}
+          aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+          title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+        >
+          {isFavorite ? (
+            <FaBookmark className="favorite-icon favorite-icon-filled" />
+          ) : (
+            <FaRegBookmark className="favorite-icon favorite-icon-outline" />
+          )}
         </button>
         
         <div className="modal-header">
@@ -189,9 +278,31 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
                       participant.apellidos?.[0] || ""
                     }`.toUpperCase();
 
+                    const avatar = getAvatarForUser(participant.id);
+                    const participantLanguages = participant.idiomas || participant.languages || [];
+
                     return (
-                      <div key={participant.id} className="participant-card">
-                        <div className="participant-avatar">{initials || "?"}</div>
+                      <div 
+                        key={participant.id} 
+                        className="participant-card"
+                        onClick={() => {
+                          setSelectedUserId(participant.id);
+                          setIsProfileModalOpen(true);
+                        }}
+                        style={{ cursor: 'pointer' }}
+                        title="Click para ver perfil"
+                      >
+                        <div className="participant-avatar">
+                          {avatar ? (
+                            <img
+                              src={avatar}
+                              alt={`Avatar de ${participant.nombre} ${participant.apellidos}`}
+                              className="participant-avatar-img"
+                            />
+                          ) : (
+                            initials || "?"
+                          )}
+                        </div>
                         <div className="participant-info">
                           <div className="participant-name">
                             {participant.nombre} {participant.apellidos}
@@ -201,15 +312,17 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
                               </span>
                             )}
                           </div>
+      
                           <div className="participant-details">
                             <span className="participant-username">@{participant.username}</span>
                             {participant.ciudad && (
                               <span className="participant-location">📍 {participant.ciudad}</span>
                             )}
                           </div>
-                          {participant.idiomas && participant.idiomas.length > 0 && (
+                          
+                          {participantLanguages.length > 0 && (
                             <div className="participant-languages">
-                              {participant.idiomas.map((lang) => {
+                              {participantLanguages.map((lang) => {
                                 const langNames = {
                                   es: "🇪🇸 ES",
                                   en: "🇬🇧 EN",
@@ -219,9 +332,10 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
                                   pt: "🇵🇹 PT",
                                   ru: "🇷🇺 RU",
                                 };
+
                                 return (
                                   <span key={lang} className="language-badge">
-                                    {langNames[lang] || lang.toUpperCase()}
+                                    {langNames[lang] || (typeof lang === "string" ? lang.toUpperCase() : lang)}
                                   </span>
                                 );
                               })}
@@ -282,6 +396,16 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           )}
         </div>
       </div>
+
+      {/* Modal de Perfil de Usuario */}
+      <UserProfileModal
+        userId={selectedUserId}
+        isOpen={isProfileModalOpen}
+        onClose={() => {
+          setIsProfileModalOpen(false);
+          setSelectedUserId(null);
+        }}
+      />
     </div>
   );
 }

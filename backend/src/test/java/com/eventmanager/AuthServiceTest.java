@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.eventmanager.dto.AuthDtos.*;
 import com.eventmanager.dto.AuthDtos.LoginRequest;
 import com.eventmanager.dto.AuthDtos.SignUpRequest;
 import com.eventmanager.repository.ClienteRepository;
