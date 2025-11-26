@@ -2,10 +2,8 @@ package com.eventmanager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import com.eventmanager.domain.Cliente;
 import com.eventmanager.repository.ClienteRepository;
@@ -291,5 +289,147 @@ class EventoServiceTest {
     );
 
     assertEquals("Evento no encontrado", err.getMessage());
+  }
+
+  @Test
+  void add_evento_favorito() {
+    Cliente user = new Cliente();
+    user.setId(1L);
+
+    Evento e = getEvento();
+
+    when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+    when(eventoRepo.findById(10L)).thenReturn(Optional.of(e));
+    when(clienteRepo.save(user)).thenReturn(user);
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var r = service.addEventoFavorito(dto);
+
+    assertEquals(10L, r.id());
+  }
+
+  @Test
+  void add_evento_favorito_error_evento_ya_favorito() {
+      Cliente user = new Cliente();
+      user.setId(1L);
+
+      Evento e = getEvento();
+      user.addEventoFavorito(e);
+
+      when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+      when(eventoRepo.findById(10L)).thenReturn(Optional.of(e));
+
+      var dto = new EventoDtos.EventoFav(10L, 1L);
+
+      var err = assertThrowsExactly(
+              RuntimeException.class,
+              () -> service.addEventoFavorito(dto)
+      );
+
+      assertEquals("El evento ya está en favoritos", err.getMessage());
+  }
+
+  @Test
+  void add_evento_favorito_error_usuario_inexistente() {
+    when(clienteRepo.findById(1L)).thenReturn(Optional.empty());
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var err = assertThrowsExactly(
+            RuntimeException.class,
+            () -> service.addEventoFavorito(dto)
+    );
+
+    assertEquals("Cliente no encontrado", err.getMessage());
+  }
+
+  @Test
+  void add_evento_favorito_error_evento_inexistente() {
+    Cliente user = new Cliente();
+    user.setId(1L);
+
+    when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+    when(eventoRepo.findById(10L)).thenReturn(Optional.empty());
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var err = assertThrowsExactly(
+            RuntimeException.class,
+            () -> service.addEventoFavorito(dto)
+    );
+
+    assertEquals("Evento no encontrado", err.getMessage());
+  }
+
+  @Test
+  void remove_evento_favorito() {
+    Cliente user = new Cliente();
+    user.setId(1L);
+
+    Evento e = getEvento();
+    user.addEventoFavorito(e);
+
+    when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+    when(eventoRepo.findById(10L)).thenReturn(Optional.of(e));
+    when(clienteRepo.save(user)).thenReturn(user);
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var r = service.removeEventoFavorito(dto);
+
+    assertEquals(10L, r.id());
+  }
+
+  @Test
+  void remove_evento_favorito_error_evento_no_favorito() {
+    Cliente user = new Cliente();
+    user.setId(1L);
+
+    Evento e = getEvento();
+
+    when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+    when(eventoRepo.findById(10L)).thenReturn(Optional.of(e));
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var err = assertThrowsExactly(
+            RuntimeException.class,
+            () -> service.removeEventoFavorito(dto)
+    );
+
+    assertEquals("El evento no está en favoritos", err.getMessage());
+  }
+
+  @Test
+  void remove_evento_favorito_error_usuario_inexistente() {
+    when(clienteRepo.findById(1L)).thenReturn(Optional.empty());
+
+    var dto = new EventoDtos.EventoFav(10L, 1L);
+
+    var err = assertThrowsExactly(
+            RuntimeException.class,
+            () -> service.removeEventoFavorito(dto)
+    );
+
+    assertEquals("Cliente no encontrado", err.getMessage());
+  }
+
+  @Test
+  void remove_evento_favorito_error_evento_inexistente() {
+      Cliente user = new Cliente();
+      user.setId(1L);
+
+      when(clienteRepo.findById(1L)).thenReturn(Optional.of(user));
+      when(eventoRepo.findById(10L)).thenReturn(Optional.empty());
+
+      var dto = new EventoDtos.EventoFav(10L, 1L);
+
+      var err = assertThrowsExactly(
+              RuntimeException.class,
+              () -> service.removeEventoFavorito(dto)
+      );
+
+      assertEquals("Evento no encontrado", err.getMessage());
   }
 }

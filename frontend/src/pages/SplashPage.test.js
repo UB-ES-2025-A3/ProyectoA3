@@ -19,7 +19,7 @@ describe('SplashPage', () => {
 
   test('renderiza correctamente todos los elementos', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -42,7 +42,7 @@ describe('SplashPage', () => {
 
   test('el botón de Iniciar Sesión navega a /login', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -56,7 +56,7 @@ describe('SplashPage', () => {
 
   test('el botón de Registrarse navega a /register', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -70,7 +70,7 @@ describe('SplashPage', () => {
 
   test('tiene la estructura de clases CSS correcta', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -94,7 +94,7 @@ describe('SplashPage', () => {
 
   test('los botones tienen las clases CSS correctas', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -113,7 +113,7 @@ describe('SplashPage', () => {
 
   test('el título tiene la clase correcta', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -125,7 +125,7 @@ describe('SplashPage', () => {
 
   test('el tagline tiene la clase correcta', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -137,7 +137,7 @@ describe('SplashPage', () => {
 
   test('el subtítulo tiene la clase correcta', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -149,7 +149,7 @@ describe('SplashPage', () => {
 
   test('los botones son accesibles mediante teclado', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -167,7 +167,7 @@ describe('SplashPage', () => {
 
   test('no navega si los botones no reciben click', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -178,7 +178,7 @@ describe('SplashPage', () => {
 
   test('múltiples clics en el mismo botón llaman a navigate múltiples veces', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -195,7 +195,7 @@ describe('SplashPage', () => {
 
   test('el contenido textual está en catalán', () => {
     render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );
@@ -212,7 +212,7 @@ describe('SplashPage', () => {
 
   test('snapshot test - verifica que no haya cambios inesperados en la UI', () => {
     const { container } = render(
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <SplashPage />
       </BrowserRouter>
     );

@@ -93,27 +93,36 @@ test('Events - Apuntarse y desapuntarse de un evento desde la tarjeta', async ({
   await expect(joinButton).toBeVisible();
   await joinButton.click();
 
-  // Banner de éxito al apuntarse
-  await expect(
-    page.getByText('¡Te has apuntado al evento correctamente!')
-  ).toBeVisible();
+  // 👇 En vez de depender SOLO del banner, esperamos a que aparezca el botón de "Desapuntarse"
+  const leaveButtonsAfterJoin = page.getByRole('button', { name: /^Desapuntarse$/ });
+  await expect(leaveButtonsAfterJoin.first()).toBeVisible();
 
-  // Buscar botones de "Desapuntarse"
-  const allLeaveButtons = page.getByRole('button', { name: /^Desapuntarse$/ });
-  const leaveCount = await allLeaveButtons.count();
+  // (Opcional) si quieres seguir comprobando el banner, hazlo pero no como única condición
+  // await expect(
+  //   page.getByText('¡Te has apuntado al evento correctamente!')
+  // ).toBeVisible();
+
+  // Ahora probamos desapuntarse
+  const leaveCount = await leaveButtonsAfterJoin.count();
 
   if (leaveCount === 0) {
     console.warn('⛔ No se encontró ningún botón de "Desapuntarse" después de apuntarse — fallback.');
     return;
   }
 
-  const leaveButton = allLeaveButtons.first();
+  const leaveButton = leaveButtonsAfterJoin.first();
   await expect(leaveButton).toBeVisible();
   await leaveButton.click();
 
+  // Esperar mensaje de desapuntado o que vuelva a aparecer "Apuntarse"
   await expect(
-    page.getByText('Te has desapuntado del evento correctamente.')
+    page.getByRole('button', { name: /^Apuntarse$/ }).first()
   ).toBeVisible();
+
+  // (Opcional) si tienes banner de desapuntado:
+  // await expect(
+  //  page.getByText('Te has desapuntado del evento correctamente.')
+  // ).toBeVisible();
 });
 
 

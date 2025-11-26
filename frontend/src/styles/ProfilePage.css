@@ -211,6 +211,23 @@
   box-shadow: 0 0 0 3px rgba(79, 79, 80, 0.12);
 }
 
+.input-field.error {
+  border-color: #dc3545;
+}
+
+.input-field.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+}
+
+.error-message {
+  display: block;
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
 /* Bio Section */
 .bio-section {
   padding: 10px 0;
@@ -240,6 +257,15 @@
   outline: none;
   border-color: var(--accent-color, #4f4f50);
   box-shadow: 0 0 0 3px rgba(79, 79, 80, 0.12);
+}
+
+.bio-textarea.error {
+  border-color: #dc3545;
+}
+
+.bio-textarea.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
 }
 
 /* Tags Section */
