@@ -1,7 +1,10 @@
 package com.eventmanager.service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,7 @@ import com.eventmanager.domain.Evento;
 import com.eventmanager.domain.Evento.Restricciones;
 import com.eventmanager.dto.EventoDtos.EventoAdd;
 import com.eventmanager.dto.EventoDtos.EventoCreate;
+import com.eventmanager.dto.EventoDtos.EventoFav;
 import com.eventmanager.dto.EventoDtos.EventoView;
 import com.eventmanager.repository.ClienteRepository;
 import com.eventmanager.repository.EventoRepository;
@@ -40,6 +44,42 @@ public class EventoService {
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
     }
   }
+  public List<EventoView> listarEventosSinRestricciones(Long userId) {
+     try {
+      var usuario = clienteRepo.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
+      int edadUsuario = Period.between(usuario.getFechaNacimiento(), LocalDate.now()).getYears();
+
+      List<String> idiomasList = usuario.getIdiomas();
+
+       Set<String> idiomasPermitidos = new HashSet<>(idiomasList);
+
+       var eventos = repo.findEventosPermitidos(userId, edadUsuario);
+
+       eventos.removeIf(evento -> {
+         var restricciones = evento.getRestricciones();
+         if (restricciones == null) return false; // o true si quieres excluir sin restricciones
+         List<String> idiomasEvento = restricciones.getIdiomas_permitidos();
+         if (idiomasEvento == null || idiomasEvento.isEmpty()) return false;
+
+         for (String idiomaEvento : idiomasEvento) {
+           if (!idiomasPermitidos.contains(idiomaEvento)) {
+             return true; // eliminar este evento
+           }
+         }
+         return false; // mantener
+       });
+
+      return eventos.stream()
+            .map(this::toView)
+            .toList();
+
+     } catch (DataAccessException | PersistenceException ex) {
+       var det = SqlErrorDetails.from(ex);
+       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+     }
+  }
+
 
   public List<EventoView> listarMisEventos(Long clienteId) {
     try {
@@ -90,7 +130,7 @@ public class EventoService {
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
-          req.restricciones().idiomaRequerido(),
+          req.restricciones().idiomasRequerido(),
           req.restricciones().edad_minima(),
           req.restricciones().plazasDisponibles()
         ));
@@ -122,7 +162,7 @@ public class EventoService {
 
   private EventoView toView(Evento e) {
     var r = e.getRestricciones();
-    System.err.printf("Participantes: ", e.getParticipantes().stream().map(p -> p.getId()).toList());
+
     return new EventoView(
       e.getId(), e.getFecha(), e.getHora(), e.getLugar(),
       r != null ? r.getIdiomas_permitidos() : null,
@@ -165,6 +205,38 @@ public class EventoService {
 
     evento.removeParticipante(participante);
     repo.save(evento);
+
+    return toView(evento);
+  }
+
+  public EventoView addEventoFavorito(EventoFav dto){
+    var user = clienteRepo.findById(dto.idUsuario())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    if(user.getFavoritos().contains(evento)){
+      throw new RuntimeException("El evento ya está en favoritos");
+    }
+
+    user.addEventoFavorito(evento);
+    clienteRepo.save(user);
+
+    return toView(evento);
+  }
+
+  public EventoView removeEventoFavorito(EventoFav dto){
+    var user = clienteRepo.findById(dto.idUsuario())
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    var evento = repo.findById(dto.idEvento())
+            .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
+
+    if(!user.getFavoritos().contains(evento)){
+      throw new RuntimeException("El evento no está en favoritos");
+    }
+
+    user.removeEventoFavorito(evento);
+    clienteRepo.save(user);
 
     return toView(evento);
   }

@@ -11,7 +11,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
     correo: '',
     fechaNacimiento: '',
     ciudad: '',
-    idioma: '',
+    idioma: [],
     password: ''
   });
 
@@ -49,6 +49,18 @@ const RegisterForm = ({ onSuccess, onError }) => {
         specialChar: /[^A-Za-z0-9]/.test(value)
       });
     }
+  };
+
+  const [idiomaOpen, setIdiomaOpen] = useState(false);
+  const handleCheckboxChange = (e) => {
+    const{value, checked} = e.target;
+      setFormData(prev => {
+        if(checked){
+          return { ...prev, idioma: [...prev.idioma, value]};
+        }else{
+          return { ...prev, idioma: prev.idioma.filter(i => i !== value)};
+        }
+      });
   };
 
   const validateForm = () => {
@@ -99,7 +111,13 @@ const RegisterForm = ({ onSuccess, onError }) => {
     setIsLoading(true);
     
     try {
-      const result = await authService.signUp(formData);
+      // El backend espera List<String> idioma (array), no string
+      // Mantener como array, enviar array vacío si no hay selección
+      const payload = {
+        ...formData,
+        idioma: Array.isArray(formData.idioma) ? formData.idioma : []
+      };
+      const result = await authService.signUp(payload);
       
       if (result.success) {
         onSuccess && onSuccess(result.data);
@@ -119,7 +137,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
         <h2>Crear Cuenta</h2>
         <p className="form-subtitle">Únete a nuestra plataforma de eventos</p>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="nombre">
@@ -218,22 +236,86 @@ const RegisterForm = ({ onSuccess, onError }) => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="idioma">
-                Idioma
-              </label>
-              <select
-                id="idioma"
-                name="idioma"
-                className="form-input"
-                value={formData.idioma}
-                onChange={handleChange}
-              >
-                <option value="">Selecciona un idioma</option>
-                <option value="es">Español</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="de">Deutsch</option>
-              </select>
+              <label className="form-label">Idioma(s) Hablado(s)</label>
+              <div className="multi-dropdown">
+                <div
+                  className="multi-dropdown-header"
+                  onClick={() => setIdiomaOpen(!idiomaOpen)}
+                >
+                  {formData.idioma.length > 0 
+                  ? formData.idioma.join(', ') 
+                  : 'Selecciona idioma(s)'}
+                  <span className="dropdown-arrow">{idiomaOpen ? '▲' : '▼'}</span>
+                </div>
+                {idiomaOpen && (
+                  <div className="multi-dropdown-menu">
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="es"
+                        checked={formData.idioma.includes('es')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Español
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="en"
+                        checked={formData.idioma.includes('en')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Inglés
+                    </label>
+                    <label>
+                      <input
+
+                        type="checkbox"
+                        value="fr"
+                        checked={formData.idioma.includes('fr')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Francés
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="de"
+                        checked={formData.idioma.includes('de')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Alemán
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="it"
+                        checked={formData.idioma.includes('it')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Italiano
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="pt"
+                        checked={formData.idioma.includes('pt')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Portugués
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value="ru"
+                        checked={formData.idioma.includes('ru')}
+                        onChange={handleCheckboxChange}
+                      />
+                      Ruso
+                    </label>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1,14 +1,17 @@
 package com.eventmanager.service;
 
-import com.eventmanager.dto.ClienteDtos.ClienteView;
-import com.eventmanager.dto.ClienteUpdateDto;
-import com.eventmanager.domain.Cliente;
-import com.eventmanager.repository.ClienteRepository;
-import jakarta.validation.ValidationException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.regex.Pattern;
+import com.eventmanager.domain.Cliente;
+import com.eventmanager.dto.ClienteDtos.ClienteView;
+import com.eventmanager.dto.ClienteUpdateDto;
+import com.eventmanager.repository.ClienteRepository;
+
+import jakarta.validation.ValidationException;
 
 @Service
 public class ClienteService {
@@ -62,8 +65,12 @@ public class ClienteService {
     if (req.getCorreo() != null) c.setCorreo(req.getCorreo().trim());
     if (req.getFechaNacimiento() != null) c.setFechaNacimiento(req.getFechaNacimiento());
     if (req.getCiudad() != null) c.setCiudad(req.getCiudad().trim());
-    if (req.getIdioma() != null) c.setIdioma(req.getIdioma().trim());
-    // Si hay campos extras como bio/languages y tu entidad los soporta, mapearlos aquí.
+    if (req.getIdioma() != null) c.setIdiomas(req.getIdioma());
+    // Permite actualizar descripcion incluso si viene vacía (para poder borrarla)
+    if (req.getDescripcion() != null) {
+      String descripcionTrimmed = req.getDescripcion().trim();
+      c.setDescripcion(descripcionTrimmed.isEmpty() ? null : descripcionTrimmed);
+    }
 
     Cliente saved = repo.save(c);
 
@@ -75,7 +82,8 @@ public class ClienteService {
       saved.getCorreo(),
       saved.getFechaNacimiento(),
       saved.getCiudad(),
-      saved.getIdioma()
+      saved.getIdiomas(),
+      saved.getDescripcion()
     );
   }
 
@@ -89,7 +97,12 @@ public class ClienteService {
       c.getCorreo(),
       c.getFechaNacimiento(),
       c.getCiudad(),
-      c.getIdioma()
+      c.getIdiomas(),
+      c.getDescripcion()
     );
+  }
+
+  public List<Cliente> getParticipantesByIds(List<Long> participantesIds){
+    return repo.findAllById(participantesIds);
   }
 }

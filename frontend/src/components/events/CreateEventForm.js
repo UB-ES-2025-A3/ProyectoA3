@@ -11,6 +11,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     hora: '',
     idioma: '',
     plazasDisponibles: '',
+    edadMinima: '',
     lugar: '',
     descripcion: ''
   });
@@ -61,7 +62,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.hora = 'La hora es requerida';
     }
 
-    if (!formData.idioma) {
+    if (!formData.idioma || (typeof formData.idioma === 'string' && formData.idioma.trim() === '') || (Array.isArray(formData.idioma) && formData.idioma.length === 0)) {
       newErrors.idioma = 'Debes seleccionar un idioma';
     }
 
@@ -69,6 +70,12 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.plazasDisponibles = 'Las plazas disponibles son requeridas';
     } else if (parseInt(formData.plazasDisponibles) < 1) {
       newErrors.plazasDisponibles = 'Debe haber al menos 1 plaza disponible';
+    }
+
+    if (formData.edadMinima && parseInt(formData.edadMinima) < 0) {
+      newErrors.edadMinima = 'La edad mínima debe ser 0 o mayor';
+    } else if (formData.edadMinima && parseInt(formData.edadMinima) > 120) {
+      newErrors.edadMinima = 'La edad mínima debe ser menor a 120';
     }
 
     if (!formData.lugar.trim()) {
@@ -94,13 +101,14 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       const response = await createEvent({
         titulo: formData.titulo,
         descripcion: formData.descripcion,
-        etiquetas: formData.etiquetas,
+        etiquetas: formData.etiquetas || 'otros',        
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,
         restricciones: {
-          idiomaRequerido: formData.idioma,
-          plazasDisponibles: parseInt(formData.plazasDisponibles)
+          idiomasRequerido: formData.idioma ? [formData.idioma] : [],
+          plazasDisponibles: parseInt(formData.plazasDisponibles),
+          edad_minima: formData.edadMinima ? parseInt(formData.edadMinima) : null
         }
       });
 
@@ -111,8 +119,10 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         titulo: '',
         etiquetas: '',
         fecha: '',
+        hora: '',
         idioma: '',
         plazasDisponibles: '',
+        edadMinima: '',
         lugar: '',
         descripcion: ''
       });
@@ -203,8 +213,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="etiquetas">Etiquetas *</label>
+            <label htmlFor="etiquetas">Etiquetas</label>  
             <select
+              // Antes habia Etiquetas * pero no es obligatorio
               id="etiquetas"
               name="etiquetas"
               value={formData.etiquetas}
@@ -213,9 +224,19 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               disabled={loading}
             >
               <option value="">Selecciona una etiqueta</option>
+              <option value="turismo">Turismo</option>
               <option value="comida">Comida</option>
               <option value="excursion">Excursión</option>
-              <option value="turismo">Turismo</option>
+              <option value="cultural">Cultural</option>
+              <option value="social">Social</option>
+              <option value="deporte">Deporte</option>
+              <option value="aventura">Aventura</option>
+              <option value="familiar">Familiar</option>
+              <option value="juegos">Juegos</option>
+              <option value="cine">Cine</option>
+              <option value="relax">Relax</option>
+              <option value="tardeo">Tardeo</option>
+              <option value="noche">Noche</option>
               <option value="otros">Otros</option>
             </select>
             {errors.etiquetas && <span className="error-message">{errors.etiquetas}</span>}
@@ -292,6 +313,25 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               {errors.plazasDisponibles && <span className="error-message">{errors.plazasDisponibles}</span>}
             </div>
 
+            <div className="form-group">
+              <label htmlFor="edadMinima">Edad Mínima (opcional)</label>
+              <input
+                type="number"
+                id="edadMinima"
+                name="edadMinima"
+                value={formData.edadMinima}
+                onChange={handleChange}
+                min="0"
+                max="120"
+                placeholder="Ej: 18"
+                className={errors.edadMinima ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.edadMinima && <span className="error-message">{errors.edadMinima}</span>}
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="lugar">Lugar *</label>
               <input
