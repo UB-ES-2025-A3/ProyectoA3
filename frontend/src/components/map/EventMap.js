@@ -114,12 +114,47 @@ function MapClickHandler({ onMapClick }) {
   return null;
 }
 
+// Estilos de mapa disponibles
+const MAP_STYLES = {
+  googlelike: {
+    name: 'Estilo Google Maps',
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  },
+  light: {
+    name: 'Claro (Positron)',
+    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  },
+  dark: {
+    name: 'Oscuro (Dark Matter)',
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  },
+  default: {
+    name: 'OpenStreetMap',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  terrain: {
+    name: 'Topográfico',
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
+  },
+  satellite: {
+    name: 'Satelital',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>'
+  }
+};
+
 const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUnpin, isPinned = false, onMapClick }) {
   const mapRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchCenter, setSearchCenter] = useState(null);
   const [searchZoom, setSearchZoom] = useState(null);
+  const [mapStyle, setMapStyle] = useState('googlelike'); // Estado para el estilo del mapa (por defecto estilo Google Maps)
 
   // Función para buscar una ubicación usando Nominatim (OpenStreetMap)
   const searchLocation = useCallback(async (query) => {
@@ -234,6 +269,20 @@ const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUn
         )}
       </form>
 
+      {/* Selector de estilo del mapa */}
+      <div className="map-style-selector">
+        <select 
+          className="map-style-select"
+          value={mapStyle}
+          onChange={(e) => setMapStyle(e.target.value)}
+          title="Cambiar estilo del mapa"
+        >
+          {Object.entries(MAP_STYLES).map(([key, style]) => (
+            <option key={key} value={key}>{style.name}</option>
+          ))}
+        </select>
+      </div>
+
       {isPinned && onUnpin && (
         <button 
           className="map-unpin-button"
@@ -251,8 +300,8 @@ const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUn
         ref={mapRef}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={MAP_STYLES[mapStyle].attribution}
+          url={MAP_STYLES[mapStyle].url}
         />
         
         {/* Centrar el mapa cuando cambia el evento seleccionado */}
