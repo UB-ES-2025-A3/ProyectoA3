@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './CreateEventForm.css';
 import { createEvent } from '../../services/eventService';
 
-export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
+export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLocation, initialCoordinates }) {
   const [formData, setFormData] = useState({
     titulo: '',
     etiquetas: '',
@@ -13,8 +13,50 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     plazasDisponibles: '',
     edadMinima: '',
     lugar: '',
-    descripcion: ''
+    descripcion: '',
+    latitude: '',
+    longitude: ''
   });
+
+  // Resetear el formulario cuando se cierre
+  React.useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        titulo: '',
+        etiquetas: '',
+        fecha: '',
+        hora: '',
+        idioma: '',
+        plazasDisponibles: '',
+        edadMinima: '',
+        lugar: '',
+        descripcion: '',
+        latitude: '',
+        longitude: ''
+      });
+      setErrors({});
+      setSubmitError('');
+    }
+  }, [isOpen]);
+
+  // Actualizar el formulario cuando se abra con coordenadas iniciales
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialLocation) {
+        setFormData(prev => ({
+          ...prev,
+          lugar: initialLocation
+        }));
+      }
+      if (initialCoordinates) {
+        setFormData(prev => ({
+          ...prev,
+          latitude: initialCoordinates.latitude?.toString() || '',
+          longitude: initialCoordinates.longitude?.toString() || ''
+        }));
+      }
+    }
+  }, [isOpen, initialLocation, initialCoordinates]);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -98,7 +140,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
 
     try {
       // Llamar al backend para crear el evento
-      const response = await createEvent({
+      const eventData = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
         etiquetas: formData.etiquetas || 'otros',        
@@ -110,7 +152,15 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           plazasDisponibles: parseInt(formData.plazasDisponibles),
           edad_minima: formData.edadMinima ? parseInt(formData.edadMinima) : null
         }
-      });
+      };
+
+      // Añadir coordenadas si están disponibles
+      if (formData.latitude && formData.longitude) {
+        eventData.latitude = parseFloat(formData.latitude);
+        eventData.longitude = parseFloat(formData.longitude);
+      }
+
+      const response = await createEvent(eventData);
 
       console.log('Evento creado exitosamente:', response);
 

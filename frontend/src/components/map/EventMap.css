@@ -12,7 +12,7 @@
 .map-search-form {
   position: absolute;
   top: 10px;
-  left: 10px;
+  left: 50px; /* Mover más a la derecha para no tapar los controles de zoom */
   z-index: 1000;
   display: flex;
   gap: 4px;
@@ -20,7 +20,7 @@
   border-radius: 8px;
   padding: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  max-width: calc(100% - 20px);
+  max-width: calc(100% - 60px); /* Ajustar el ancho máximo */
 }
 
 .map-search-input {

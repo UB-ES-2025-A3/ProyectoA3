@@ -26,7 +26,95 @@ function MapCenter({ center, zoom }) {
   return null;
 }
 
-const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUnpin, isPinned = false }) {
+// Componente para detectar clicks en el mapa
+function MapClickHandler({ onMapClick }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!onMapClick) return;
+
+    const handleMapClick = async (e) => {
+      const { lat, lng } = e.latlng;
+      
+      // Verificar que las coordenadas son válidas
+      if (isNaN(lat) || isNaN(lng)) return;
+      
+      // Verificar que no es en el mar (coordenadas razonables)
+      // Esto es una verificación básica - coordenadas válidas de tierra
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+      
+      // Intentar obtener información de la ubicación usando reverse geocoding
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`,
+          {
+            headers: {
+              'User-Agent': 'EventManagerApp/1.0'
+            }
+          }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Verificar que no es agua (mar, océano, etc.)
+          const type = data.type || '';
+          const isWater = type.includes('water') || 
+                         type.includes('ocean') || 
+                         type.includes('sea') ||
+                         (data.address && (
+                           data.address.waterway ||
+                           data.address.natural === 'water'
+                         ));
+          
+          if (!isWater && data.address) {
+            // Construir el nombre de la ubicación
+            const locationName = data.display_name || 
+                                data.address.city || 
+                                data.address.town || 
+                                data.address.village ||
+                                data.address.municipality ||
+                                `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            
+            onMapClick({
+              latitude: lat,
+              longitude: lng,
+              location: locationName
+            });
+          } else {
+            alert('Por favor, selecciona un lugar en tierra firme.');
+          }
+        } else {
+          // Si falla la verificación, permitir el click de todas formas
+          // pero con coordenadas básicas
+          onMapClick({
+            latitude: lat,
+            longitude: lng,
+            location: `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+          });
+        }
+      } catch (error) {
+        console.error('Error al verificar ubicación:', error);
+        // Si falla la verificación, permitir el click de todas formas
+        onMapClick({
+          latitude: lat,
+          longitude: lng,
+          location: `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+        });
+      }
+    };
+
+    map.on('click', handleMapClick);
+
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, onMapClick]);
+
+  return null;
+}
+
+const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUnpin, isPinned = false, onMapClick }) {
   const mapRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -169,6 +257,9 @@ const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUn
         
         {/* Centrar el mapa cuando cambia el evento seleccionado */}
         <MapCenter center={center} zoom={zoom} />
+        
+        {/* Detectar clicks en el mapa */}
+        {onMapClick && <MapClickHandler onMapClick={onMapClick} />}
         
         {/* Mostrar marcador del evento seleccionado */}
         {selectedEvent && selectedEvent.latitude && selectedEvent.longitude && (

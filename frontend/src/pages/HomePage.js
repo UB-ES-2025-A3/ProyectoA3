@@ -45,6 +45,15 @@ export default function HomePage() {
   
   // Estado para el formulario de crear evento
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [createFormInitialLocation, setCreateFormInitialLocation] = useState(null);
+  const [createFormInitialCoordinates, setCreateFormInitialCoordinates] = useState(null);
+  
+  // Estado para el modal de confirmación de creación desde el mapa
+  const [mapClickConfirmation, setMapClickConfirmation] = useState({
+    isOpen: false,
+    location: null,
+    coordinates: null
+  });
 
   // Función para obtener favoritos del localStorage
   const getStoredFavoriteIds = useCallback(() => {
@@ -329,7 +338,35 @@ export default function HomePage() {
   // Función para cerrar el formulario de creación
   const handleCloseCreateForm = () => {
     setIsCreateFormOpen(false);
+    setCreateFormInitialLocation(null);
+    setCreateFormInitialCoordinates(null);
   };
+
+  // Función para manejar clicks en el mapa
+  const handleMapClick = useCallback((locationData) => {
+    // Mostrar modal de confirmación en lugar de abrir directamente el formulario
+    setMapClickConfirmation({
+      isOpen: true,
+      location: locationData.location,
+      coordinates: {
+        latitude: locationData.latitude,
+        longitude: locationData.longitude
+      }
+    });
+  }, []);
+
+  // Función para confirmar la creación de evento desde el mapa
+  const handleConfirmMapClick = useCallback(() => {
+    setCreateFormInitialLocation(mapClickConfirmation.location);
+    setCreateFormInitialCoordinates(mapClickConfirmation.coordinates);
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+    setIsCreateFormOpen(true);
+  }, [mapClickConfirmation]);
+
+  // Función para cancelar la creación de evento desde el mapa
+  const handleCancelMapClick = useCallback(() => {
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+  }, []);
 
   // Función para manejar la creación de evento exitosa
   const handleEventCreated = () => {
@@ -859,6 +896,7 @@ export default function HomePage() {
             events={filteredEvents}
             onUnpin={handleUnpinEvent}
             isPinned={!!pinnedEvent}
+            onMapClick={handleMapClick}
           />
         </div>
       </div>
@@ -882,11 +920,39 @@ export default function HomePage() {
         />
       )}
 
+      {/* Modal de Confirmación para crear evento desde el mapa */}
+      {mapClickConfirmation.isOpen && (
+        <div className="modal-overlay" onClick={handleCancelMapClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>¿Crear evento aquí?</h2>
+              <button className="modal-close" onClick={handleCancelMapClick}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p>¿Quieres añadir un evento en esta ubicación?</p>
+              <p className="modal-location-info">
+                <strong>Ubicación:</strong> {mapClickConfirmation.location}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-outline" onClick={handleCancelMapClick}>
+                Cancelar
+              </button>
+              <button className="btn btn-primary" onClick={handleConfirmMapClick}>
+                Sí, crear evento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Crear Evento */}
       <CreateEventForm
         isOpen={isCreateFormOpen}
         onClose={handleCloseCreateForm}
         onSuccess={handleEventCreated}
+        initialLocation={createFormInitialLocation}
+        initialCoordinates={createFormInitialCoordinates}
       />
     </div>
   );
