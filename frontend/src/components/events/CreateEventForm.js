@@ -213,7 +213,7 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="etiquetas">Etiquetas *</label>
+            <label htmlFor="etiquetas">Etiquetas</label>
             <select
               id="etiquetas"
               name="etiquetas"
