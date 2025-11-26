@@ -213,8 +213,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="etiquetas">Etiquetas</label>
+            <label htmlFor="etiquetas">Etiquetas</label>  
             <select
+              // Antes habia Etiquetas * pero no es obligatorio
               id="etiquetas"
               name="etiquetas"
               value={formData.etiquetas}
