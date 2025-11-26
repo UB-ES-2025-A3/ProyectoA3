@@ -2,6 +2,30 @@ import React, { useState, useEffect, useCallback } from 'react';
 import userService from '../../services/userService';
 import './UserProfileModal.css';
 
+import avatarDefault from "../../assets/avatars/avatar-default.jpg";
+import avatar1 from "../../assets/avatars/avatar-1.png";
+import avatar2 from "../../assets/avatars/avatar-2.png";
+import avatar3 from "../../assets/avatars/avatar-3.png";
+import avatar4 from "../../assets/avatars/avatar-4.png";
+import avatar5 from "../../assets/avatars/avatar-5.png";
+
+const AVATAR_OPTIONS = [avatar1, avatar2, avatar3, avatar4, avatar5, avatarDefault];
+
+const getAvatarForUser = (userKey) => {
+  if (!userKey) return avatarDefault;
+
+  const idStr = userKey.toString();
+  let sum = 0;
+
+  for (let i = 0; i < idStr.length; i++) {
+    sum += idStr.charCodeAt(i);
+  }
+
+  const index = sum % AVATAR_OPTIONS.length;
+  return AVATAR_OPTIONS[index];
+};
+
+
 export default function UserProfileModal({ userId, isOpen, onClose }) {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -89,8 +113,14 @@ export default function UserProfileModal({ userId, isOpen, onClose }) {
   };
 
   const initials = userProfile
-    ? `${userProfile.nombre?.[0] || ''}${userProfile.apellidos?.[0] || ''}`.toUpperCase()
-    : '?';
+  ? `${userProfile.nombre?.[0] || ''}${userProfile.apellidos?.[0] || ''}`.toUpperCase()
+  : '?';
+
+  const avatar = userProfile
+    ? getAvatarForUser(userProfile.id || userId || userProfile.username)
+    : avatarDefault;
+
+
 
   return (
     <div className="user-profile-modal-backdrop" onClick={handleBackdropClick}>
@@ -115,13 +145,22 @@ export default function UserProfileModal({ userId, isOpen, onClose }) {
           <>
             <div className="user-profile-header">
               <div className="user-profile-avatar-large">
-                {initials || '?'}
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt={`Avatar de ${userProfile.nombre} ${userProfile.apellidos}`}
+                    className="user-profile-avatar-img"
+                  />
+                ) : (
+                  initials || "?"
+                )}
               </div>
               <h2 className="user-profile-name">
                 {userProfile.nombre} {userProfile.apellidos}
               </h2>
               <p className="user-profile-username">@{userProfile.username}</p>
             </div>
+
 
             <div className="user-profile-body">
               <div className="user-profile-section">
