@@ -1,5 +1,14 @@
 {
  
+  
+  "register": {
+    "messages": {
+      "success": "Compte creat amb èxit! Benvingut/da {{username}}",
+      "redirecting": "Seràs redirigit al login en uns segons...",
+      "errorFallback": "Error en crear el compte."
+    }
+  },
+
 
   "login": {
     "messages": {

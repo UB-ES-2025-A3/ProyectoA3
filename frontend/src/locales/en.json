@@ -1,6 +1,15 @@
 {
 
     
+  "register": {
+    "messages": {
+      "success": "Account successfully created! Welcome {{username}}",
+      "redirecting": "You will be redirected to the login in a few seconds...",
+      "errorFallback": "Error creating the account."
+    }
+  },
+
+    
   "login": {
     "messages": {
       "welcome": "Welcome back, {{username}}!",
