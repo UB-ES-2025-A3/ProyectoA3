@@ -1,3 +1,4 @@
+// src/components/layout/NavBar.jsx
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import authService from "../../services/authService";
@@ -10,8 +11,8 @@ export default function NavBar() {
 
   const handleLogout = () => {
     authService.logout();
-    localStorage.removeItem('authToken');
-    navigate('/login');
+    localStorage.removeItem("authToken");
+    navigate("/login");
   };
 
   const changeLang = (lang) => {
@@ -21,12 +22,12 @@ export default function NavBar() {
 
   return (
     <nav className="nav">
-      <div className="nav__brand">Trips & Events</div>
+      <div className="nav__brand">{t("nav.brand")}</div>
 
       <div className="nav__links">
-        <NavLink to="/events">{t("events")}</NavLink>
-        <NavLink to="/profile">{t("profile")}</NavLink>
-        <NavLink to="/my-events">{t("myEvents")}</NavLink>
+        <NavLink to="/events">{t("nav.events")}</NavLink>
+        <NavLink to="/profile">{t("nav.profile")}</NavLink>
+        <NavLink to="/my-events">{t("nav.myEvents")}</NavLink>
       </div>
 
       <div className="nav__right">
@@ -50,12 +51,12 @@ export default function NavBar() {
             className={i18n.language === "cat" ? "lang active" : "lang"}
             onClick={() => changeLang("cat")}
           >
-            cat
+            ca
           </span>
         </div>
 
         <button className="nav__logout" onClick={handleLogout}>
-          {t("logout")}
+          {t("nav.logout")}
         </button>
       </div>
     </nav>

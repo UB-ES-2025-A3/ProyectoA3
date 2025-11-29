@@ -1,4 +1,13 @@
 {
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Events",
+    "profile": "Profile",
+    "myEvents": "My events",
+    "logout": "Logout"
+  },
+
   "profile": {
     "loading": "Loading profile...",
     "loadError": "Could not load user profile",

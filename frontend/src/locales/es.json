@@ -1,4 +1,14 @@
 {
+
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Eventos",
+    "profile": "Perfil",
+    "myEvents": "Mis eventos",
+    "logout": "Cerrar sesión"
+  },
+
   "profile": {
     "loading": "Cargando perfil...",
     "loadError": "No se pudo cargar el perfil del usuario",
