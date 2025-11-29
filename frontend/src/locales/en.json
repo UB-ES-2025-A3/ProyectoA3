@@ -1,5 +1,81 @@
 {
   "profile": {
-    "loading": "Loading profile ..."
+    "loading": "Loading profile...",
+    "loadError": "Could not load user profile",
+    "loadErrorWithMessage": "Error loading data: {{error}}",
+    "noUserLogged": "No user logged in",
+    "unknownError": "Unknown error",
+
+    "header": {
+      "usernameLabel": "User",
+      "edit": "Edit profile",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "bgColorTitle": "Background color",
+      "changeAvatarTitle": "Change avatar",
+      "avatarAlt": "{{fullName}}'s avatar"
+    },
+
+    "sections": {
+      "personalInfo": "Personal information",
+      "description": "Description",
+      "languages": "Languages",
+      "createdEvents": "My created events ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "city": "City",
+      "birthDate": "Date of birth",
+      "cityNotSpecified": "Not specified",
+      "birthDateNotSpecified": "Not specified",
+      "descriptionPlaceholder": "Tell us a bit about yourself...",
+      "noDescription": "No description available"
+    },
+
+    "languages": {
+      "addLanguage": "Add language",
+      "add": "Add"
+    },
+
+    "events": {
+      "dateNotAvailable": "Date not available",
+      "participants": "{{current}} / {{capacity}} participants"
+    },
+
+    "stats": {
+      "enrolledEvents": "Joined events",
+      "organizedEvents": "Organized events",
+      "ratings": "Ratings"
+    },
+
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "firstNameMin": "First name must be at least 2 characters",
+      "firstNameMax": "First name cannot be longer than 50 characters",
+
+      "lastNameRequired": "Last name is required",
+      "lastNameMin": "Last name must be at least 2 characters",
+      "lastNameMax": "Last name cannot be longer than 100 characters",
+
+      "emailRequired": "Email is required",
+      "emailInvalid": "Email is not valid",
+
+      "birthDateInvalid": "Date of birth is not valid",
+      "tooYoung": "You must be at least 13 years old to use this platform",
+      "tooOld": "The date of birth does not seem valid",
+      "birthDateFuture": "Date of birth cannot be in the future",
+
+      "cityMax": "City name cannot be longer than 100 characters",
+      "descriptionMax": "Description cannot be longer than 500 characters",
+
+      "fixErrors": "Please fix the errors in the form"
+    },
+
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Error updating the profile"
   }
 }

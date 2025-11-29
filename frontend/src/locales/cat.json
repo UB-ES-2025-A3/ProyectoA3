@@ -1,5 +1,81 @@
 {
   "profile": {
-    "loading": "Carregant perfil ..."
+    "loading": "Carregant perfil...",
+    "loadError": "No s'ha pogut carregar el perfil de l'usuari",
+    "loadErrorWithMessage": "Error en carregar les dades: {{error}}",
+    "noUserLogged": "No hi ha cap usuari connectat",
+    "unknownError": "Error desconegut",
+
+    "header": {
+      "usernameLabel": "Usuari",
+      "edit": "Editar perfil",
+      "save": "Desar",
+      "saving": "Desant...",
+      "cancel": "Cancel·lar",
+      "bgColorTitle": "Color de fons",
+      "changeAvatarTitle": "Canviar avatar",
+      "avatarAlt": "Avatar de {{fullName}}"
+    },
+
+    "sections": {
+      "personalInfo": "Informació personal",
+      "description": "Descripció",
+      "languages": "Idiomes",
+      "createdEvents": "Els meus esdeveniments creats ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "Nom",
+      "lastName": "Cognoms",
+      "email": "Correu electrònic",
+      "city": "Ciutat",
+      "birthDate": "Data de naixement",
+      "cityNotSpecified": "No especificada",
+      "birthDateNotSpecified": "No especificada",
+      "descriptionPlaceholder": "Explica'ns una mica sobre tu...",
+      "noDescription": "No hi ha cap descripció disponible"
+    },
+
+    "languages": {
+      "addLanguage": "Afegir idioma",
+      "add": "Afegir"
+    },
+
+    "events": {
+      "dateNotAvailable": "Data no disponible",
+      "participants": "{{current}} / {{capacity}} participants"
+    },
+
+    "stats": {
+      "enrolledEvents": "Esdeveniments apuntats",
+      "organizedEvents": "Esdeveniments organitzats",
+      "ratings": "Valoracions"
+    },
+
+    "validation": {
+      "firstNameRequired": "El nom és obligatori",
+      "firstNameMin": "El nom ha de tenir almenys 2 caràcters",
+      "firstNameMax": "El nom no pot tenir més de 50 caràcters",
+
+      "lastNameRequired": "Els cognoms són obligatoris",
+      "lastNameMin": "Els cognoms han de tenir almenys 2 caràcters",
+      "lastNameMax": "Els cognoms no poden tenir més de 100 caràcters",
+
+      "emailRequired": "El correu electrònic és obligatori",
+      "emailInvalid": "El correu electrònic no és vàlid",
+
+      "birthDateInvalid": "La data de naixement no és vàlida",
+      "tooYoung": "Has de tenir almenys 13 anys per utilitzar aquesta plataforma",
+      "tooOld": "La data de naixement no sembla vàlida",
+      "birthDateFuture": "La data de naixement no pot ser en el futur",
+
+      "cityMax": "El nom de la ciutat no pot tenir més de 100 caràcters",
+      "descriptionMax": "La descripció no pot tenir més de 500 caràcters",
+
+      "fixErrors": "Si us plau, corregeix els errors del formulari"
+    },
+
+    "updateSuccess": "Perfil actualitzat correctament",
+    "updateError": "Error en actualitzar el perfil"
   }
 }
