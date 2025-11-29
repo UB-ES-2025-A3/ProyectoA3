@@ -1,6 +1,15 @@
 {
 
     
+
+  "splash": {
+    "tagline": "Organize, share and live new experiences",
+    "title": "EventManager",
+    "subtitle": "Manage all your events in one place. Collaborate with your team and inspire new participants.",
+    "loginButton": "Log in",
+    "registerButton": "Sign up"
+  },
+
   "register": {
     "messages": {
       "success": "Account successfully created! Welcome {{username}}",

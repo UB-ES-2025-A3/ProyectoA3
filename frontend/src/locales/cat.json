@@ -1,6 +1,14 @@
 {
  
-  
+
+  "splash": {
+    "tagline": "Organitza, comparteix i viu experiències",
+    "title": "EventManager",
+    "subtitle": "Gestiona els teus esdeveniments des d'un sol lloc. Col·labora amb el teu equip i inspira nous participants.",
+    "loginButton": "Iniciar sessió",
+    "registerButton": "Registrar-se"
+  },
+
   "register": {
     "messages": {
       "success": "Compte creat amb èxit! Benvingut/da {{username}}",
