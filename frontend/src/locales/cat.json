@@ -1,6 +1,71 @@
 {
+ 
+  "eventsPage": {
+    "filters": {
+      "title": "Filtra els teus esdeveniments",
+      "subtitle": "Troba el pla perfecte ajustant l'idioma, les places disponibles o etiquetes temàtiques.",
+      "searchPlaceholder": "Cerca esdeveniments per nom o descripció...",
+      "language": {
+        "buttonLabel": "Idioma",
+        "buttonTitle": "Filtrar per idioma",
+        "searchPlaceholder": "Cercar idioma...",
+        "any": "Qualsevol idioma",
+        "es": "Espanyol",
+        "en": "Anglès",
+        "fr": "Francès",
+        "de": "Alemany",
+        "it": "Italià",
+        "pt": "Portuguès",
+        "ru": "Rus"
+      },
+      "capacity": {
+        "buttonLabel": "Capacitat",
+        "buttonTitle": "Filtrar per capacitat màxima",
+        "label": "Capacitat màxima:",
+        "placeholder": "Ex: 10",
+        "unit": "persones",
+        "presets": {
+          "noLimit": "Sense límit",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Etiquetes",
+        "buttonTitle": "Filtrar per etiquetes",
+        "empty": "Encara no hi ha etiquetes disponibles.",
+        "clear": "Netejar etiquetes"
+      },
+      "favorites": {
+        "buttonTitle": "Mostrar només esdeveniments desats",
+        "buttonLabel": "Només favorits"
+      },
+      "clearFilters": "Netejar filtres"
+    },
+    "header": {
+      "title": "Esdeveniments",
+      "subtitle": "Descobreix i desa els teus propers plans.",
+      "createButton": "Crear esdeveniment"
+    },
+    "list": {
+      "loading": "Carregant esdeveniments...",
+      "empty": "No hi ha esdeveniments disponibles amb els filtres aplicats."
+    },
+    "messages": {
+      "loadError": "Error en carregar els esdeveniments. Torna-ho a intentar.",
+      "eventNotFound": "No s'ha trobat l'esdeveniment.",
+      "eventFull": "L'esdeveniment està complet. No t'hi pots apuntar.",
+      "alreadyEnrolled": "Ja estàs apuntat a aquest esdeveniment.",
+      "joinSuccess": "T'has apuntat a l'esdeveniment correctament!",
+      "joinErrorFallback": "Error en apuntar-te a l'esdeveniment.",
+      "notEnrolled": "No estàs apuntat a aquest esdeveniment.",
+      "leaveSuccess": "T'has donat de baixa de l'esdeveniment correctament.",
+      "leaveErrorFallback": "Error en donar-te de baixa de l'esdeveniment.",
+      "createSuccess": "Esdeveniment creat correctament!"
+    }
+  },
 
-  
   "myEvents": {
     "title": "La meva agenda d'esdeveniments",
     "subtitle": "Aquí pots veure tots els esdeveniments als quals estàs inscrit",

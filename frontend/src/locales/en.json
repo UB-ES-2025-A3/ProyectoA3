@@ -1,6 +1,72 @@
 {
 
 
+  "eventsPage": {
+    "filters": {
+      "title": "Filter your events",
+      "subtitle": "Find the perfect plan by adjusting language, available seats or topic tags.",
+      "searchPlaceholder": "Search events by name or description...",
+      "language": {
+        "buttonLabel": "Language",
+        "buttonTitle": "Filter by language",
+        "searchPlaceholder": "Search language...",
+        "any": "Any language",
+        "es": "Spanish",
+        "en": "English",
+        "fr": "French",
+        "de": "German",
+        "it": "Italian",
+        "pt": "Portuguese",
+        "ru": "Russian"
+      },
+      "capacity": {
+        "buttonLabel": "Capacity",
+        "buttonTitle": "Filter by maximum capacity",
+        "label": "Maximum capacity:",
+        "placeholder": "Ex: 10",
+        "unit": "people",
+        "presets": {
+          "noLimit": "No limit",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Tags",
+        "buttonTitle": "Filter by tags",
+        "empty": "There are no tags available yet.",
+        "clear": "Clear tags"
+      },
+      "favorites": {
+        "buttonTitle": "Show only saved events",
+        "buttonLabel": "Only favourites"
+      },
+      "clearFilters": "Clear filters"
+    },
+    "header": {
+      "title": "Events",
+      "subtitle": "Discover and save your next plans.",
+      "createButton": "Create event"
+    },
+    "list": {
+      "loading": "Loading events...",
+      "empty": "There are no events available with the current filters."
+    },
+    "messages": {
+      "loadError": "Error loading events. Please try again.",
+      "eventNotFound": "Event not found.",
+      "eventFull": "The event is full. You cannot join.",
+      "alreadyEnrolled": "You are already enrolled in this event.",
+      "joinSuccess": "You have successfully joined the event!",
+      "joinErrorFallback": "Error while joining the event.",
+      "notEnrolled": "You are not enrolled in this event.",
+      "leaveSuccess": "You have successfully left the event.",
+      "leaveErrorFallback": "Error while leaving the event.",
+      "createSuccess": "Event created successfully!"
+    }
+  },
+
   "myEvents": {
     "title": "My events schedule",
     "subtitle": "Here you can see all the events you are enrolled in",

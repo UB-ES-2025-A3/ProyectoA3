@@ -1,5 +1,70 @@
 {
 
+  "eventsPage": {
+    "filters": {
+      "title": "Filtra tus eventos",
+      "subtitle": "Encuentra el plan perfecto ajustando idioma, plazas disponibles o etiquetas temáticas.",
+      "searchPlaceholder": "Buscar eventos por nombre o descripción...",
+      "language": {
+        "buttonLabel": "Idioma",
+        "buttonTitle": "Filtrar por idioma",
+        "searchPlaceholder": "Buscar idioma...",
+        "any": "Cualquier idioma",
+        "es": "Español",
+        "en": "Inglés",
+        "fr": "Francés",
+        "de": "Alemán",
+        "it": "Italiano",
+        "pt": "Portugués",
+        "ru": "Ruso"
+      },
+      "capacity": {
+        "buttonLabel": "Capacidad",
+        "buttonTitle": "Filtrar por capacidad máxima",
+        "label": "Capacidad máxima:",
+        "placeholder": "Ej: 10",
+        "unit": "personas",
+        "presets": {
+          "noLimit": "Sin límite",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Tags",
+        "buttonTitle": "Filtrar por etiquetas",
+        "empty": "Todavía no hay etiquetas disponibles.",
+        "clear": "Limpiar tags"
+      },
+      "favorites": {
+        "buttonTitle": "Mostrar solo eventos guardados",
+        "buttonLabel": "Solo favoritos"
+      },
+      "clearFilters": "Limpiar filtros"
+    },
+    "header": {
+      "title": "Eventos",
+      "subtitle": "Descubre y guarda tus próximos planes.",
+      "createButton": "Crear evento"
+    },
+    "list": {
+      "loading": "Cargando eventos...",
+      "empty": "No hay eventos disponibles con los filtros aplicados."
+    },
+    "messages": {
+      "loadError": "Error al cargar los eventos. Inténtalo de nuevo.",
+      "eventNotFound": "Evento no encontrado.",
+      "eventFull": "El evento está completo. No puedes apuntarte.",
+      "alreadyEnrolled": "Ya estás apuntado a este evento.",
+      "joinSuccess": "¡Te has apuntado al evento correctamente!",
+      "joinErrorFallback": "Error al apuntarse al evento.",
+      "notEnrolled": "No estás apuntado a este evento.",
+      "leaveSuccess": "Te has desapuntado del evento correctamente.",
+      "leaveErrorFallback": "Error al desapuntarse del evento.",
+      "createSuccess": "¡Evento creado correctamente!"
+    }
+  },
 
   "myEvents": {
     "title": "Mi agenda de eventos",
