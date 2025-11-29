@@ -4,24 +4,22 @@ import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, Fa
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
+import { useTranslation } from 'react-i18next';
 
-// 👇 IMPORTA AQUÍ TUS IMÁGENES DE AVATAR
-// Asegúrate de crear estos archivos o adaptar las rutas a las que tú tengas
 import avatarDefault from '../assets/avatars/avatar-default.jpg';
-// import avatar1 from '../assets/avatars/avatar-1.jpg';
-// import avatar2 from '../assets/avatars/avatar-2.jpg';
-// import avatar3 from '../assets/avatars/avatar-3.jpg';
-
 import avatar1 from '../assets/avatars/avatar-1.png';
 import avatar2 from '../assets/avatars/avatar-2.png';
 import avatar3 from '../assets/avatars/avatar-3.png';
 import avatar4 from '../assets/avatars/avatar-4.png';
 import avatar5 from '../assets/avatars/avatar-5.png';
 
-// 👇 Opciones de avatar disponibles
+// Opciones de avatar disponibles
 const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
 
 export default function ProfilePage() {
+
+  const { t, i18n } = useTranslation();  // 👈 AÑADIDO
+
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [userEvents, setUserEvents] = useState([]);
@@ -32,7 +30,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // 👇 Estado para el avatar seleccionado
+  // Estado para el avatar seleccionado
   const [avatar, setAvatar] = useState(avatarDefault);
 
   // *** NUEVO: COLOR DE FONDO ***
@@ -267,7 +265,7 @@ const handleBgColorChange = (newColor) => {
     return (
       <div className="profile-page">
         <div className="profile-container" style={{ textAlign: 'center', padding: '50px' }}>
-          <p>Cargando perfil...</p>
+        <p>{t('profile.loading')}</p> {/* antes: "Cargando perfil..." */}
         </div>
       </div>
     );
