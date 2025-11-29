@@ -2,6 +2,16 @@
 
     
 
+  "EnrolledEvents": {
+    "card": {
+      "status": {
+        "finished": "Finished",
+        "active": "Active"
+      },
+      "leaveButton": "Leave event",
+      "finishedButton": "Event finished"
+    }
+  },
 
   "createEvent": {
     "modal": {

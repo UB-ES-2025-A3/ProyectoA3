@@ -1,6 +1,16 @@
 {
  
-
+  
+  "EnrolledEvents": {
+    "card": {
+      "status": {
+        "finished": "Finalitzat",
+        "active": "Actiu"
+      },
+      "leaveButton": "Donar-se de baixa",
+      "finishedButton": "Esdeveniment finalitzat"
+    }
+  },
   
   "createEvent": {
     "modal": {

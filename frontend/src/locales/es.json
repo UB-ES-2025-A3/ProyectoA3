@@ -1,6 +1,17 @@
 {
 
     
+  "myEvents": {
+    "card": {
+      "status": {
+        "finished": "Finalizado",
+        "active": "Activo"
+      },
+      "leaveButton": "Desapuntarse",
+      "finishedButton": "Evento finalizado"
+    }
+  },
+    
   "createEvent": {
     "modal": {
       "title": "Crear nuevo evento",
