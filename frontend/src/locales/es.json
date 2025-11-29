@@ -1,5 +1,15 @@
 {
 
+
+  "login": {
+    "messages": {
+      "welcome": "¡Bienvenido de nuevo, {{username}}!",
+      "redirecting": "Redirigiendo...",
+      "errorFallback": "Error al iniciar sesión."
+    }
+  },
+
+
   "eventsPage": {
     "filters": {
       "title": "Filtra tus eventos",

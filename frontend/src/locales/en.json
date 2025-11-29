@@ -1,5 +1,14 @@
 {
 
+    
+  "login": {
+    "messages": {
+      "welcome": "Welcome back, {{username}}!",
+      "redirecting": "Redirecting...",
+      "errorFallback": "Login failed."
+    }
+  },
+
 
   "eventsPage": {
     "filters": {

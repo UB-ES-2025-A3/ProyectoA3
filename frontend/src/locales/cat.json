@@ -1,5 +1,14 @@
 {
  
+
+  "login": {
+    "messages": {
+      "welcome": "Benvingut de nou, {{username}}!",
+      "redirecting": "Redirigint...",
+      "errorFallback": "Error en iniciar sessió."
+    }
+  },
+
   "eventsPage": {
     "filters": {
       "title": "Filtra els teus esdeveniments",
