@@ -1,5 +1,31 @@
 {
 
+  
+  "myEvents": {
+    "title": "La meva agenda d'esdeveniments",
+    "subtitle": "Aquí pots veure tots els esdeveniments als quals estàs inscrit",
+
+    "loading": "Carregant els teus esdeveniments...",
+
+    "empty": {
+      "title": "Encara no tens esdeveniments guardats",
+      "description": "Explora els esdeveniments disponibles i apunta't als que més t'interessin",
+      "button": "Veure esdeveniments disponibles"
+    },
+
+    "sections": {
+      "upcoming": "Propers esdeveniments ({{count}})",
+      "past": "Esdeveniments passats ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "T'has donat de baixa de l'esdeveniment correctament.",
+      "loadError": "Error en carregar els teus esdeveniments. Torna-ho a intentar.",
+      "leaveErrorFallback": "Error en donar-te de baixa de l'esdeveniment."
+    }
+  },
+
+
   "nav": {
     "brand": "Trips & Events",
     "events": "Esdeveniments",

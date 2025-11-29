@@ -1,5 +1,30 @@
 {
 
+
+  "myEvents": {
+    "title": "My events schedule",
+    "subtitle": "Here you can see all the events you are enrolled in",
+
+    "loading": "Loading your events...",
+
+    "empty": {
+      "title": "You don't have any saved events yet",
+      "description": "Browse the available events and join the ones you are most interested in",
+      "button": "View available events"
+    },
+
+    "sections": {
+      "upcoming": "Upcoming events ({{count}})",
+      "past": "Past events ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "You have successfully left the event.",
+      "loadError": "Error loading your events. Please try again.",
+      "leaveErrorFallback": "Error while leaving the event."
+    }
+  },
+
   "nav": {
     "brand": "Trips & Events",
     "events": "Events",

@@ -1,6 +1,31 @@
 {
 
 
+  "myEvents": {
+    "title": "Mi agenda de eventos",
+    "subtitle": "Aquí puedes ver todos los eventos en los que estás inscrito",
+
+    "loading": "Cargando tus eventos...",
+
+    "empty": {
+      "title": "Todavía no tienes eventos guardados",
+      "description": "Explora los eventos disponibles y apúntate a los que más te interesen",
+      "button": "Ver eventos disponibles"
+    },
+
+    "sections": {
+      "upcoming": "Próximos eventos ({{count}})",
+      "past": "Eventos pasados ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "Te has desapuntado del evento correctamente.",
+      "loadError": "Error al cargar tus eventos. Inténtalo de nuevo.",
+      "leaveErrorFallback": "Error al desapuntarse del evento."
+    }
+  },
+
+
   "nav": {
     "brand": "Trips & Events",
     "events": "Eventos",
