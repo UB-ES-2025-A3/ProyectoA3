@@ -1,6 +1,85 @@
 {
  
 
+  
+  "createEvent": {
+    "modal": {
+      "title": "Crear nou esdeveniment",
+      "subtitle": "Completa el formulari per crear un nou esdeveniment"
+    },
+    "messages": {
+      "submitErrorFallback": "S'ha produït un error en crear l'esdeveniment. Torna-ho a intentar."
+    },
+    "form": {
+      "labels": {
+        "title": "Títol de l'esdeveniment",
+        "description": "Descripció",
+        "tags": "Etiquetes",
+        "date": "Data",
+        "time": "Hora",
+        "language": "Idioma",
+        "capacity": "Places disponibles",
+        "minAge": "Edat mínima (opcional)",
+        "place": "Lloc"
+      },
+      "placeholders": {
+        "title": "Ex: Passeig pel centre històric",
+        "description": "Descriu el teu esdeveniment (opcional)",
+        "capacity": "Nombre de places",
+        "minAge": "Ex: 18",
+        "place": "Ex: Cafè Central"
+      },
+      "tags": {
+        "placeholder": "Selecciona una etiqueta",
+        "options": {
+          "turismo": "Turisme",
+          "comida": "Menjar",
+          "excursion": "Excursió",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Esport",
+          "aventura": "Aventura",
+          "familiar": "Familiar",
+          "juegos": "Jocs",
+          "cine": "Cinema",
+          "relax": "Relax",
+          "tardeo": "Tardeo",
+          "noche": "Nit",
+          "otros": "Altres"
+        }
+      },
+      "language": {
+        "placeholder": "Selecciona un idioma",
+        "options": {
+          "es": "Espanyol",
+          "en": "Anglès",
+          "fr": "Francès",
+          "de": "Alemany",
+          "it": "Italià",
+          "pt": "Portuguès",
+          "ru": "Rus"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel·lar",
+      "submit": "Crear esdeveniment",
+      "submitting": "Creant..."
+    },
+    "validation": {
+      "titleRequired": "El títol de l'esdeveniment és obligatori",
+      "dateRequired": "La data és obligatòria",
+      "dateInPast": "La data no pot ser anterior a avui",
+      "timeRequired": "L'hora és obligatòria",
+      "languageRequired": "Has de seleccionar un idioma",
+      "capacityRequired": "Les places disponibles són obligatòries",
+      "capacityMin": "Hi ha d'haver almenys 1 plaça disponible",
+      "minAgeMin": "L'edat mínima ha de ser 0 o superior",
+      "minAgeMax": "L'edat mínima ha de ser inferior a 120",
+      "placeRequired": "El lloc és obligatori"
+    }
+  },
+
   "splash": {
     "tagline": "Organitza, comparteix i viu experiències",
     "title": "EventManager",

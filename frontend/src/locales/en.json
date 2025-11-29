@@ -2,6 +2,85 @@
 
     
 
+
+  "createEvent": {
+    "modal": {
+      "title": "Create new event",
+      "subtitle": "Fill in the form to create a new event"
+    },
+    "messages": {
+      "submitErrorFallback": "Error creating the event. Please try again."
+    },
+    "form": {
+      "labels": {
+        "title": "Event title",
+        "description": "Description",
+        "tags": "Tags",
+        "date": "Date",
+        "time": "Time",
+        "language": "Language",
+        "capacity": "Available spots",
+        "minAge": "Minimum age (optional)",
+        "place": "Location"
+      },
+      "placeholders": {
+        "title": "E.g.: Walk through the historic center",
+        "description": "Describe your event (optional)",
+        "capacity": "Number of spots",
+        "minAge": "E.g.: 18",
+        "place": "E.g.: Central Café"
+      },
+      "tags": {
+        "placeholder": "Select a tag",
+        "options": {
+          "turismo": "Tourism",
+          "comida": "Food",
+          "excursion": "Excursion",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Sports",
+          "aventura": "Adventure",
+          "familiar": "Family",
+          "juegos": "Games",
+          "cine": "Cinema",
+          "relax": "Relax",
+          "tardeo": "Afternoon plans",
+          "noche": "Night out",
+          "otros": "Others"
+        }
+      },
+      "language": {
+        "placeholder": "Select a language",
+        "options": {
+          "es": "Spanish",
+          "en": "English",
+          "fr": "French",
+          "de": "German",
+          "it": "Italian",
+          "pt": "Portuguese",
+          "ru": "Russian"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "submit": "Create event",
+      "submitting": "Creating..."
+    },
+    "validation": {
+      "titleRequired": "Event title is required",
+      "dateRequired": "Date is required",
+      "dateInPast": "The date cannot be earlier than today",
+      "timeRequired": "Time is required",
+      "languageRequired": "You must select a language",
+      "capacityRequired": "Available spots are required",
+      "capacityMin": "There must be at least 1 available spot",
+      "minAgeMin": "Minimum age must be 0 or higher",
+      "minAgeMax": "Minimum age must be less than 120",
+      "placeRequired": "Location is required"
+    }
+  },
+
   "splash": {
     "tagline": "Organize, share and live new experiences",
     "title": "EventManager",

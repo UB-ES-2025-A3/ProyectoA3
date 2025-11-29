@@ -1,5 +1,83 @@
 {
 
+    
+  "createEvent": {
+    "modal": {
+      "title": "Crear nuevo evento",
+      "subtitle": "Completa el formulario para crear un nuevo evento"
+    },
+    "messages": {
+      "submitErrorFallback": "Error al crear el evento. Inténtalo de nuevo."
+    },
+    "form": {
+      "labels": {
+        "title": "Título del evento",
+        "description": "Descripción",
+        "tags": "Etiquetas",
+        "date": "Fecha",
+        "time": "Hora",
+        "language": "Idioma",
+        "capacity": "Plazas disponibles",
+        "minAge": "Edad mínima (opcional)",
+        "place": "Lugar"
+      },
+      "placeholders": {
+        "title": "Ej: Paseo por el centro histórico",
+        "description": "Describe tu evento (opcional)",
+        "capacity": "Número de plazas",
+        "minAge": "Ej: 18",
+        "place": "Ej: Café Central"
+      },
+      "tags": {
+        "placeholder": "Selecciona una etiqueta",
+        "options": {
+          "turismo": "Turismo",
+          "comida": "Comida",
+          "excursion": "Excursión",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Deporte",
+          "aventura": "Aventura",
+          "familiar": "Familiar",
+          "juegos": "Juegos",
+          "cine": "Cine",
+          "relax": "Relax",
+          "tardeo": "Tardeo",
+          "noche": "Noche",
+          "otros": "Otros"
+        }
+      },
+      "language": {
+        "placeholder": "Selecciona un idioma",
+        "options": {
+          "es": "Español",
+          "en": "Inglés",
+          "fr": "Francés",
+          "de": "Alemán",
+          "it": "Italiano",
+          "pt": "Portugués",
+          "ru": "Ruso"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "submit": "Crear evento",
+      "submitting": "Creando..."
+    },
+    "validation": {
+      "titleRequired": "El título del evento es requerido",
+      "dateRequired": "La fecha es requerida",
+      "dateInPast": "La fecha no puede ser anterior a hoy",
+      "timeRequired": "La hora es requerida",
+      "languageRequired": "Debes seleccionar un idioma",
+      "capacityRequired": "Las plazas disponibles son requeridas",
+      "capacityMin": "Debe haber al menos 1 plaza disponible",
+      "minAgeMin": "La edad mínima debe ser 0 o mayor",
+      "minAgeMax": "La edad mínima debe ser menor a 120",
+      "placeRequired": "El lugar es requerido"
+    }
+    },
 
   "splash": {
     "tagline": "Organiza, comparte y vive experiencias",
