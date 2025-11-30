@@ -3,10 +3,20 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EventModal from './EventModal';
 import userService from '../../services/userService';
+import * as eventService from '../../services/eventService';
 
+// Mock del userService
 jest.mock('../../services/userService', () => ({
   getParticipantsByIds: jest.fn(),
   getUserProfile: jest.fn(),
+}));
+
+// Mock del eventService para las funciones de favoritos
+jest.mock('../../services/eventService', () => ({
+  ...jest.requireActual('../../services/eventService'),
+  isEventFavorite: jest.fn(),
+  addEventToFavorites: jest.fn(),
+  removeEventFromFavorites: jest.fn(),
 }));
 
 describe('EventModal - Funcionalidad de Favoritos', () => {
@@ -37,59 +47,78 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    
     jest.clearAllMocks();
+    
+    // Mock por defecto: usuario autenticado
+    localStorage.setItem('userId', '1');
     
     userService.getParticipantsByIds.mockResolvedValue({
       success: true,
       data: [],
     });
+    
+    // Mock por defecto: no es favorito
+    eventService.isEventFavorite.mockResolvedValue(false);
+    eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
+    eventService.removeEventFromFavorites.mockResolvedValue({ success: true, data: {} });
   });
 
   describe('Renderizado del botón de favoritos', () => {
-    test('renderiza el botón de favoritos correctamente', () => {
+    test('renderiza el botón de favoritos correctamente', async () => {
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /añadir a favoritos/i,
+        });
+        expect(favoriteButton).toBeInTheDocument();
+        expect(favoriteButton).toHaveClass('modal-favorite-btn');
       });
-
-      expect(favoriteButton).toBeInTheDocument();
-      expect(favoriteButton).toHaveClass('modal-favorite-btn');
     });
 
-    test('muestra el icono de favorito vacío cuando no está en favoritos', () => {
+    test('muestra el icono de favorito vacío cuando no está en favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /añadir a favoritos/i,
+        });
+        expect(favoriteButton).toHaveAttribute(
+          'aria-label',
+          'Añadir a favoritos'
+        );
       });
-
-      expect(favoriteButton).toHaveAttribute(
-        'aria-label',
-        'Añadir a favoritos'
-      );
     });
 
-    test('muestra el icono de favorito lleno cuando está en favoritos', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123']));
+    test('muestra el icono de favorito lleno cuando está en favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(true);
 
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /eliminar de favoritos/i,
+        });
+        expect(favoriteButton).toHaveAttribute(
+          'aria-label',
+          'Eliminar de favoritos'
+        );
       });
-
-      expect(favoriteButton).toHaveAttribute(
-        'aria-label',
-        'Eliminar de favoritos'
-      );
     });
   });
 
   describe('Añadir a favoritos', () => {
-    test('añade un evento a favoritos al hacer clic', () => {
+    test('añade un evento a favoritos al hacer clic', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
+      
       render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
@@ -97,13 +126,20 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
       fireEvent.click(favoriteButton);
 
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
-      expect(favorites).toHaveLength(1);
+      await waitFor(() => {
+        expect(eventService.addEventToFavorites).toHaveBeenCalledWith('123');
+      });
     });
 
-    test('cambia el aria-label después de añadir a favoritos', () => {
+    test('cambia el aria-label después de añadir a favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
+      
       render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
@@ -111,55 +147,56 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
       fireEvent.click(favoriteButton);
 
-      expect(favoriteButton).toHaveAttribute(
-        'aria-label',
-        'Eliminar de favoritos'
-      );
+      await waitFor(() => {
+        expect(favoriteButton).toHaveAttribute(
+          'aria-label',
+          'Eliminar de favoritos'
+        );
+      });
     });
 
-    test('añade múltiples eventos a favoritos', () => {
-      const { rerender } = render(<EventModal {...mockProps} />);
-
-      const favoriteButton1 = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+    test('maneja error al añadir a favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      eventService.addEventToFavorites.mockResolvedValue({ 
+        success: false, 
+        error: 'Error al añadir' 
       });
-      fireEvent.click(favoriteButton1);
-
-      const event2 = { ...mockEvent, id: '456', name: 'Evento 2' };
-      rerender(<EventModal {...mockProps} event={event2} />);
-
-      const favoriteButton2 = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-      fireEvent.click(favoriteButton2);
-
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
-      expect(favorites).toContain('456');
-      expect(favorites).toHaveLength(2);
-    });
-
-    test('no añade eventos duplicados a favoritos', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123']));
-
+      
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       render(<EventModal {...mockProps} />);
 
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
+
       const favoriteButton = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
+        name: /añadir a favoritos/i,
       });
 
       fireEvent.click(favoriteButton);
 
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).not.toContain('123');
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Error al añadir a favoritos:',
+          'Error al añadir'
+        );
+      });
+      
+      consoleSpy.mockRestore();
     });
   });
 
   describe('Eliminar de favoritos', () => {
-    test('elimina un evento de favoritos al hacer clic', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123']));
-
+    test('elimina un evento de favoritos al hacer clic', async () => {
+      eventService.isEventFavorite.mockResolvedValue(true);
+      eventService.removeEventFromFavorites.mockResolvedValue({ success: true, data: {} });
+      
       render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /eliminar de favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /eliminar de favoritos/i,
@@ -167,15 +204,20 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
       fireEvent.click(favoriteButton);
 
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).not.toContain('123');
-      expect(favorites).toHaveLength(0);
+      await waitFor(() => {
+        expect(eventService.removeEventFromFavorites).toHaveBeenCalledWith('123');
+      });
     });
 
-    test('cambia el aria-label después de eliminar de favoritos', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123']));
-
+    test('cambia el aria-label después de eliminar de favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(true);
+      eventService.removeEventFromFavorites.mockResolvedValue({ success: true, data: {} });
+      
       render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /eliminar de favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /eliminar de favoritos/i,
@@ -183,134 +225,140 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
       fireEvent.click(favoriteButton);
 
-      expect(favoriteButton).toHaveAttribute(
-        'aria-label',
-        'Añadir a favoritos'
+      await waitFor(() => {
+        expect(favoriteButton).toHaveAttribute(
+          'aria-label',
+          'Añadir a favoritos'
+        );
+      });
+    });
+
+    test('maneja error al eliminar de favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(true);
+      eventService.removeEventFromFavorites.mockResolvedValue({ 
+        success: false, 
+        error: 'Error al eliminar' 
+      });
+      
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
+      render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /eliminar de favoritos/i })).toBeInTheDocument();
+      });
+
+      const favoriteButton = screen.getByRole('button', {
+        name: /eliminar de favoritos/i,
+      });
+
+      fireEvent.click(favoriteButton);
+
+      await waitFor(() => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Error al eliminar de favoritos:',
+          'Error al eliminar'
+        );
+      });
+      
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Usuario no autenticado', () => {
+    beforeEach(() => {
+      localStorage.removeItem('userId');
+    });
+
+    test('muestra mensaje cuando usuario no autenticado intenta añadir favorito', async () => {
+      const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+      
+      render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
+
+      const favoriteButton = screen.getByRole('button', {
+        name: /añadir a favoritos/i,
+      });
+
+      fireEvent.click(favoriteButton);
+
+      expect(alertMock).toHaveBeenCalledWith(
+        'Debes iniciar sesión para guardar eventos en favoritos'
       );
+      
+      alertMock.mockRestore();
     });
 
-    test('solo elimina el evento específico, no otros favoritos', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123', '456', '789']));
-
+    test('no llama a la API cuando usuario no está autenticado', async () => {
+      const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+      
       render(<EventModal {...mockProps} />);
 
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
+
       const favoriteButton = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
+        name: /añadir a favoritos/i,
       });
 
       fireEvent.click(favoriteButton);
 
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).not.toContain('123');
-      expect(favorites).toContain('456');
-      expect(favorites).toContain('789');
-      expect(favorites).toHaveLength(2);
+      expect(eventService.addEventToFavorites).not.toHaveBeenCalled();
+      
+      alertMock.mockRestore();
+    });
+
+    test('muestra título informativo para usuarios no autenticados', async () => {
+      render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', { name: /añadir a favoritos/i });
+        expect(favoriteButton).toHaveAttribute('title', 'Inicia sesión para guardar favoritos');
+      });
     });
   });
 
-  describe('Toggle de favoritos', () => {
-    test('alterna entre añadir y eliminar de favoritos', () => {
+  describe('Estado de carga', () => {
+    test('deshabilita el botón mientras se procesa la solicitud', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      
+      // Simular una respuesta lenta
+      eventService.addEventToFavorites.mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve({ success: true }), 100))
+      );
+      
       render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
       });
 
       fireEvent.click(favoriteButton);
-      let favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
 
-      fireEvent.click(favoriteButton);
-      favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).not.toContain('123');
-
-      fireEvent.click(favoriteButton);
-      favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
-    });
-
-    test('múltiples clics alternan correctamente el estado', () => {
-      render(<EventModal {...mockProps} />);
-
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      // El botón debe estar deshabilitado durante la carga
+      await waitFor(() => {
+        expect(favoriteButton).toBeDisabled();
       });
-
-      for (let i = 0; i < 5; i++) {
-        fireEvent.click(favoriteButton);
-      }
-
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
-    });
-  });
-
-  describe('Persistencia y estado inicial', () => {
-    test('carga el estado inicial desde localStorage', () => {
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123', '456']));
-
-      render(<EventModal {...mockProps} />);
-
-      const favoriteButton = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
-      });
-
-      expect(favoriteButton).toBeInTheDocument();
-    });
-
-    test('inicializa correctamente cuando localStorage está vacío', () => {
-      render(<EventModal {...mockProps} />);
-
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-
-      expect(favoriteButton).toBeInTheDocument();
-    });
-
-    test('mantiene el estado al cerrar y reabrir el modal', () => {
-      const { rerender } = render(<EventModal {...mockProps} />);
-
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-      fireEvent.click(favoriteButton);
-
-      rerender(<EventModal {...mockProps} isOpen={false} />);
-
-      rerender(<EventModal {...mockProps} isOpen={true} />);
-
-      const favoriteButtonAfterReopen = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
-      });
-
-      expect(favoriteButtonAfterReopen).toBeInTheDocument();
-    });
-
-    test('actualiza el estado al cambiar de evento', () => {
-      const { rerender } = render(<EventModal {...mockProps} />);
-
-      const favoriteButton1 = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-      fireEvent.click(favoriteButton1);
-
-      const event2 = { ...mockEvent, id: '456', name: 'Evento 2' };
-      rerender(<EventModal {...mockProps} event={event2} />);
-
-      const favoriteButton2 = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-
-      expect(favoriteButton2).toBeInTheDocument();
     });
   });
 
   describe('Manejo de edge cases', () => {
-    test('no hace nada si el evento no tiene id', () => {
+    test('no hace nada si el evento no tiene id', async () => {
       const eventWithoutId = { ...mockEvent, id: null };
 
       render(<EventModal {...mockProps} event={eventWithoutId} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
@@ -318,98 +366,70 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
 
       fireEvent.click(favoriteButton);
 
-      const favorites = JSON.parse(
-        localStorage.getItem('favoriteEvents') || '[]'
-      );
-      expect(favorites).toHaveLength(0);
+      expect(eventService.addEventToFavorites).not.toHaveBeenCalled();
     });
 
-    test('maneja correctamente localStorage corrupto', () => {
-      localStorage.setItem('favoriteEvents', 'invalid-json');
-
-      // El componente debe renderizar sin crashear y resetear localStorage
-      render(<EventModal {...mockProps} />);
-
-      // Verificar que localStorage se reseteó a un array vacío
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toEqual([]);
-      
-      // Verificar que el botón de favoritos se renderiza correctamente
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-      expect(favoriteButton).toBeInTheDocument();
-      
-      localStorage.clear();
-    });
-
-    test('convierte el id a string para comparación', () => {
+    test('convierte el id a string para comparación', async () => {
       const eventWithNumericId = { ...mockEvent, id: 123 };
-      localStorage.setItem('favoriteEvents', JSON.stringify(['123']));
+      eventService.isEventFavorite.mockResolvedValue(true);
 
       render(<EventModal {...mockProps} event={eventWithNumericId} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /eliminar de favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /eliminar de favoritos/i,
+        });
+        expect(favoriteButton).toBeInTheDocument();
       });
-
-      expect(favoriteButton).toBeInTheDocument();
-    });
-
-    test('maneja ids como strings y números de forma consistente', () => {
-      const { rerender } = render(<EventModal {...mockProps} />);
-
-      const favoriteButton1 = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
-      });
-      fireEvent.click(favoriteButton1);
-
-      const eventWithNumericId = { ...mockEvent, id: 123 };
-      rerender(<EventModal {...mockProps} event={eventWithNumericId} />);
-
-      const favorites = JSON.parse(localStorage.getItem('favoriteEvents'));
-      expect(favorites).toContain('123');
     });
   });
 
   describe('Accesibilidad', () => {
-    test('el botón tiene el atributo aria-label correcto', () => {
+    test('el botón tiene el atributo aria-label correcto', async () => {
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /añadir a favoritos/i,
+        });
+        expect(favoriteButton).toHaveAttribute('aria-label');
       });
-
-      expect(favoriteButton).toHaveAttribute('aria-label');
     });
 
-    test('el botón es accesible mediante teclado', () => {
+    test('el botón es accesible mediante teclado', async () => {
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /añadir a favoritos/i,
+        });
+        favoriteButton.focus();
+        expect(document.activeElement).toBe(favoriteButton);
       });
-
-      favoriteButton.focus();
-      expect(document.activeElement).toBe(favoriteButton);
     });
 
-    test('el título del botón proporciona información adicional', () => {
+    test('el título del botón proporciona información adicional para usuarios autenticados', async () => {
       render(<EventModal {...mockProps} />);
 
-      const favoriteButton = screen.getByRole('button', {
-        name: /añadir a favoritos/i,
+      await waitFor(() => {
+        const favoriteButton = screen.getByRole('button', {
+          name: /añadir a favoritos/i,
+        });
+        expect(favoriteButton).toHaveAttribute('title', 'Añadir a favoritos');
       });
-
-      expect(favoriteButton).toHaveAttribute('title', 'Añadir a favoritos');
     });
   });
 
   describe('Integración con el resto del modal', () => {
-    test('la funcionalidad de favoritos no interfiere con otras funciones del modal', () => {
+    test('la funcionalidad de favoritos no interfiere con otras funciones del modal', async () => {
       const mockOnClose = jest.fn();
+      eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
 
       render(<EventModal {...mockProps} onClose={mockOnClose} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
@@ -422,10 +442,15 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    test('el botón de favoritos no interfiere con los botones de inscripción', () => {
+    test('el botón de favoritos no interfiere con los botones de inscripción', async () => {
       const mockOnJoin = jest.fn();
+      eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
 
       render(<EventModal {...mockProps} onJoin={mockOnJoin} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
 
       const favoriteButton = screen.getByRole('button', {
         name: /añadir a favoritos/i,
@@ -438,6 +463,60 @@ describe('EventModal - Funcionalidad de Favoritos', () => {
       fireEvent.click(joinButton);
 
       expect(mockOnJoin).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Notificación de actualización de favoritos', () => {
+    test('dispara evento favoritesUpdated al añadir a favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(false);
+      eventService.addEventToFavorites.mockResolvedValue({ success: true, data: {} });
+      
+      const eventListener = jest.fn();
+      window.addEventListener('favoritesUpdated', eventListener);
+      
+      render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /añadir a favoritos/i })).toBeInTheDocument();
+      });
+
+      const favoriteButton = screen.getByRole('button', {
+        name: /añadir a favoritos/i,
+      });
+
+      fireEvent.click(favoriteButton);
+
+      await waitFor(() => {
+        expect(eventListener).toHaveBeenCalled();
+      });
+      
+      window.removeEventListener('favoritesUpdated', eventListener);
+    });
+
+    test('dispara evento favoritesUpdated al eliminar de favoritos', async () => {
+      eventService.isEventFavorite.mockResolvedValue(true);
+      eventService.removeEventFromFavorites.mockResolvedValue({ success: true, data: {} });
+      
+      const eventListener = jest.fn();
+      window.addEventListener('favoritesUpdated', eventListener);
+      
+      render(<EventModal {...mockProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /eliminar de favoritos/i })).toBeInTheDocument();
+      });
+
+      const favoriteButton = screen.getByRole('button', {
+        name: /eliminar de favoritos/i,
+      });
+
+      fireEvent.click(favoriteButton);
+
+      await waitFor(() => {
+        expect(eventListener).toHaveBeenCalled();
+      });
+      
+      window.removeEventListener('favoritesUpdated', eventListener);
     });
   });
 });

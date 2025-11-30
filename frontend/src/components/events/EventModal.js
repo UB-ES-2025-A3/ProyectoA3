@@ -1,8 +1,9 @@
 // src/components/events/EventModal.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
+import { isEventFavorite, addEventToFavorites, removeEventFromFavorites } from "../../services/eventService";
 import UserProfileModal from "../users/UserProfileModal";
 
 // src/components/events/EventModal.js
@@ -32,30 +33,45 @@ const getAvatarForUser = (userId) => {
 
 export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull, onJoin, onLeave }) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   // Ignoramos el valor, solo usamos el setter (mantiene la lógica pero evita el warning)
   const [, setCreatorInfo] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  
   const notifyFavoritesUpdated = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('favoritesUpdated'));
     }
   };
 
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = useCallback(() => {
+    return !!localStorage.getItem('userId');
+  }, []);
+
+  // Cargar estado de favorito desde la API
   useEffect(() => {
-    if (event?.id) {
-      let favorites;
-      try {
-        favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-      } catch (e) {
-        favorites = [];
-        localStorage.setItem('favoriteEvents', JSON.stringify([]));
+    const loadFavoriteStatus = async () => {
+      if (event?.id && isAuthenticated()) {
+        try {
+          const favorite = await isEventFavorite(event.id);
+          setIsFavorite(favorite);
+        } catch (error) {
+          console.error("Error al verificar favorito:", error);
+          setIsFavorite(false);
+        }
+      } else {
+        setIsFavorite(false);
       }
-      setIsFavorite(favorites.includes(event.id.toString()));
+    };
+
+    if (isOpen) {
+      loadFavoriteStatus();
     }
-  }, [event?.id]);
+  }, [event?.id, isOpen, isAuthenticated]);
 
   // Cargar información de participantes cuando se abre el modal
   useEffect(() => {
@@ -67,28 +83,39 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, event]);
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     if (!event?.id) return;
     
-    let favorites;
-    try {
-      favorites = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-    } catch (e) {
-      favorites = [];
-      localStorage.setItem('favoriteEvents', JSON.stringify([]));
+    // Verificar si el usuario está autenticado
+    if (!isAuthenticated()) {
+      alert("Debes iniciar sesión para guardar eventos en favoritos");
+      return;
     }
-    const eventIdStr = event.id.toString();
+
+    setLoadingFavorite(true);
     
-    if (isFavorite) {
-      const updated = favorites.filter(id => id !== eventIdStr);
-      localStorage.setItem('favoriteEvents', JSON.stringify(updated));
-      setIsFavorite(false);
-      notifyFavoritesUpdated();
-    } else {
-      favorites.push(eventIdStr);
-      localStorage.setItem('favoriteEvents', JSON.stringify(favorites));
-      setIsFavorite(true);
-      notifyFavoritesUpdated();
+    try {
+      if (isFavorite) {
+        const result = await removeEventFromFavorites(event.id);
+        if (result.success) {
+          setIsFavorite(false);
+          notifyFavoritesUpdated();
+        } else {
+          console.error("Error al eliminar de favoritos:", result.error);
+        }
+      } else {
+        const result = await addEventToFavorites(event.id);
+        if (result.success) {
+          setIsFavorite(true);
+          notifyFavoritesUpdated();
+        } else {
+          console.error("Error al añadir a favoritos:", result.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cambiar favorito:", error);
+    } finally {
+      setLoadingFavorite(false);
     }
   };
 
@@ -161,12 +188,15 @@ export default function EventModal({ event, isOpen, onClose, isEnrolled, isFull,
           ✕
         </button>
         <button 
-          className="modal-favorite-btn" 
+          className={`modal-favorite-btn ${loadingFavorite ? 'loading' : ''}`}
           onClick={toggleFavorite}
+          disabled={loadingFavorite}
           aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
-          title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+          title={!isAuthenticated() ? "Inicia sesión para guardar favoritos" : (isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos")}
         >
-          {isFavorite ? (
+          {loadingFavorite ? (
+            <span className="favorite-loading">⏳</span>
+          ) : isFavorite ? (
             <FaBookmark className="favorite-icon favorite-icon-filled" />
           ) : (
             <FaRegBookmark className="favorite-icon favorite-icon-outline" />
