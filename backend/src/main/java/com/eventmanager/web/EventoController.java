@@ -86,4 +86,18 @@ public class EventoController {
   public EventoView removeFavoriteEvento(@RequestBody EventoFav dto) {
     return service.removeEventoFavorito(dto);
   }
+
+  @GetMapping("/favorites")
+  public ResponseEntity<List<EventoView>> listarFavoritos(@RequestHeader("Authorization") String authHeader) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.listarFavoritos(userId));
+  }
+
+  @GetMapping("/is-favorite/{eventoId}")
+  public ResponseEntity<Boolean> isEventoFavorito(
+      @RequestHeader("Authorization") String authHeader,
+      @org.springframework.web.bind.annotation.PathVariable Long eventoId) {
+    Long userId = extractUserIdFromToken(authHeader);
+    return ResponseEntity.ok(service.isEventoFavorito(userId, eventoId));
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { getEvents, joinEvent, leaveEvent } from '../services/eventService';
+import { getEvents, joinEvent, leaveEvent, getFavoriteEvents } from '../services/eventService';
 import EventCard from '../components/events/EventCard';
 import EventModal from '../components/events/EventModal';
 import CreateEventForm from '../components/events/CreateEventForm';
@@ -26,17 +26,21 @@ export default function EventPage() {
   const [joiningEventId, setJoiningEventId] = useState(null);
   const [favoriteEventIds, setFavoriteEventIds] = useState([]);
 
-  const getStoredFavoriteIds = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return [];
+  // Cargar favoritos desde la API
+  const loadFavoriteIds = useCallback(async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setFavoriteEventIds([]);
+      return;
     }
 
     try {
-      const stored = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-      return Array.isArray(stored) ? stored : [];
+      const favoriteEvents = await getFavoriteEvents();
+      const ids = favoriteEvents.map(event => event.id?.toString()).filter(Boolean);
+      setFavoriteEventIds(ids);
     } catch (error) {
-      console.warn('No se pudieron cargar los favoritos almacenados.', error);
-      return [];
+      console.warn('No se pudieron cargar los favoritos desde la API.', error);
+      setFavoriteEventIds([]);
     }
   }, []);
 
@@ -121,27 +125,27 @@ export default function EventPage() {
     applyFilters();
   }, [applyFilters]);
 
+  // Cargar favoritos al montar el componente
   useEffect(() => {
-    setFavoriteEventIds(getStoredFavoriteIds());
-  }, [getStoredFavoriteIds]);
+    loadFavoriteIds();
+  }, [loadFavoriteIds]);
 
+  // Escuchar actualizaciones de favoritos
   useEffect(() => {
     if (typeof window === 'undefined') {
       return undefined;
     }
 
     const handleFavoritesUpdated = () => {
-      setFavoriteEventIds(getStoredFavoriteIds());
+      loadFavoriteIds();
     };
 
     window.addEventListener('favoritesUpdated', handleFavoritesUpdated);
-    window.addEventListener('storage', handleFavoritesUpdated);
 
     return () => {
       window.removeEventListener('favoritesUpdated', handleFavoritesUpdated);
-      window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [getStoredFavoriteIds]);
+  }, [loadFavoriteIds]);
 
   useEffect(() => {
     const tagsSet = new Set();

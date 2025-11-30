@@ -240,4 +240,21 @@ public class EventoService {
 
     return toView(evento);
   }
+
+  public List<EventoView> listarFavoritos(Long userId) {
+    var user = clienteRepo.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    
+    return user.getFavoritos().stream()
+            .map(this::toView)
+            .toList();
+  }
+
+  public boolean isEventoFavorito(Long userId, Long eventoId) {
+    var user = clienteRepo.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    
+    return user.getFavoritos().stream()
+            .anyMatch(e -> e.getId().equals(eventoId));
+  }
 }
