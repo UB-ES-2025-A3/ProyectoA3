@@ -46,6 +46,9 @@ public class Cliente {
   private String descripcion;
   @NotBlank private String passwordHash;
 
+  // Tema de color de la interfaz (default, blue, green, purple, orange, pink)
+  private String tema = "default";
+
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
   @JoinTable(
@@ -93,4 +96,7 @@ public class Cliente {
   public void setFavoritos(Set<Evento> favoritos) { this.favoritos = favoritos; }
   public void addEventoFavorito(Evento evento) { this.favoritos.add(evento); }
   public void removeEventoFavorito(Evento evento) { this.favoritos.remove(evento);}
+
+  public String getTema() { return tema; }
+  public void setTema(String tema) { this.tema = tema; }
 }
