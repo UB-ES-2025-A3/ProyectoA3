@@ -15,7 +15,9 @@ public class EventoDtos {
       List<String> tags,
       String titulo,
       String descripcion,
-      Long idCreador
+      Long idCreador,
+      Double latitud,
+      Double longitud
   ) {}
 
   public static record RestriccionesCreate(
@@ -28,7 +30,8 @@ public class EventoDtos {
   public static record EventoView(
       Long id, LocalDate fecha, LocalTime hora, String lugar,
       List<String> idiomasPermitidos, Integer edadMinima, Integer maxPersonas,
-      String titulo, String descripcion, Long idCreador, List<String> tags, List<Long> participantesIds
+      String titulo, String descripcion, Long idCreador, List<String> tags, List<Long> participantesIds,
+      Double latitud, Double longitud
   ) {}
 
   public static record EventoAdd(

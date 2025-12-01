@@ -163,6 +163,8 @@ describe('CreateEventForm', () => {
         await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '10');
         await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
         await userEvent.selectOptions(screen.getByLabelText(/etiquetas/i), 'turismo');
+        await userEvent.type(screen.getByLabelText(/latitud \*/i), '41.3851');
+        await userEvent.type(screen.getByLabelText(/longitud \*/i), '2.1734');
       };
 
       test('muestra el campo de edad mínima como opcional', () => {
@@ -403,6 +405,8 @@ describe('CreateEventForm', () => {
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
       await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '50');
       await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '41.3851');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '2.1734');
       await userEvent.type(screen.getByLabelText(/descripción/i), 'Test description');
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
@@ -416,6 +420,8 @@ describe('CreateEventForm', () => {
           fecha: tomorrowStr,
           hora: '10:00',
           lugar: 'Barcelona',
+          latitud: 41.3851,
+          longitud: 2.1734,
           restricciones: {
             idiomasRequerido: ['es'],
             plazasDisponibles: 50,
@@ -447,6 +453,8 @@ describe('CreateEventForm', () => {
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
       await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '50');
       await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '41.3851');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '2.1734');
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       await userEvent.click(submitButton);
@@ -478,6 +486,8 @@ describe('CreateEventForm', () => {
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
       await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '50');
       await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '41.3851');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '2.1734');
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       await userEvent.click(submitButton);
@@ -518,6 +528,8 @@ describe('CreateEventForm', () => {
       await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
       await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '50');
       await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '41.3851');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '2.1734');
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       
@@ -545,5 +557,241 @@ describe('CreateEventForm', () => {
       }, { timeout: 3000 });
     });
   });
-});
 
+  describe('Validación de Latitud y Longitud', () => {
+    test('debe mostrar los campos de latitud y longitud', () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      expect(screen.getByLabelText(/latitud \*/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/longitud \*/i)).toBeInTheDocument();
+    });
+
+    test('debe mostrar error cuando la latitud está vacía', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/la latitud es requerida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe mostrar error cuando la longitud está vacía', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/la longitud es requerida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe mostrar error cuando la latitud está fuera de rango [-90, 90]', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const latitudInput = screen.getByLabelText(/latitud \*/i);
+      await userEvent.type(latitudInput, '95');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/latitud inválida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe mostrar error cuando la latitud es menor que -90', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const latitudInput = screen.getByLabelText(/latitud \*/i);
+      await userEvent.type(latitudInput, '-95');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/latitud inválida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe mostrar error cuando la longitud está fuera de rango [-180, 180]', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const longitudInput = screen.getByLabelText(/longitud \*/i);
+      await userEvent.type(longitudInput, '200');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/longitud inválida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe mostrar error cuando la longitud es menor que -180', async () => {
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const longitudInput = screen.getByLabelText(/longitud \*/i);
+      await userEvent.type(longitudInput, '-200');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText(/longitud inválida/i)).toBeInTheDocument();
+      });
+    });
+
+    test('debe aceptar latitud y longitud válidas en el límite', async () => {
+      eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+      await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Evento de prueba');
+      await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
+      await userEvent.type(screen.getByLabelText(/hora \*/i), '18:00');
+      await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
+      await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '10');
+      await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Barcelona');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '90');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '180');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(eventService.createEvent).toHaveBeenCalled();
+      });
+
+      const callArgs = eventService.createEvent.mock.calls[0][0];
+      expect(callArgs.latitud).toBe(90);
+      expect(callArgs.longitud).toBe(180);
+    });
+
+    test('debe aceptar latitud y longitud negativas válidas', async () => {
+      eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+      await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Evento de prueba');
+      await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
+      await userEvent.type(screen.getByLabelText(/hora \*/i), '18:00');
+      await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
+      await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '10');
+      await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Buenos Aires');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '-34.6037');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '-58.3816');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(eventService.createEvent).toHaveBeenCalled();
+      });
+
+      const callArgs = eventService.createEvent.mock.calls[0][0];
+      expect(callArgs.latitud).toBe(-34.6037);
+      expect(callArgs.longitud).toBe(-58.3816);
+    });
+
+    test('debe aceptar latitud y longitud con valor 0', async () => {
+      eventService.createEvent.mockResolvedValue({ id: 1, titulo: 'Evento de prueba' });
+
+      render(
+        <CreateEventForm
+          isOpen={true}
+          onClose={mockOnClose}
+          onSuccess={mockOnSuccess}
+        />
+      );
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+      await userEvent.type(screen.getByLabelText(/título del evento \*/i), 'Evento de prueba');
+      await userEvent.type(screen.getByLabelText(/fecha \*/i), tomorrowStr);
+      await userEvent.type(screen.getByLabelText(/hora \*/i), '18:00');
+      await userEvent.selectOptions(screen.getByLabelText(/idioma \*/i), 'es');
+      await userEvent.type(screen.getByLabelText(/plazas disponibles \*/i), '10');
+      await userEvent.type(screen.getByLabelText(/lugar \*/i), 'Ecuador');
+      await userEvent.type(screen.getByLabelText(/latitud \*/i), '0');
+      await userEvent.type(screen.getByLabelText(/longitud \*/i), '0');
+
+      const submitButton = screen.getByRole('button', { name: /crear evento/i });
+      await userEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(eventService.createEvent).toHaveBeenCalled();
+      });
+
+      const callArgs = eventService.createEvent.mock.calls[0][0];
+      expect(callArgs.latitud).toBe(0);
+      expect(callArgs.longitud).toBe(0);
+    });
+  });
+});

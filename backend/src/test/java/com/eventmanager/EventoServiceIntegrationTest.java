@@ -80,7 +80,9 @@ public class EventoServiceIntegrationTest {
               List.of("musica", "verano"),
               "Prueba",
               "Prueba de guardar evento",
-              creadorId // idCreador
+              creadorId, // idCreador
+              37.3891,   // latitud
+              -5.9845    // longitud
       );
       creado = eventoService.crear(req);
   }
@@ -158,7 +160,9 @@ public class EventoServiceIntegrationTest {
         List.of("deporte"),
         "EventoUnirseSalir",
         "Prueba de unirse y salir evento",
-        creadorId 
+        creadorId,
+        40.4168,
+        -3.7038
     );
 
     EventoView creado = eventoService.crear(req);
