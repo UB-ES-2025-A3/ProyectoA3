@@ -51,7 +51,9 @@ class EventoServiceTest {
         List.of("Música", "Concierto"),
         "Concierto de Navidad",
         "Un evento especial para celebrar la Navidad con música en vivo.",
-        1L
+        1L,
+        41.3851,
+        2.1734
     );
   }
 
@@ -105,7 +107,9 @@ class EventoServiceTest {
             evento_create.tags(),
             evento_create.titulo(),
             evento_create.descripcion(),
-            evento_create.idCreador()
+            evento_create.idCreador(),
+            41.3851,
+            2.1734
     );
 
     var err = assertThrowsExactly(
@@ -128,7 +132,9 @@ class EventoServiceTest {
             evento_create.tags(),
             evento_create.titulo(),
             evento_create.descripcion(),
-            evento_create.idCreador()
+            evento_create.idCreador(),
+            41.3851,
+            2.1734
     );
 
     var err = assertThrowsExactly(

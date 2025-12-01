@@ -66,6 +66,10 @@ public class Evento {
   @Column(name = "id_creador")
   private Long idCreador;
 
+  private Double latitud;
+
+  private Double longitud;
+
   public Evento() {}
 
   // Getters/Setters
@@ -97,6 +101,12 @@ public class Evento {
 
   public Long getIdCreador() { return idCreador; }
   public void setIdCreador(Long idCreador) { this.idCreador = idCreador; }
+
+  public Double getLatitud() { return latitud; }
+  public void setLatitud(Double latitud) { this.latitud = latitud; }
+
+  public Double getLongitud() { return longitud; }
+  public void setLongitud(Double longitud) { this.longitud = longitud; }
 
   public List<String> getTags() { return tags; }
   public void setTags(List<String> tags) { this.tags = tags; }
