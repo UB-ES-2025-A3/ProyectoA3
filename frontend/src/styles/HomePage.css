@@ -1,17 +1,6 @@
 /* src/styles/HomePage.css */
 
-/* Variables de Color para fácil mantenimiento */
-:root {
-    --primary-color: #000000; /* Azul corporativo */
-    --accent-color: #4f4f50; /* Verde para acciones */
-    --background-color: #f8f9fa; /* Fondo general suave */
-    --surface-color: #ffffff; /* Fondo para elementos (tarjetas, filtros) */
-    --text-color: #343a40; /* Texto oscuro */
-    --text-muted: #6c757d; /* Texto secundario */
-    --border-color: #e9ecef;
-    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-}
+/* Las variables de color ahora se definen en App.css para el sistema de temas */
 
 /* Estilos de botones */
 .btn {
@@ -28,20 +17,22 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
-    color: #fff;
+    background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
+    color: var(--text-light, #fff);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+    background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 123, 255, 0.3));
+    filter: brightness(1.1);
 }
 
 .home-page {
-    background-color: var(--background-color);
+    background-color: var(--background-color, #f8f9fa);
     min-height: 100vh;
     padding: 0;
+    transition: background-color 0.3s ease;
 }
 
 .home-content {
