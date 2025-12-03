@@ -1,0 +1,116 @@
+{
+
+
+  "myEvents": {
+    "title": "Mi agenda de eventos",
+    "subtitle": "Aquí puedes ver todos los eventos en los que estás inscrito",
+
+    "loading": "Cargando tus eventos...",
+
+    "empty": {
+      "title": "Todavía no tienes eventos guardados",
+      "description": "Explora los eventos disponibles y apúntate a los que más te interesen",
+      "button": "Ver eventos disponibles"
+    },
+
+    "sections": {
+      "upcoming": "Próximos eventos ({{count}})",
+      "past": "Eventos pasados ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "Te has desapuntado del evento correctamente.",
+      "loadError": "Error al cargar tus eventos. Inténtalo de nuevo.",
+      "leaveErrorFallback": "Error al desapuntarse del evento."
+    }
+  },
+
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Eventos",
+    "profile": "Perfil",
+    "myEvents": "Mis eventos",
+    "logout": "Cerrar sesión"
+  },
+
+  "profile": {
+    "loading": "Cargando perfil...",
+    "loadError": "No se pudo cargar el perfil del usuario",
+    "loadErrorWithMessage": "Error al cargar los datos: {{error}}",
+    "noUserLogged": "No hay usuario logueado",
+    "unknownError": "Error desconocido",
+
+    "header": {
+      "usernameLabel": "Usuario",
+      "edit": "Editar perfil",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "bgColorTitle": "Color de fondo",
+      "changeAvatarTitle": "Cambiar avatar",
+      "avatarAlt": "Avatar de {{fullName}}"
+    },
+
+    "sections": {
+      "personalInfo": "Información personal",
+      "description": "Descripción",
+      "languages": "Idiomas",
+      "createdEvents": "Mis eventos creados ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico",
+      "city": "Ciudad",
+      "birthDate": "Fecha de nacimiento",
+      "cityNotSpecified": "No especificada",
+      "birthDateNotSpecified": "No especificada",
+      "descriptionPlaceholder": "Cuéntanos un poco sobre ti...",
+      "noDescription": "No hay descripción disponible"
+    },
+
+    "languages": {
+      "addLanguage": "Agregar idioma",
+      "add": "Agregar"
+    },
+
+    "events": {
+      "dateNotAvailable": "Fecha no disponible",
+      "participants": "{{current}} / {{capacity}} participantes"
+    },
+
+    "stats": {
+      "enrolledEvents": "Eventos apuntados",
+      "organizedEvents": "Eventos organizados",
+      "ratings": "Valoraciones"
+    },
+
+    "validation": {
+      "firstNameRequired": "El nombre es requerido",
+      "firstNameMin": "El nombre debe tener al menos 2 caracteres",
+      "firstNameMax": "El nombre no puede tener más de 50 caracteres",
+
+      "lastNameRequired": "Los apellidos son requeridos",
+      "lastNameMin": "Los apellidos deben tener al menos 2 caracteres",
+      "lastNameMax": "Los apellidos no pueden tener más de 100 caracteres",
+
+      "emailRequired": "El correo electrónico es requerido",
+      "emailInvalid": "El correo electrónico no es válido",
+
+      "birthDateInvalid": "La fecha de nacimiento no es válida",
+      "tooYoung": "Debes tener al menos 13 años para usar esta plataforma",
+      "tooOld": "La fecha de nacimiento no parece válida",
+      "birthDateFuture": "La fecha de nacimiento no puede ser en el futuro",
+
+      "cityMax": "El nombre de la ciudad no puede tener más de 100 caracteres",
+      "descriptionMax": "La descripción no puede tener más de 500 caracteres",
+
+      "fixErrors": "Por favor, corrige los errores en el formulario"
+    },
+
+    "updateSuccess": "Perfil actualizado correctamente",
+    "updateError": "Error al actualizar el perfil"
+  }
+}
