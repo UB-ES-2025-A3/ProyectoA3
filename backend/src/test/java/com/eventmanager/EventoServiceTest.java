@@ -175,6 +175,22 @@ class EventoServiceTest {
   }
 
   @Test
+  void listar_mis_eventos() {
+    Evento e1 = getEvento();
+    Evento e2 = getEvento();
+    e2.setId(20L);
+
+    when(eventoRepo.findEventosByParticipanteId(1L))
+        .thenReturn(List.of(e1, e2));
+
+    var lista = service.listarMisEventos(1L);
+
+    assertEquals(2, lista.size());
+    assertEquals(10L, lista.get(0).id());
+    assertEquals(20L, lista.get(1).id());
+  }
+
+  @Test
   void apuntarse_a_evento() {
     Cliente participante = new Cliente();
     participante.setId(1L);

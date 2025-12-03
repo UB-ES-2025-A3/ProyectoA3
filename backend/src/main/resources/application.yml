@@ -40,3 +40,10 @@ app:
       https://ub-es-2025-a3.github.io,
       https://proyecto-a3.vercel.app,
       https://proyecto-a3-git-preprod.vercel.app
+
+logging:
+  level:
+    org.hibernate.tool.schema: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
