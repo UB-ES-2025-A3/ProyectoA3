@@ -1,6 +1,29 @@
 {
  
   
+  "EventCard": {
+    "status": {
+      "full": "Complet",
+      "spotsAvailable": "{{count}} places lliures"
+    },
+    "location": "📍 {{location}}",
+    "date": "📅 {{date}}",
+    "capacity": {
+      "label": "participants"
+    },
+    "buttons": {
+      "join": "Apuntar-se",
+      "joining": "Apuntant...",
+      "leave": "Desapuntar-se"
+    },
+    "enrolled": {
+      "already": "✓ Ja estàs apuntat a aquest esdeveniment"
+    },
+    "fallback": {
+      "noDate": "Data no disponible"
+    }
+  },
+  
   "EnrolledEvents": {
     "card": {
       "status": {

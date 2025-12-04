@@ -2,6 +2,30 @@
 
     
 
+    
+  "EventCard": {
+    "status": {
+      "full": "Full",
+      "spotsAvailable": "{{count}} spots available"
+    },
+    "location": "📍 {{location}}",
+    "date": "📅 {{date}}",
+    "capacity": {
+      "label": "participants"
+    },
+    "buttons": {
+      "join": "Join",
+      "joining": "Joining...",
+      "leave": "Leave event"
+    },
+    "enrolled": {
+      "already": "✓ You are already enrolled in this event"
+    },
+    "fallback": {
+      "noDate": "Date not available"
+    }
+  },
+
   "EnrolledEvents": {
     "card": {
       "status": {
