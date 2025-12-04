@@ -1,7 +1,42 @@
 {
 
     
-
+  "EventModal": {
+    "aria": {
+      "addFavorite": "Add to favorites",
+      "removeFavorite": "Remove from favorites"
+    },
+    "status": {
+      "full": "Full",
+      "availableSpots": "{{count}} spots available"
+    },
+    "meta": {
+      "participantsCount": "{{current}}/{{capacity}} participants",
+      "languages": "Languages"
+    },
+    "sections": {
+      "description": "Event Description",
+      "restrictions": "Restrictions",
+      "info": "Event Information",
+      "registeredParticipants": "Registered Participants ({{count}})",
+      "loadingParticipants": "Loading participants...",
+      "participantsError": "Could not load participant information"
+    },
+    "details": {
+      "capacity": "Capacity:",
+      "currentParticipants": "Current participants:",
+      "availableSpots": "Available spots:"
+    },
+    "creatorBadge": "Event creator",
+    "creatorStar": "★ Creator",
+    "clickToViewProfile": "Click to view profile",
+    "join": "Join Event",
+    "leave": "Leave Event",
+    "eventFull": "Event Full",
+    "alreadyEnrolled": "✓ You are already enrolled in this event",
+    "dateFallback": "Date unavailable"
+  },
+    
     
   "EventCard": {
     "status": {

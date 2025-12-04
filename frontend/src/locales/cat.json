@@ -1,5 +1,40 @@
 {
  
+  "EventModal": {
+    "aria": {
+      "addFavorite": "Afegir a favorits",
+      "removeFavorite": "Eliminar de favorits"
+    },
+    "status": {
+      "full": "Complet",
+      "availableSpots": "{{count}} places lliures"
+    },
+    "meta": {
+      "participantsCount": "{{current}}/{{capacity}} participants",
+      "languages": "Idiomes"
+    },
+    "sections": {
+      "description": "Descripció de l'Esdeveniment",
+      "restrictions": "Restriccions",
+      "info": "Informació de l'Esdeveniment",
+      "registeredParticipants": "Participants Inscrits ({{count}})",
+      "loadingParticipants": "Carregant participants...",
+      "participantsError": "No s'ha pogut carregar la informació dels participants"
+    },
+    "details": {
+      "capacity": "Capacitat:",
+      "currentParticipants": "Participants actuals:",
+      "availableSpots": "Places disponibles:"
+    },
+    "creatorBadge": "Creador de l'esdeveniment",
+    "creatorStar": "★ Creador",
+    "clickToViewProfile": "Clica per veure el perfil",
+    "join": "Apuntar-se a l'Esdeveniment",
+    "leave": "Desapuntar-se de l'Esdeveniment",
+    "eventFull": "Esdeveniment Complet",
+    "alreadyEnrolled": "✓ Ja estàs inscrit en aquest esdeveniment",
+    "dateFallback": "Data no disponible"
+  },
   
   "EventCard": {
     "status": {

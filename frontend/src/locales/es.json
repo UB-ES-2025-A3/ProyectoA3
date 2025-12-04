@@ -1,5 +1,41 @@
 {
 
+    
+  "EventModal": {
+    "aria": {
+      "addFavorite": "Añadir a favoritos",
+      "removeFavorite": "Eliminar de favoritos"
+    },
+    "status": {
+      "full": "Completo",
+      "availableSpots": "{{count}} plazas libres"
+    },
+    "meta": {
+      "participantsCount": "{{current}}/{{capacity}} participantes",
+      "languages": "Idiomas"
+    },
+    "sections": {
+      "description": "Descripción del Evento",
+      "restrictions": "Restricciones",
+      "info": "Información del Evento",
+      "registeredParticipants": "Participantes Inscritos ({{count}})",
+      "loadingParticipants": "Cargando participantes...",
+      "participantsError": "No se pudo cargar la información de los participantes"
+    },
+    "details": {
+      "capacity": "Capacidad:",
+      "currentParticipants": "Participantes actuales:",
+      "availableSpots": "Plazas disponibles:"
+    },
+    "creatorBadge": "Creador del evento",
+    "creatorStar": "★ Creador",
+    "clickToViewProfile": "Click para ver perfil",
+    "join": "Apuntarse al Evento",
+    "leave": "Desapuntarse del Evento",
+    "eventFull": "Evento Completo",
+    "alreadyEnrolled": "✓ Ya estás apuntado a este evento",
+    "dateFallback": "Fecha no disponible"
+  },
 
   "EventCard": {
     "status": {
