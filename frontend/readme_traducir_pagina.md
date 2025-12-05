@@ -62,6 +62,7 @@ En el css añadir los colores
 
 # Paso 5 : Usar las traducciones en cualquier página
 
+``` js 
 // src/pages/Home.jsx
 import { useTranslation } from 'react-i18next';
 
@@ -78,6 +79,9 @@ function Home() {
 
 export default Home;
 
+```
+
+``` js
 
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -100,3 +104,5 @@ function App() {
 }
 
 export default App;
+
+``` 

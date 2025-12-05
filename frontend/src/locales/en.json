@@ -1,6 +1,22 @@
 {
 
 
+  "UserProfile": {
+  "loading": "Loading profile...",
+  "loadError": "Error loading user profile",
+  "closeButton": "Close",
+  "sections": {
+    "personalInfo": "Personal Information",
+    "languages": "Languages",
+    "description": "Description"
+  },
+  "fields": {
+    "city": "City",
+    "age": "Age"
+  },
+  "ageSuffix": "years old"
+},
+
     "Register": {
   "title": "Create Account",
   "subtitle": "Join our event platform",

@@ -1,5 +1,22 @@
 {
 
+
+  "UserProfile": {
+  "loading": "Cargando perfil...",
+  "loadError": "Error al cargar el perfil del usuario",
+  "closeButton": "Cerrar",
+  "sections": {
+    "personalInfo": "Información Personal",
+    "languages": "Idiomas",
+    "description": "Descripción"
+  },
+  "fields": {
+    "city": "Ciudad",
+    "age": "Edad"
+  },
+  "ageSuffix": "años"
+},
+
     "Register": {
   "title": "Crear Cuenta",
   "subtitle": "Únete a nuestra plataforma de eventos",

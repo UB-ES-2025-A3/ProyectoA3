@@ -10,14 +10,26 @@ export default function EnrolledEventCard({ event, onLeave, onClick }) {
   const now = new Date();
   const isFinished = eventDate < now;
 
-  // Elegir locale según el idioma actual de i18n
-  const lang = (i18n.language || "es").split("-")[0];
+  const rawLang = i18n.language || "es";
+  const baseLang = rawLang.split("-")[0]; // "es-ES" -> "es", "ca-ES" -> "ca", "cat" -> "cat"
+
+  // si en tu config usas "cat" como código, lo mapeamos a "ca"
+  const lang = baseLang === "cat" ? "ca" : baseLang;
+
+
+    // Elegir locale según el idioma actual de i18n
   const localeMap = {
     es: "es-ES",
     ca: "ca-ES",
-    en: "en-GB"
+    en: "en-GB",
+    fr: "fr-FR",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    ru: "ru-RU"
   };
   const locale = localeMap[lang] || "es-ES";
+
 
   const formattedDate = eventDate.toLocaleDateString(locale, {
     year: "numeric",

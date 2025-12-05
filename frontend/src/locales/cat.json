@@ -1,6 +1,23 @@
 {
  
 
+
+  "UserProfile": {
+  "loading": "Carregant perfil...",
+  "loadError": "Error en carregar el perfil de l'usuari",
+  "closeButton": "Tancar",
+  "sections": {
+    "personalInfo": "Informació personal",
+    "languages": "Idiomes",
+    "description": "Descripció"
+  },
+  "fields": {
+    "city": "Ciutat",
+    "age": "Edat"
+  },
+  "ageSuffix": "anys"
+},
+
   "Register": {
   "title": "Crear Compte",
   "subtitle": "Uneix-te a la nostra plataforma d'esdeveniments",

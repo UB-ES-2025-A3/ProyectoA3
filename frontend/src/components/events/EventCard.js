@@ -12,22 +12,46 @@ export default function EventCard({
   onClick,
   isJoining = false,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  // Formatear fecha de manera segura
-  let start = t("EventCard.fallback.noDate");
+  const rawLang = i18n.language || "es";
+  const baseLang = rawLang.split("-")[0]; // "es-ES" -> "es", "ca-ES" -> "ca", "cat" -> "cat"
+
+  // si en tu config usas "cat" como código, lo mapeamos a "ca"
+  const lang = baseLang === "cat" ? "ca" : baseLang;
+
+
+    // Elegir locale según el idioma actual de i18n
+  const localeMap = {
+    es: "es-ES",
+    ca: "ca-ES",
+    en: "en-GB",
+    fr: "fr-FR",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    ru: "ru-RU"
+  };
+  const locale = localeMap[lang] || "es-ES";
+
+  console.log("[EventModal] rawLang =", rawLang, "| baseLang =", baseLang, "| lang =", lang, "| locale =", locale);
+
+
+  let start = t("EventModal.dateFallback");
   if (event.startDate) {
     const date = new Date(event.startDate);
     if (!isNaN(date.getTime())) {
-      start = date.toLocaleString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      start = date.toLocaleString(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
   }
+
+
 
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
