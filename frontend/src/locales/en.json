@@ -1,6 +1,30 @@
 {
 
     
+    "Login": {
+  "title": "Log In",
+  "subtitle": "Access your event account",
+  "fields": {
+    "usernameOrEmail": "Username or Email",
+    "password": "Password",
+    "placeholderUsernameOrEmail": "Enter your username or email",
+    "placeholderPassword": "Enter your password"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "Username or email is required",
+    "passwordRequired": "Password is required",
+    "unexpected": "Unexpected error while logging in. Please try again."
+  },
+  "button": {
+    "login": "Log In",
+    "loading": "Logging in..."
+  },
+  "register": {
+    "question": "Don't have an account?",
+    "link": "Register here"
+  }
+},
+
   "EventModal": {
     "aria": {
       "addFavorite": "Add to favorites",

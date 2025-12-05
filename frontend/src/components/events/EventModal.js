@@ -32,7 +32,9 @@ export default function EventModal({
   onJoin,
   onLeave
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  console.log("[EventModal] i18n.language =", i18n.language);
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [participants, setParticipants] = useState([]);
@@ -122,11 +124,34 @@ export default function EventModal({
 
   if (!isOpen || !event) return null;
 
+  const rawLang = i18n.language || "es";
+  const baseLang = rawLang.split("-")[0]; // "es-ES" -> "es", "ca-ES" -> "ca", "cat" -> "cat"
+
+  // si en tu config usas "cat" como código, lo mapeamos a "ca"
+  const lang = baseLang === "cat" ? "ca" : baseLang;
+
+
+    // Elegir locale según el idioma actual de i18n
+  const localeMap = {
+    es: "es-ES",
+    ca: "ca-ES",
+    en: "en-GB",
+    fr: "fr-FR",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    ru: "ru-RU"
+  };
+  const locale = localeMap[lang] || "es-ES";
+
+  console.log("[EventModal] rawLang =", rawLang, "| baseLang =", baseLang, "| lang =", lang, "| locale =", locale);
+
+
   let start = t("EventModal.dateFallback");
   if (event.startDate) {
     const date = new Date(event.startDate);
     if (!isNaN(date.getTime())) {
-      start = date.toLocaleString("es-ES", {
+      start = date.toLocaleString(locale, {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -135,6 +160,7 @@ export default function EventModal({
       });
     }
   }
+
 
   const currentParticipants = event.participants?.length || 0;
   const availableSpots = event.capacity - currentParticipants;

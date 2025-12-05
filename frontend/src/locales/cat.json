@@ -1,5 +1,31 @@
 {
  
+
+
+  "Login": {
+  "title": "Inicia Sessió",
+  "subtitle": "Accedeix al teu compte d'esdeveniments",
+  "fields": {
+    "usernameOrEmail": "Nom d'usuari o correu",
+    "password": "Contrasenya",
+    "placeholderUsernameOrEmail": "Introdueix el teu usuari o correu electrònic",
+    "placeholderPassword": "Introdueix la teva contrasenya"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "El nom d'usuari o correu és obligatori",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "unexpected": "Error inesperat en iniciar sessió. Si us plau, intenta-ho de nou."
+  },
+  "button": {
+    "login": "Inicia Sessió",
+    "loading": "Iniciant sessió..."
+  },
+  "register": {
+    "question": "No tens un compte?",
+    "link": "Registra't aquí"
+  }
+  },
+
   "EventModal": {
     "aria": {
       "addFavorite": "Afegir a favorits",

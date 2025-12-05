@@ -1,6 +1,30 @@
 {
 
     
+"Login": {
+  "title": "Iniciar Sesión",
+  "subtitle": "Accede a tu cuenta de eventos",
+  "fields": {
+    "usernameOrEmail": "Nombre de Usuario o Correo",
+    "password": "Contraseña",
+    "placeholderUsernameOrEmail": "Ingresa tu usuario o correo electrónico",
+    "placeholderPassword": "Ingresa tu contraseña"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "El nombre de usuario o correo es requerido",
+    "passwordRequired": "La contraseña es requerida",
+    "unexpected": "Error inesperado al iniciar sesión. Por favor, intenta de nuevo."
+  },
+  "button": {
+    "login": "Iniciar Sesión",
+    "loading": "Iniciando sesión..."
+  },
+  "register": {
+    "question": "¿No tienes una cuenta?",
+    "link": "Regístrate aquí"
+  } 
+    },
+    
   "EventModal": {
     "aria": {
       "addFavorite": "Añadir a favoritos",
