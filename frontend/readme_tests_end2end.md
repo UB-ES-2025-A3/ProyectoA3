@@ -19,11 +19,13 @@ local
 
 cd frontend
 
-npm test -- EventModal
-npm test -- ProfilePage
-npm test -- SplashPage
-npm test -- App
+npm test -- CreateEventForm.test.js
+...
 
 cuando salga todo verde
 
-npm test --if-present
+
+
+# ver coverage
+
+npm run test:coverage
