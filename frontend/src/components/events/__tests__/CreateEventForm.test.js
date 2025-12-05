@@ -1,10 +1,94 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 import CreateEventForm from '../CreateEventForm';
 import * as eventService from '../../../services/eventService';
 
-// Mock del servicio de eventos
+// 🔹 Mock react-i18next ajustado a las keys reales de createEvent
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    const translations = {
+      // Modal
+      'createevent.modal.title': 'Crear nuevo evento',
+      'createevent.modal.subtitle': 'Completa el formulario para crear un nuevo evento',
+
+      // Mensajes
+      'createevent.messages.submiterrorfallback': 'Error al crear el evento. Inténtalo de nuevo.',
+
+      // Labels
+      'createevent.form.labels.title': 'Título del evento',
+      'createevent.form.labels.description': 'Descripción',
+      'createevent.form.labels.tags': 'Etiquetas',
+      'createevent.form.labels.date': 'Fecha',
+      'createevent.form.labels.time': 'Hora',
+      'createevent.form.labels.language': 'Idioma',
+      'createevent.form.labels.capacity': 'Plazas disponibles',
+      'createevent.form.labels.minage': 'Edad mínima (opcional)',
+      'createevent.form.labels.place': 'Lugar',
+
+      // Placeholders
+      'createevent.form.placeholders.title': 'Ej: Paseo por el centro histórico',
+      'createevent.form.placeholders.description': 'Describe tu evento (opcional)',
+      'createevent.form.placeholders.capacity': 'Número de plazas',
+      'createevent.form.placeholders.minage': 'Ej: 18',
+      'createevent.form.placeholders.place': 'Ej: Café Central',
+
+      // Tags
+      'createevent.form.tags.placeholder': 'Selecciona una etiqueta',
+      'createevent.form.tags.options.turismo': 'Turismo',
+      'createevent.form.tags.options.comida': 'Comida',
+      'createevent.form.tags.options.excursion': 'Excursión',
+      'createevent.form.tags.options.cultural': 'Cultural',
+      'createevent.form.tags.options.social': 'Social',
+      'createevent.form.tags.options.deporte': 'Deporte',
+      'createevent.form.tags.options.aventura': 'Aventura',
+      'createevent.form.tags.options.familiar': 'Familiar',
+      'createevent.form.tags.options.juegos': 'Juegos',
+      'createevent.form.tags.options.cine': 'Cine',
+      'createevent.form.tags.options.relax': 'Relax',
+      'createevent.form.tags.options.tardeo': 'Tardeo',
+      'createevent.form.tags.options.noche': 'Noche',
+      'createevent.form.tags.options.otros': 'Otros',
+
+      // Language select
+      'createevent.form.language.placeholder': 'Selecciona un idioma',
+      'createevent.form.language.options.es': 'Español',
+      'createevent.form.language.options.en': 'Inglés',
+      'createevent.form.language.options.fr': 'Francés',
+      'createevent.form.language.options.de': 'Alemán',
+      'createevent.form.language.options.it': 'Italiano',
+      'createevent.form.language.options.pt': 'Portugués',
+      'createevent.form.language.options.ru': 'Ruso',
+
+      // Botones
+      'createevent.buttons.cancel': 'Cancelar',
+      'createevent.buttons.submit': 'Crear evento',
+      'createevent.buttons.submitting': 'Creando...',
+
+      // Validación
+      'createevent.validation.titlerequired': 'El título del evento es requerido',
+      'createevent.validation.daterequired': 'La fecha es requerida',
+      'createevent.validation.dateinpast': 'La fecha no puede ser anterior a hoy',
+      'createevent.validation.timerequired': 'La hora es requerida',
+      'createevent.validation.languagerequired': 'Debes seleccionar un idioma',
+      'createevent.validation.capacityrequired': 'Las plazas disponibles son requeridas',
+      'createevent.validation.capacitymin': 'Debe haber al menos 1 plaza disponible',
+      'createevent.validation.minagemin': 'La edad mínima debe ser 0 o mayor',
+      'createevent.validation.minagemax': 'La edad mínima debe ser menor a 120',
+      'createevent.validation.placerequired': 'El lugar es requerido'
+    };
+
+    return {
+      t: (key) => {
+        const lk = String(key).toLowerCase();
+        return translations[lk] || key;
+      },
+      i18n: { language: 'es', changeLanguage: () => Promise.resolve() }
+    };
+  }
+}));
+
 jest.mock('../../../services/eventService');
 
 describe('CreateEventForm', () => {
@@ -176,8 +260,8 @@ describe('CreateEventForm', () => {
           />
         );
         
-        const edadMinimaLabel = screen.getByLabelText(/edad mínima/i);
-        expect(edadMinimaLabel).toBeInTheDocument();
+        const edadMinimaInput = screen.getByLabelText(/edad mínima/i);
+        expect(edadMinimaInput).toBeInTheDocument();
         expect(screen.getByText(/edad mínima \(opcional\)/i)).toBeInTheDocument();
       });
 
@@ -492,16 +576,12 @@ describe('CreateEventForm', () => {
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       await userEvent.click(submitButton);
 
-      // Esperar a que aparezca el mensaje de error usando findByText
       const errorMessage = await screen.findByText(/Error al crear el evento/i, {}, { timeout: 3000 });
       expect(errorMessage).toBeInTheDocument();
-
-      // Verificar que onSuccess NO fue llamado
       expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
     test('debe mostrar estado de carga durante la creación', async () => {
-      // Crear una promesa que se resuelve después de un delay
       let resolvePromise;
       const delayedPromise = new Promise(resolve => {
         resolvePromise = resolve;
@@ -533,24 +613,19 @@ describe('CreateEventForm', () => {
 
       const submitButton = screen.getByRole('button', { name: /crear evento/i });
       
-      // Hacer click y verificar que el botón se deshabilita
       await userEvent.click(submitButton);
 
-      // Verificar que el botón está deshabilitado durante la carga
       await waitFor(() => {
         expect(submitButton).toBeDisabled();
       });
 
-      // Verificar que el texto del botón cambia a "Creando..."
       await waitFor(() => {
         const creatingButton = screen.getByRole('button', { name: /creando.../i });
         expect(creatingButton).toBeDisabled();
       });
 
-      // Resolver la promesa para completar el test
       resolvePromise({ id: 1 });
       
-      // Esperar a que termine la carga y el botón vuelva a estar habilitado
       await waitFor(() => {
         const enabledButton = screen.getByRole('button', { name: /crear evento/i });
         expect(enabledButton).not.toBeDisabled();

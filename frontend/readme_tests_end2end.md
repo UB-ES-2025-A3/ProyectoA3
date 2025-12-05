@@ -26,4 +26,4 @@ npm test -- App
 
 cuando salga todo verde
 
-CI=true npm test
+npm test --if-present
