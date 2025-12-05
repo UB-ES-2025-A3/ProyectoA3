@@ -31,7 +31,7 @@ exports[`SplashPage snapshot test - verifica que no haya cambios inesperados en 
       <button
         class="splash__cta splash__cta--primary"
       >
-        Iniciar Sesión
+        Iniciar sesión
       </button>
       <button
         class="splash__cta splash__cta--secondary"

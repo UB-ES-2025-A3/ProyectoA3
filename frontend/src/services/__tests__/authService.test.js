@@ -1,29 +1,29 @@
-// Mock de axios - Jest usará automáticamente src/__mocks__/axios.js
-jest.mock('axios');
-import axios from 'axios';
+// src/services/__tests__/authService.test.js
 
+import axios from 'axios';
 import authService from '../authService';
 
+// Mock de axios - Jest usará automáticamente src/__mocks__/axios.js si existe
+jest.mock('axios');
+
 describe('authService', () => {
-  // Espiar localStorage para poder verificar las llamadas
   let setItemSpy;
   let removeItemSpy;
 
   beforeEach(() => {
     // Limpiar mocks de axios
-    axios.post.mockClear();
-    axios.get.mockClear();
-    axios.put.mockClear();
-    axios.delete.mockClear();
-    axios.patch.mockClear();
-    
-    // Espiar localStorage - esto asegura que las llamadas se registren correctamente
+    axios.post.mockReset();
+    axios.get?.mockReset && axios.get.mockReset();
+    axios.put?.mockReset && axios.put.mockReset();
+    axios.delete?.mockReset && axios.delete.mockReset();
+    axios.patch?.mockReset && axios.patch.mockReset();
+
+    // Espiar localStorage
     setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
     removeItemSpy = jest.spyOn(Storage.prototype, 'removeItem');
   });
 
   afterEach(() => {
-    // Restaurar los spies después de cada test
     setItemSpy.mockRestore();
     removeItemSpy.mockRestore();
   });
@@ -36,6 +36,8 @@ describe('authService', () => {
       correo: 'test@example.com',
       fechaNacimiento: '2000-01-01',
       ciudad: 'Barcelona',
+      // En tu RegisterForm usas idioma como array, pero el servicio simplemente lo envía tal cual.
+      // Aquí lo dejamos como string porque sólo verificamos que se pasa el objeto tal cual.
       idioma: 'es',
       password: 'Password123!'
     };
@@ -135,7 +137,7 @@ describe('authService', () => {
       expect(setItemSpy).toHaveBeenCalledWith('userId', '2');
     });
 
-    test('debe manejar error con mensaje del servidor', async () => {
+    test('debe manejar error con mensaje del servidor (message)', async () => {
       const mockError = {
         response: {
           data: {
@@ -178,7 +180,9 @@ describe('authService', () => {
       const result = await authService.login(mockCredentials);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Servicio no disponible. Verifica que el servidor esté funcionando.');
+      expect(result.error).toBe(
+        'Servicio no disponible. Verifica que el servidor esté funcionando.'
+      );
     });
 
     test('debe manejar error 500 con mensaje específico', async () => {
@@ -192,7 +196,9 @@ describe('authService', () => {
       const result = await authService.login(mockCredentials);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Error del servidor. Inténtalo de nuevo más tarde.');
+      expect(result.error).toBe(
+        'Error del servidor. Inténtalo de nuevo más tarde.'
+      );
     });
 
     test('debe manejar Network Error con mensaje específico', async () => {
@@ -204,7 +210,9 @@ describe('authService', () => {
       const result = await authService.login(mockCredentials);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Error de conexión. Verifica tu conexión a internet o que el servidor esté activo.');
+      expect(result.error).toBe(
+        'Error de conexión. Verifica tu conexión a internet o que el servidor esté activo.'
+      );
     });
 
     test('debe usar mensaje de error por defecto si no hay información específica', async () => {

@@ -1,6 +1,7 @@
 // src/components/events/EventCard.js
 import React from "react";
 import "./EventCard.css";
+import { useTranslation } from "react-i18next";
 
 export default function EventCard({
   event,
@@ -11,20 +12,47 @@ export default function EventCard({
   onClick,
   isJoining = false,
 }) {
-  // Formatear fecha de manera segura
-  let start = "Fecha no disponible";
+  const { t, i18n } = useTranslation();
+
+  const rawLang = i18n.language || "es";
+  const baseLang = rawLang.split("-")[0]; // "es-ES" -> "es", "ca-ES" -> "ca", "cat" -> "cat"
+
+  // si en tu config usas "cat" como código, lo mapeamos a "ca"
+  const lang = baseLang === "cat" ? "ca" : baseLang;
+
+
+    // Elegir locale según el idioma actual de i18n
+  const localeMap = {
+    es: "es-ES",
+    ca: "ca-ES",
+    en: "en-GB",
+    fr: "fr-FR",
+    de: "de-DE",
+    it: "it-IT",
+    pt: "pt-PT",
+    ru: "ru-RU"
+  };
+  const locale = localeMap[lang] || "es-ES";
+
+  console.log("[EventModal] rawLang =", rawLang, "| baseLang =", baseLang, "| lang =", lang, "| locale =", locale);
+
+
+  let start = t("EventModal.dateFallback");
   if (event.startDate) {
     const date = new Date(event.startDate);
     if (!isNaN(date.getTime())) {
-      start = date.toLocaleString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      start = date.toLocaleString(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
   }
+
+
+
   const currentParticipants = event.participants ? event.participants.length : 0;
   const availableSpots = event.capacity - currentParticipants;
 
@@ -34,10 +62,12 @@ export default function EventCard({
         <img src={event.imageUrl} alt={event.name} />
         <div className="event-card__status">
           {isFull ? (
-            <span className="status-badge status-full">Completo</span>
+            <span className="status-badge status-full">
+              {t("EventCard.status.full")}
+            </span>
           ) : (
             <span className="status-badge status-available">
-              {availableSpots} plazas libres
+              {t("EventCard.status.spotsAvailable", { count: availableSpots })}
             </span>
           )}
         </div>
@@ -46,16 +76,26 @@ export default function EventCard({
       <div className="event-card__body">
         <div className="event-card__main">
           <h3 className="event-card__title">{event.name}</h3>
-          <p className="event-card__location">📍 {event.location}</p>
-          <p className="event-card__date">📅 {start}</p>
+
+          <p className="event-card__location">
+            {t("EventCard.location", { location: event.location })}
+          </p>
+
+          <p className="event-card__date">
+            {t("EventCard.date", { date: start })}
+          </p>
         </div>
 
         <div className="event-card__sidebar">
           <div className="event-card__capacity-info">
-            <span className="capacity-number">{currentParticipants}/{event.capacity}</span>
-            <span className="capacity-label">participantes</span>
+            <span className="capacity-number">
+              {currentParticipants}/{event.capacity}
+            </span>
+            <span className="capacity-label">
+              {t("EventCard.capacity.label")}
+            </span>
           </div>
-          
+
           <footer className="event-card__footer">
             {!isEnrolled && (
               <button
@@ -67,33 +107,46 @@ export default function EventCard({
                 disabled={isFull || isJoining}
                 aria-disabled={isFull || isJoining}
               >
-                {isFull ? "Completo" : isJoining ? "Apuntando..." : "Apuntarse"}
+                {isFull
+                  ? t("EventCard.status.full")
+                  : isJoining
+                  ? t("EventCard.buttons.joining")
+                  : t("EventCard.buttons.join")}
               </button>
             )}
 
             {isEnrolled && (
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
-                <p style={{ 
-                  margin: 0, 
-                  padding: '8px 12px', 
-                  backgroundColor: '#e8f5e9', 
-                  color: '#2e7d32', 
-                  borderRadius: '4px', 
-                  fontSize: '14px',
-                  textAlign: 'center',
-                  fontWeight: '500'
-                }}>
-                  ✓ Ya estás apuntado a este evento
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  width: "100%",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    padding: "8px 12px",
+                    backgroundColor: "#e8f5e9",
+                    color: "#2e7d32",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    textAlign: "center",
+                    fontWeight: "500",
+                  }}
+                >
+                  {t("EventCard.enrolled.already")}
                 </p>
-                <button 
-                  className="btn btn-primary" 
+
+                <button
+                  className="btn btn-primary"
                   onClick={(e) => {
                     e.stopPropagation();
                     onLeave();
                   }}
                 >
-                  Desapuntarse
+                  {t("EventCard.buttons.leave")}
                 </button>
               </div>
             )}
