@@ -80,7 +80,8 @@ jobs:
         working-directory: ./frontend
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
-        run: npx playwright test
+        run: npx playwright test --reporter=html
+
 
       - name: Upload Playwright HTML report
         if: always()
