@@ -1,5 +1,65 @@
 {
 
+
+    "Register": {
+  "title": "Create Account",
+  "subtitle": "Join our event platform",
+  "fields": {
+    "nombre": "First Name",
+    "apellidos": "Last Name",
+    "username": "Username",
+    "correo": "Email",
+    "fechaNacimiento": "Date of Birth",
+    "ciudad": "City",
+    "idioma": "Spoken Language(s)",
+    "idiomaPlaceholder": "Select language(s)",
+    "placeholderNombre": "Enter your first name",
+    "placeholderApellidos": "Enter your last name",
+    "placeholderUsername": "Choose a username",
+    "placeholderCorreo": "your@email.com",
+    "placeholderCiudad": "Your city"
+  },
+  "languages": {
+    "es": "Spanish",
+    "en": "English",
+    "fr": "French",
+    "de": "German",
+    "it": "Italian",
+    "pt": "Portuguese",
+    "ru": "Russian"
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "Minimum 6 characters",
+    "requirementsTitle": "Your password must include:",
+    "requirements": {
+      "length": "At least 6 characters",
+      "uppercase": "One uppercase letter",
+      "lowercase": "One lowercase letter",
+      "number": "One number",
+      "specialChar": "One special character"
+    }
+  },
+  "errors": {
+    "nombreRequired": "First name is required",
+    "apellidosRequired": "Last name is required",
+    "usernameRequired": "Username is required",
+    "correoRequired": "Email is required",
+    "correoInvalid": "Email is not valid",
+    "fechaNacimientoRequired": "Date of birth is required",
+    "passwordRequired": "Password is required",
+    "passwordRequirements": "Password does not meet the minimum requirements",
+    "unexpected": "Unexpected error while registering user"
+  },
+  "button": {
+    "submit": "Create Account",
+    "loading": "Creating account..."
+  },
+  "footer": {
+    "question": "Already have an account?",
+    "link": "Log in here"
+  }
+},
     
     "Login": {
   "title": "Log In",

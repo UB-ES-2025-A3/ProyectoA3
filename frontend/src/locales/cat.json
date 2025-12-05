@@ -1,6 +1,65 @@
 {
  
 
+  "Register": {
+  "title": "Crear Compte",
+  "subtitle": "Uneix-te a la nostra plataforma d'esdeveniments",
+  "fields": {
+    "nombre": "Nom",
+    "apellidos": "Cognoms",
+    "username": "Nom d'usuari",
+    "correo": "Correu electrònic",
+    "fechaNacimiento": "Data de naixement",
+    "ciudad": "Ciutat",
+    "idioma": "Idioma(es) parlat(s)",
+    "idiomaPlaceholder": "Selecciona idioma(es)",
+    "placeholderNombre": "Introdueix el teu nom",
+    "placeholderApellidos": "Introdueix els teus cognoms",
+    "placeholderUsername": "Tria un nom d'usuari",
+    "placeholderCorreo": "elteu@email.com",
+    "placeholderCiudad": "La teva ciutat"
+  },
+  "languages": {
+    "es": "Espanyol",
+    "en": "Anglès",
+    "fr": "Francès",
+    "de": "Alemany",
+    "it": "Italià",
+    "pt": "Portuguès",
+    "ru": "Rus"
+  },
+  "password": {
+    "label": "Contrasenya",
+    "placeholder": "Mínim 6 caràcters",
+    "requirementsTitle": "La contrasenya ha d'incloure:",
+    "requirements": {
+      "length": "Almenys 6 caràcters",
+      "uppercase": "Una lletra majúscula",
+      "lowercase": "Una lletra minúscula",
+      "number": "Un número",
+      "specialChar": "Un caràcter especial"
+    }
+  },
+  "errors": {
+    "nombreRequired": "El nom és obligatori",
+    "apellidosRequired": "Els cognoms són obligatoris",
+    "usernameRequired": "El nom d'usuari és obligatori",
+    "correoRequired": "El correu és obligatori",
+    "correoInvalid": "El correu no és vàlid",
+    "fechaNacimientoRequired": "La data de naixement és obligatòria",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "passwordRequirements": "La contrasenya no compleix els requisits mínims",
+    "unexpected": "Error inesperat en registrar l'usuari"
+  },
+  "button": {
+    "submit": "Crear Compte",
+    "loading": "Creant compte..."
+  },
+  "footer": {
+    "question": "Ja tens un compte?",
+    "link": "Inicia sessió aquí"
+  }
+},
 
   "Login": {
   "title": "Inicia Sessió",

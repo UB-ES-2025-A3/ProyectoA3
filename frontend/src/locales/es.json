@@ -1,5 +1,64 @@
 {
 
+    "Register": {
+  "title": "Crear Cuenta",
+  "subtitle": "Únete a nuestra plataforma de eventos",
+  "fields": {
+    "nombre": "Nombre",
+    "apellidos": "Apellidos",
+    "username": "Nombre de Usuario",
+    "correo": "Correo Electrónico",
+    "fechaNacimiento": "Fecha de Nacimiento",
+    "ciudad": "Ciudad",
+    "idioma": "Idioma(s) Hablado(s)",
+    "idiomaPlaceholder": "Selecciona idioma(s)",
+    "placeholderNombre": "Ingresa tu nombre",
+    "placeholderApellidos": "Ingresa tus apellidos",
+    "placeholderUsername": "Elige un nombre de usuario",
+    "placeholderCorreo": "tu@email.com",
+    "placeholderCiudad": "Tu ciudad"
+  },
+  "languages": {
+    "es": "Español",
+    "en": "Inglés",
+    "fr": "Francés",
+    "de": "Alemán",
+    "it": "Italiano",
+    "pt": "Portugués",
+    "ru": "Ruso"
+  },
+  "password": {
+    "label": "Contraseña",
+    "placeholder": "Mínimo 6 caracteres",
+    "requirementsTitle": "La contraseña debe incluir:",
+    "requirements": {
+      "length": "Al menos 6 caracteres",
+      "uppercase": "Una letra mayúscula",
+      "lowercase": "Una letra minúscula",
+      "number": "Un número",
+      "specialChar": "Un carácter especial"
+    }
+  },
+  "errors": {
+    "nombreRequired": "El nombre es requerido",
+    "apellidosRequired": "Los apellidos son requeridos",
+    "usernameRequired": "El nombre de usuario es requerido",
+    "correoRequired": "El correo es requerido",
+    "correoInvalid": "El correo no es válido",
+    "fechaNacimientoRequired": "La fecha de nacimiento es requerida",
+    "passwordRequired": "La contraseña es requerida",
+    "passwordRequirements": "La contraseña no cumple con los requisitos mínimos",
+    "unexpected": "Error inesperado al registrar usuario"
+  },
+  "button": {
+    "submit": "Crear Cuenta",
+    "loading": "Creando cuenta..."
+  },
+  "footer": {
+    "question": "¿Ya tienes una cuenta?",
+    "link": "Inicia sesión aquí"
+  }
+},
     
 "Login": {
   "title": "Iniciar Sesión",
