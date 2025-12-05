@@ -25,22 +25,36 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  // Limitar el año del date a 4 dígitos
+  if (name === "fecha") {
+    // value en un input type="date" es siempre "YYYY-MM-DD" o parcial ("2025-", "2025-01", etc.)
+    const [year] = value.split("-");
+
+    // Si el usuario intenta meter más de 4 dígitos en el año, ignoramos el cambio
+    if (year && year.length > 4) {
+      return;
+    }
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  if (errors[name]) {
+    setErrors((prev) => ({
       ...prev,
-      [name]: value
+      [name]: "",
     }));
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    if (submitError) {
-      setSubmitError('');
-    }
-  };
+  }
+  if (submitError) {
+    setSubmitError("");
+  }
+};
+
 
   const validateForm = () => {
     const newErrors = {};

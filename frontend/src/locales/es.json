@@ -64,6 +64,7 @@
     "correoRequired": "El correo es requerido",
     "correoInvalid": "El correo no es válido",
     "fechaNacimientoRequired": "La fecha de nacimiento es requerida",
+    "fechaNacimientoInvalid": "La fecha de nacimiento no es válida",
     "passwordRequired": "La contraseña es requerida",
     "passwordRequirements": "La contraseña no cumple con los requisitos mínimos",
     "unexpected": "Error inesperado al registrar usuario"
