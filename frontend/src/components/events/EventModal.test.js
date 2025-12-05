@@ -1,7 +1,28 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import EventModal from './EventModal';
+
+// Mock de i18n para que t() devuelva los textos que espera el test
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    const translations = {
+      // título de participantes inscritos (ignoramos el count para el test)
+      'EventModal.sections.registeredParticipants': 'Participantes Inscritos',
+      // mensaje de error de participantes
+      'EventModal.sections.participantsError':
+        'No se pudo cargar la información de los participantes',
+      // botones de inscripción
+      'EventModal.join': 'Apuntarse al Evento',
+      'EventModal.leave': 'Desapuntarse del Evento',
+      // por si acaso se usan otros textos, devolvemos la key
+    };
+
+    return {
+      t: (key, _options) => translations[key] || key,
+      i18n: { language: 'es', changeLanguage: () => Promise.resolve() }
+    };
+  }
+}));
 
 // Mock del userService
 const mockGetParticipantsByIds = jest.fn();
@@ -14,6 +35,15 @@ jest.mock('../../services/userService', () => ({
   },
   __esModule: true
 }));
+
+// (opcional pero recomendable) mock sencillo del eventService para que no llame a red real
+jest.mock('../../services/eventService', () => ({
+  isEventFavorite: jest.fn().mockResolvedValue(false),
+  addEventToFavorites: jest.fn(),
+  removeEventFromFavorites: jest.fn()
+}));
+
+import EventModal from './EventModal';
 
 describe('EventModal - Funcionalidad Básica', () => {
   const mockOnClose = jest.fn();
@@ -48,7 +78,7 @@ describe('EventModal - Funcionalidad Básica', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     mockGetParticipantsByIds.mockResolvedValue({
       success: true,
       data: mockParticipants
@@ -124,7 +154,9 @@ describe('EventModal - Funcionalidad Básica', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Participantes Inscritos/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Participantes Inscritos/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -165,12 +197,16 @@ describe('EventModal - Funcionalidad Básica', () => {
       />
     );
 
-    expect(screen.queryByText(/Participantes Inscritos/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Participantes Inscritos/i)
+    ).not.toBeInTheDocument();
   });
 
   test('debe manejar error al cargar participantes', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
+    const consoleErrorSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
     mockGetParticipantsByIds.mockResolvedValue({
       success: false,
       error: 'Error del servidor'
@@ -189,7 +225,11 @@ describe('EventModal - Funcionalidad Básica', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/No se pudo cargar la información de los participantes/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /No se pudo cargar la información de los participantes/i
+        )
+      ).toBeInTheDocument();
     });
 
     consoleErrorSpy.mockRestore();
@@ -208,7 +248,9 @@ describe('EventModal - Funcionalidad Básica', () => {
       />
     );
 
-    expect(screen.getByText(/Apuntarse al Evento/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Apuntarse al Evento/i)
+    ).toBeInTheDocument();
   });
 
   test('debe mostrar botón de desapuntarse cuando está inscrito', () => {
@@ -224,6 +266,8 @@ describe('EventModal - Funcionalidad Básica', () => {
       />
     );
 
-    expect(screen.getByText(/Desapuntarse del Evento/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Desapuntarse del Evento/i)
+    ).toBeInTheDocument();
   });
 });

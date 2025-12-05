@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function EventPage() {
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);

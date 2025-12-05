@@ -81,13 +81,49 @@ export default function EventModal({
     }
   }, [event?.id, isOpen, isAuthenticated]);
 
+  // Cargar info de participantes (useCallback + useEffect con deps correctas)
+  const loadParticipantsInfo = useCallback(async () => {
+    if (!event) {
+      setParticipants([]);
+      return;
+    }
+
+    setLoadingParticipants(true);
+    try {
+      const participantIds = event.participants || [];
+      if (participantIds.length === 0) {
+        setParticipants([]);
+        setLoadingParticipants(false);
+        return;
+      }
+
+      const result = await userService.getParticipantsByIds(participantIds);
+
+      if (result.success) {
+        setParticipants(result.data);
+        if (event.creatorId) {
+          const creatorResult = await userService.getUserProfile(event.creatorId);
+          if (creatorResult.success) {
+            setCreatorInfo(creatorResult.data);
+          }
+        }
+      } else {
+        setParticipants([]);
+      }
+    } catch {
+      setParticipants([]);
+    } finally {
+      setLoadingParticipants(false);
+    }
+  }, [event]);
+
   useEffect(() => {
     if (isOpen && event?.participants?.length > 0) {
       loadParticipantsInfo();
     } else {
       setParticipants([]);
     }
-  }, [isOpen, event]);
+  }, [isOpen, event, loadParticipantsInfo]);
 
   const toggleFavorite = async () => {
     if (!event?.id) return;
@@ -122,36 +158,6 @@ export default function EventModal({
       console.error("Error al cambiar favorito:", error);
     } finally {
       setLoadingFavorite(false);
-    }
-  };
-
-  const loadParticipantsInfo = async () => {
-    setLoadingParticipants(true);
-    try {
-      const participantIds = event.participants || [];
-      if (participantIds.length === 0) {
-        setParticipants([]);
-        setLoadingParticipants(false);
-        return;
-      }
-
-      const result = await userService.getParticipantsByIds(participantIds);
-
-      if (result.success) {
-        setParticipants(result.data);
-        if (event.creatorId) {
-          const creatorResult = await userService.getUserProfile(event.creatorId);
-          if (creatorResult.success) {
-            setCreatorInfo(creatorResult.data);
-          }
-        }
-      } else {
-        setParticipants([]);
-      }
-    } catch {
-      setParticipants([]);
-    } finally {
-      setLoadingParticipants(false);
     }
   };
 
