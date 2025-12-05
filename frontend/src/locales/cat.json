@@ -103,40 +103,44 @@
   },
 
   "EventModal": {
-    "aria": {
-      "addFavorite": "Afegir a favorits",
-      "removeFavorite": "Eliminar de favorits"
-    },
-    "status": {
-      "full": "Complet",
-      "availableSpots": "{{count}} places lliures"
-    },
-    "meta": {
-      "participantsCount": "{{current}}/{{capacity}} participants",
-      "languages": "Idiomes"
-    },
-    "sections": {
-      "description": "Descripció de l'Esdeveniment",
-      "restrictions": "Restriccions",
-      "info": "Informació de l'Esdeveniment",
-      "registeredParticipants": "Participants Inscrits ({{count}})",
-      "loadingParticipants": "Carregant participants...",
-      "participantsError": "No s'ha pogut carregar la informació dels participants"
-    },
-    "details": {
-      "capacity": "Capacitat:",
-      "currentParticipants": "Participants actuals:",
-      "availableSpots": "Places disponibles:"
-    },
-    "creatorBadge": "Creador de l'esdeveniment",
-    "creatorStar": "★ Creador",
-    "clickToViewProfile": "Clica per veure el perfil",
-    "join": "Apuntar-se a l'Esdeveniment",
-    "leave": "Desapuntar-se de l'Esdeveniment",
-    "eventFull": "Esdeveniment Complet",
-    "alreadyEnrolled": "✓ Ja estàs inscrit en aquest esdeveniment",
-    "dateFallback": "Data no disponible"
+  "dateFallback": "Data no disponible",
+  "status": {
+    "full": "Complet",
+    "availableSpots": "Queden {{count}} places"
   },
+  "meta": {
+    "participantsCount": "{{current}} de {{capacity}} participants",
+    "languages": "Idiomes"
+  },
+  "sections": {
+    "description": "Descripció",
+    "restrictions": "Restriccions",
+    "info": "Informació de l'esdeveniment",
+    "registeredParticipants": "Participants inscrits ({{count}})",
+    "loadingParticipants": "Carregant participants...",
+    "participantsError": "No s'han pogut carregar els participants"
+  },
+  "details": {
+    "capacity": "Capacitat total:",
+    "currentParticipants": "Participants actuals:",
+    "availableSpots": "Places disponibles:"
+  },
+  "eventFull": "Esdeveniment complet",
+  "join": "Unir-me a l'esdeveniment",
+  "alreadyEnrolled": "Ja estàs inscrit en aquest esdeveniment",
+  "leave": "Donar-me de baixa",
+  "clickToViewProfile": "Fes clic per veure el perfil",
+  "creatorBadge": "Creador de l'esdeveniment",
+  "creatorStar": "Creador",
+  "aria": {
+    "addFavorite": "Afegir a favorits",
+    "removeFavorite": "Treure de favorits",
+    "loginToFavorite": "Inicia sessió per desar esdeveniments com a favorits"
+  },
+  "favorite": {
+    "mustLogin": "Has d'iniciar sessió per desar esdeveniments com a favorits"
+  }
+},
   
   "EventCard": {
     "status": {

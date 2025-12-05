@@ -17,6 +17,7 @@
   "ageSuffix": "años"
 },
 
+
     "Register": {
   "title": "Crear Cuenta",
   "subtitle": "Únete a nuestra plataforma de eventos",
@@ -101,41 +102,45 @@
   } 
     },
     
-  "EventModal": {
-    "aria": {
-      "addFavorite": "Añadir a favoritos",
-      "removeFavorite": "Eliminar de favoritos"
-    },
-    "status": {
-      "full": "Completo",
-      "availableSpots": "{{count}} plazas libres"
-    },
-    "meta": {
-      "participantsCount": "{{current}}/{{capacity}} participantes",
-      "languages": "Idiomas"
-    },
-    "sections": {
-      "description": "Descripción del Evento",
-      "restrictions": "Restricciones",
-      "info": "Información del Evento",
-      "registeredParticipants": "Participantes Inscritos ({{count}})",
-      "loadingParticipants": "Cargando participantes...",
-      "participantsError": "No se pudo cargar la información de los participantes"
-    },
-    "details": {
-      "capacity": "Capacidad:",
-      "currentParticipants": "Participantes actuales:",
-      "availableSpots": "Plazas disponibles:"
-    },
-    "creatorBadge": "Creador del evento",
-    "creatorStar": "★ Creador",
-    "clickToViewProfile": "Click para ver perfil",
-    "join": "Apuntarse al Evento",
-    "leave": "Desapuntarse del Evento",
-    "eventFull": "Evento Completo",
-    "alreadyEnrolled": "✓ Ya estás apuntado a este evento",
-    "dateFallback": "Fecha no disponible"
+"EventModal": {
+  "dateFallback": "Fecha no disponible",
+  "status": {
+    "full": "Completo",
+    "availableSpots": "Quedan {{count}} plazas"
   },
+  "meta": {
+    "participantsCount": "{{current}} de {{capacity}} participantes",
+    "languages": "Idiomas"
+  },
+  "sections": {
+    "description": "Descripción",
+    "restrictions": "Restricciones",
+    "info": "Información del evento",
+    "registeredParticipants": "Participantes inscritos ({{count}})",
+    "loadingParticipants": "Cargando participantes...",
+    "participantsError": "No se han podido cargar los participantes"
+  },
+  "details": {
+    "capacity": "Capacidad total:",
+    "currentParticipants": "Participantes actuales:",
+    "availableSpots": "Plazas disponibles:"
+  },
+  "eventFull": "Evento completo",
+  "join": "Unirme al evento",
+  "alreadyEnrolled": "Ya estás inscrito en este evento",
+  "leave": "Desapuntarme",
+  "clickToViewProfile": "Haz clic para ver el perfil",
+  "creatorBadge": "Creador del evento",
+  "creatorStar": "Creador",
+  "aria": {
+    "addFavorite": "Añadir a favoritos",
+    "removeFavorite": "Eliminar de favoritos",
+    "loginToFavorite": "Inicia sesión para guardar eventos en favoritos"
+  },
+  "favorite": {
+    "mustLogin": "Debes iniciar sesión para guardar eventos en favoritos"
+  }
+},
 
   "EventCard": {
     "status": {

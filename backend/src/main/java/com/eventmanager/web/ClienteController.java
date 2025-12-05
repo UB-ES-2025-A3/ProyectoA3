@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eventmanager.domain.Cliente;
 import com.eventmanager.dto.ClienteDtos.ClienteView;
+import com.eventmanager.dto.ClienteDtos.TemaUpdate;
 import com.eventmanager.dto.ClienteUpdateDto;
 import com.eventmanager.service.ClienteService;
 
@@ -55,5 +56,27 @@ public class ClienteController {
   @PostMapping("/participants")
   public List<Cliente> obtenerParticipantes(@RequestBody List<Long> participanteIds){
     return svc.getParticipantesByIds(participanteIds);
+  }
+
+  @GetMapping("/{id}/tema")
+  public ResponseEntity<String> getTema(@PathVariable Long id) {
+    try {
+      String tema = svc.getTema(id);
+      return ResponseEntity.ok(tema);
+    } catch (ValidationException ve) {
+      return ResponseEntity.badRequest().body(ve.getMessage());
+    }
+  }
+
+  @PutMapping("/{id}/tema")
+  public ResponseEntity<?> updateTema(@PathVariable Long id, @RequestBody TemaUpdate req) {
+    try {
+      ClienteView updated = svc.updateTema(id, req.tema());
+      return ResponseEntity.ok(updated);
+    } catch (ValidationException ve) {
+      return ResponseEntity.badRequest().body(java.util.Map.of("message", ve.getMessage()));
+    } catch (Exception ex) {
+      return ResponseEntity.status(500).body(java.util.Map.of("message", "Error actualizando tema"));
+    }
   }
 }

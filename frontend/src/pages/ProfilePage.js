@@ -26,6 +26,23 @@ import avatar5 from '../assets/avatars/avatar-5.png';
 // Opciones de avatar disponibles
 const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
 
+// Mapeo de nombres de tema a colores
+const THEME_MAP = {
+  default: '#f3f3f3',
+  blue: '#d3e5ff',
+  green: '#d4edda',
+  purple: '#e2d5f1',
+  orange: '#ffe5cc',
+  pink: '#ffd6e8',
+  dark: '#2d2d2d'
+};
+
+// Lista de temas disponibles
+const THEME_OPTIONS = Object.keys(THEME_MAP);
+
+// Función para obtener el color de un tema
+const getThemeColor = (theme) => THEME_MAP[theme] || THEME_MAP.default;
+
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
 
@@ -42,9 +59,11 @@ export default function ProfilePage() {
   // Estado para el avatar seleccionado
   const [avatar, setAvatar] = useState(avatarDefault);
 
-  // Color de fondo por defecto
-  const DEFAULT_BG = '#f3f3f3';
-  const [bgColor, setBgColor] = useState(DEFAULT_BG);
+  // *** TEMA: Estado para previsualización y guardado ***
+  const [savedTheme, setSavedTheme] = useState('default'); // Tema guardado en backend
+  const [previewTheme, setPreviewTheme] = useState('default'); // Tema para previsualizar
+  const [savingTema, setSavingTema] = useState(false);
+  const [themeChanged, setThemeChanged] = useState(false); // Indica si hay cambios pendientes
 
   // Helper para locale de fechas según idioma
   const getLocale = () => {
@@ -53,31 +72,24 @@ export default function ProfilePage() {
     return 'es-ES';
   };
 
-  // Cargar datos del usuario + avatar desde localStorage
+  // Cargar datos del usuario + tema + avatar
   useEffect(() => {
     const loadUserData = async () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem('userId');
 
-        // Color de fondo desde localStorage
-        const storedColor = localStorage.getItem('profileBgColor');
-        if (storedColor) {
-          setBgColor(storedColor);
-        } else {
-          localStorage.setItem('profileBgColor', DEFAULT_BG);
-        }
-
         if (!userId) {
           setBanner({ type: 'error', message: t('profile.noUserLogged') });
           return;
         }
 
-        // Carga de datos en paralelo
-        const [profileResult, statsResult, createdEventsData] = await Promise.all([
+        // --- Carga de datos en paralelo ---
+        const [profileResult, statsResult, createdEventsData, temaResult] = await Promise.all([
           userService.getUserProfile(userId),
           userService.getUserStats(userId),
-          getMyCreatedEvents()
+          getMyCreatedEvents(),
+          userService.getTema(userId)
         ]);
 
         // 1. Perfil
@@ -97,7 +109,22 @@ export default function ProfilePage() {
         // 3. Eventos Creados
         setUserEvents(createdEventsData);
 
-        // 4. Avatar desde localStorage
+        // 4. Cargar tema desde API
+        if (temaResult.success && temaResult.data?.tema) {
+          const theme = temaResult.data.tema;
+          setSavedTheme(theme);
+          setPreviewTheme(theme);
+          localStorage.setItem('profileTheme', theme);
+          // Disparar evento para que el resto de la app sepa el tema
+          window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme } }));
+        } else {
+          setSavedTheme('default');
+          setPreviewTheme('default');
+          localStorage.setItem('profileTheme', 'default');
+          window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: 'default' } }));
+        }
+
+        // 5. Avatar desde localStorage
         const storedAvatar = localStorage.getItem('profileAvatar');
         if (storedAvatar) {
           setAvatar(storedAvatar);
@@ -265,14 +292,54 @@ export default function ProfilePage() {
     localStorage.setItem('profileAvatar', newAvatar);
   };
 
-  // Cambio de color de fondo
-  const handleBgColorChange = newColor => {
-    setBgColor(newColor);
-    if (newColor === 'none') {
-      localStorage.removeItem('profileBgColor');
-    } else {
-      localStorage.setItem('profileBgColor', newColor);
+  // *** PREVISUALIZACIÓN DE TEMA (sin guardar) ***
+  const handleThemePreview = (themeName) => {
+    setPreviewTheme(themeName);
+    setThemeChanged(themeName !== savedTheme);
+
+    window.dispatchEvent(
+      new CustomEvent('themeChange', { detail: { theme: themeName } })
+    );
+  };
+
+  // *** GUARDAR TEMA EN BACKEND ***
+  const handleSaveTheme = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    setSavingTema(true);
+    try {
+      const result = await userService.updateTema(userId, previewTheme);
+
+      if (result.success) {
+        setSavedTheme(previewTheme);
+        setThemeChanged(false);
+        localStorage.setItem('profileTheme', previewTheme);
+        setBanner({ type: 'success', message: 'Tema guardado correctamente' });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
+      } else {
+        setBanner({
+          type: 'error',
+          message: result.error || 'Error al guardar el tema'
+        });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
+      }
+    } catch (error) {
+      console.error('Error guardando tema:', error);
+      setBanner({ type: 'error', message: 'Error al guardar el tema' });
+      setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
+    } finally {
+      setSavingTema(false);
     }
+  };
+
+  // *** CANCELAR CAMBIO DE TEMA (restaurar el guardado) ***
+  const handleCancelTheme = () => {
+    setPreviewTheme(savedTheme);
+    setThemeChanged(false);
+    window.dispatchEvent(
+      new CustomEvent('themeChange', { detail: { theme: savedTheme } })
+    );
   };
 
   if (loading) {
@@ -306,7 +373,7 @@ export default function ProfilePage() {
             <div
               className="profile-avatar"
               style={{
-                backgroundColor: bgColor === 'none' ? 'transparent' : bgColor,
+                backgroundColor: getThemeColor(previewTheme),
                 backgroundImage: 'none'
               }}
             >
@@ -337,30 +404,67 @@ export default function ProfilePage() {
                 </button>
               </div>
             )}
-
-            {isEditing && (
-              <div className="profile-section">
-                <h2 className="section-title">{t('profile.header.bgColorTitle')}</h2>
-
-                <div className="color-options">
-                  {['none', '#f3f3f3', '#ffffff', '#d3e5ff', '#ef8325ff', '#4ee8f9ff', '#ca3593ff'].map(
-                    (color, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        className="color-option-btn"
-                        style={{
-                          backgroundColor: color === 'none' ? 'transparent' : color,
-                          border: bgColor === color ? '3px solid #007bff' : '2px solid #ccc'
-                        }}
-                        onClick={() => handleBgColorChange(color)}
-                      />
-                    )
-                  )}
-                </div>
-              </div>
-            )}
           </div>
+        </div>
+
+        {/* Sección de Tema - siempre visible e independiente */}
+        <div className="profile-section">
+          <h2 className="section-title">Tema</h2>
+
+          <div className="color-options">
+            {THEME_OPTIONS.map((theme) => (
+              <button
+                key={theme}
+                type="button"
+                className="color-option-btn"
+                style={{
+                  backgroundColor: getThemeColor(theme),
+                  border: previewTheme === theme ? '3px solid #007bff' : '2px solid #ccc',
+                  color: theme === 'dark' ? '#fff' : '#333'
+                }}
+                onClick={() => handleThemePreview(theme)}
+                disabled={savingTema}
+                aria-label={`Seleccionar tema ${theme}`}
+                title={theme.charAt(0).toUpperCase() + theme.slice(1)}
+              />
+            ))}
+          </div>
+
+          {themeChanged && (
+            <div
+              className="theme-actions"
+              style={{ marginTop: '16px', display: 'flex', gap: '12px' }}
+            >
+              <button
+                className="save-btn"
+                onClick={handleSaveTheme}
+                disabled={savingTema}
+                style={{ padding: '8px 20px', borderRadius: '8px' }}
+              >
+                <FaCheck /> {savingTema ? 'Guardando...' : 'Guardar tema'}
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={handleCancelTheme}
+                disabled={savingTema}
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: '8px',
+                  background: '#6c757d',
+                  color: '#fff',
+                  border: 'none'
+                }}
+              >
+                <FaTimes /> Cancelar
+              </button>
+            </div>
+          )}
+
+          {savingTema && (
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+              Guardando tema...
+            </p>
+          )}
         </div>
 
         {/* Selector de avatar sólo en edición */}
@@ -477,9 +581,7 @@ export default function ProfilePage() {
                       {errors.ciudad && <span className="error-message">{errors.ciudad}</span>}
                     </>
                   ) : (
-                    <p>
-                      {userData.ciudad || t('profile.fields.cityNotSpecified')}
-                    </p>
+                    <p>{userData.ciudad || t('profile.fields.cityNotSpecified')}</p>
                   )}
                 </div>
               </div>
@@ -498,31 +600,22 @@ export default function ProfilePage() {
                         onChange={e => handleChange('fechaNacimiento', e.target.value)}
                         className={`input-field ${errors.fechaNacimiento ? 'error' : ''}`}
                         max={new Date().toISOString().split('T')[0]}
-                        min={new Date(
-                          new Date().getFullYear() - 120,
-                          0,
-                          1
-                        )
+                        min={new Date(new Date().getFullYear() - 120, 0, 1)
                           .toISOString()
                           .split('T')[0]}
                       />
                       {errors.fechaNacimiento && (
-                        <span className="error-message">
-                          {errors.fechaNacimiento}
-                        </span>
+                        <span className="error-message">{errors.fechaNacimiento}</span>
                       )}
                     </>
                   ) : (
                     <p>
                       {userData.fechaNacimiento
-                        ? new Date(userData.fechaNacimiento).toLocaleDateString(
-                            getLocale(),
-                            {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            }
-                          )
+                        ? new Date(userData.fechaNacimiento).toLocaleDateString(getLocale(), {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })
                         : t('profile.fields.birthDateNotSpecified')}
                     </p>
                   )}

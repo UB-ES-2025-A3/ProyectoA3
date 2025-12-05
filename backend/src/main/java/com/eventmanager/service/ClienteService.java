@@ -83,7 +83,8 @@ public class ClienteService {
       saved.getFechaNacimiento(),
       saved.getCiudad(),
       saved.getIdiomas(),
-      saved.getDescripcion()
+      saved.getDescripcion(),
+      saved.getTema()
     );
   }
 
@@ -98,8 +99,40 @@ public class ClienteService {
       c.getFechaNacimiento(),
       c.getCiudad(),
       c.getIdiomas(),
-      c.getDescripcion()
+      c.getDescripcion(),
+      c.getTema()
     );
+  }
+
+  public ClienteView updateTema(Long id, String tema) {
+    Cliente c = repo.findById(id).orElseThrow(() -> new ValidationException("Cliente no encontrado"));
+    
+    // Validar que el tema es válido
+    List<String> temasValidos = List.of("default", "blue", "green", "purple", "orange", "pink", "dark");
+    if (!temasValidos.contains(tema)) {
+      throw new ValidationException("Tema no válido. Temas disponibles: " + String.join(", ", temasValidos));
+    }
+    
+    c.setTema(tema);
+    Cliente saved = repo.save(c);
+    
+    return new ClienteView(
+      saved.getId(),
+      saved.getNombre(),
+      saved.getApellidos(),
+      saved.getUsername(),
+      saved.getCorreo(),
+      saved.getFechaNacimiento(),
+      saved.getCiudad(),
+      saved.getIdiomas(),
+      saved.getDescripcion(),
+      saved.getTema()
+    );
+  }
+
+  public String getTema(Long id) {
+    Cliente c = repo.findById(id).orElseThrow(() -> new ValidationException("Cliente no encontrado"));
+    return c.getTema() != null ? c.getTema() : "default";
   }
 
   public List<Cliente> getParticipantesByIds(List<Long> participantesIds){

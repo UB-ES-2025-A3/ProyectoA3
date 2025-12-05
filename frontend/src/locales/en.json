@@ -102,40 +102,44 @@
 },
 
   "EventModal": {
-    "aria": {
-      "addFavorite": "Add to favorites",
-      "removeFavorite": "Remove from favorites"
-    },
-    "status": {
-      "full": "Full",
-      "availableSpots": "{{count}} spots available"
-    },
-    "meta": {
-      "participantsCount": "{{current}}/{{capacity}} participants",
-      "languages": "Languages"
-    },
-    "sections": {
-      "description": "Event Description",
-      "restrictions": "Restrictions",
-      "info": "Event Information",
-      "registeredParticipants": "Registered Participants ({{count}})",
-      "loadingParticipants": "Loading participants...",
-      "participantsError": "Could not load participant information"
-    },
-    "details": {
-      "capacity": "Capacity:",
-      "currentParticipants": "Current participants:",
-      "availableSpots": "Available spots:"
-    },
-    "creatorBadge": "Event creator",
-    "creatorStar": "★ Creator",
-    "clickToViewProfile": "Click to view profile",
-    "join": "Join Event",
-    "leave": "Leave Event",
-    "eventFull": "Event Full",
-    "alreadyEnrolled": "✓ You are already enrolled in this event",
-    "dateFallback": "Date unavailable"
+  "dateFallback": "Date not available",
+  "status": {
+    "full": "Full",
+    "availableSpots": "{{count}} spots left"
   },
+  "meta": {
+    "participantsCount": "{{current}} of {{capacity}} participants",
+    "languages": "Languages"
+  },
+  "sections": {
+    "description": "Description",
+    "restrictions": "Restrictions",
+    "info": "Event information",
+    "registeredParticipants": "Registered participants ({{count}})",
+    "loadingParticipants": "Loading participants...",
+    "participantsError": "Could not load participants"
+  },
+  "details": {
+    "capacity": "Total capacity:",
+    "currentParticipants": "Current participants:",
+    "availableSpots": "Available spots:"
+  },
+  "eventFull": "Event full",
+  "join": "Join event",
+  "alreadyEnrolled": "You are already enrolled in this event",
+  "leave": "Leave event",
+  "clickToViewProfile": "Click to view profile",
+  "creatorBadge": "Event creator",
+  "creatorStar": "Creator",
+  "aria": {
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "loginToFavorite": "Log in to save events as favorites"
+  },
+  "favorite": {
+    "mustLogin": "You must log in to save events as favorites"
+  }
+},
     
     
   "EventCard": {

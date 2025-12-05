@@ -1,8 +1,9 @@
 /* src/styles/MyEventsPage.css */
 .my-events-page {
   min-height: calc(100vh - 60px);
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  background: var(--background-color, linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%));
   padding: 2rem;
+  transition: background 0.3s ease;
 }
 
 .my-events-content {
@@ -19,7 +20,7 @@
 .my-events-header h1 {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #2c3e50;
+  color: var(--text-color, #2c3e50);
   margin: 0 0 0.5rem 0;
   display: inline-flex;
   align-items: center;
@@ -36,12 +37,12 @@
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.08);
   font-size: 2rem;
-  color: #2c3e50;
+  color: var(--text-color, #2c3e50);
 }
 
 .my-events-header p {
   font-size: 1.1rem;
-  color: #6c757d;
+  color: var(--text-muted, #6c757d);
   margin: 0;
 }
 
@@ -53,18 +54,19 @@
 
 .loading-state p {
   font-size: 1.2rem;
-  color: #6c757d;
+  color: var(--text-muted, #6c757d);
 }
 
 /* Estado vacío */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--surface-color, white);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  box-shadow: var(--shadow-sm, 0 2px 12px rgba(0,0,0,.06));
   max-width: 600px;
   margin: 0 auto;
+  transition: background 0.3s ease;
 }
 
 .empty-state-icon {
@@ -85,13 +87,13 @@
 .empty-state h2 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-color, #2c3e50);
   margin: 0 0 1rem 0;
 }
 
 .empty-state p {
   font-size: 1.1rem;
-  color: #6c757d;
+  color: var(--text-muted, #6c757d);
   margin: 0 0 2rem 0;
 }
 
@@ -108,13 +110,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--btn-primary-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  color: var(--text-light, white);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(102, 126, 234, 0.4));
+  filter: brightness(1.1);
 }
 
 /* Secciones de eventos */
@@ -125,10 +128,10 @@
 .section-title {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--text-color, #2c3e50);
   margin: 0 0 1.5rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 3px solid #667eea;
+  border-bottom: 3px solid var(--primary-color, #667eea);
   display: inline-block;
 }
 

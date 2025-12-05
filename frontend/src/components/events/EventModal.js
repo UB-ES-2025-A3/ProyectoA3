@@ -1,8 +1,13 @@
 // src/components/events/EventModal.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
+import {
+  isEventFavorite,
+  addEventToFavorites,
+  removeEventFromFavorites
+} from "../../services/eventService";
 import UserProfileModal from "../users/UserProfileModal";
 import { useTranslation } from "react-i18next";
 
@@ -37,6 +42,7 @@ export default function EventModal({
   console.log("[EventModal] i18n.language =", i18n.language);
 
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loadingFavorite, setLoadingFavorite] = useState(false);
   const [participants, setParticipants] = useState([]);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
   const [, setCreatorInfo] = useState(null);
@@ -49,18 +55,31 @@ export default function EventModal({
     }
   };
 
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = useCallback(() => {
+    return !!localStorage.getItem("userId");
+  }, []);
+
+  // Cargar estado de favorito desde la API
   useEffect(() => {
-    if (event?.id) {
-      let favorites;
-      try {
-        favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
-      } catch {
-        favorites = [];
-        localStorage.setItem("favoriteEvents", JSON.stringify([]));
+    const loadFavoriteStatus = async () => {
+      if (event?.id && isAuthenticated()) {
+        try {
+          const favorite = await isEventFavorite(event.id);
+          setIsFavorite(favorite);
+        } catch (error) {
+          console.error("Error al verificar favorito:", error);
+          setIsFavorite(false);
+        }
+      } else {
+        setIsFavorite(false);
       }
-      setIsFavorite(favorites.includes(event.id.toString()));
+    };
+
+    if (isOpen) {
+      loadFavoriteStatus();
     }
-  }, [event?.id]);
+  }, [event?.id, isOpen, isAuthenticated]);
 
   useEffect(() => {
     if (isOpen && event?.participants?.length > 0) {
@@ -70,26 +89,40 @@ export default function EventModal({
     }
   }, [isOpen, event]);
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     if (!event?.id) return;
-    let favorites;
+
+    // Verificar si el usuario está autenticado
+    if (!isAuthenticated()) {
+      alert(t("EventModal.favorite.mustLogin"));
+      return;
+    }
+
+    setLoadingFavorite(true);
+
     try {
-      favorites = JSON.parse(localStorage.getItem("favoriteEvents") || "[]");
-    } catch {
-      favorites = [];
-      localStorage.setItem("favoriteEvents", JSON.stringify([]));
+      if (isFavorite) {
+        const result = await removeEventFromFavorites(event.id);
+        if (result.success) {
+          setIsFavorite(false);
+          notifyFavoritesUpdated();
+        } else {
+          console.error("Error al eliminar de favoritos:", result.error);
+        }
+      } else {
+        const result = await addEventToFavorites(event.id);
+        if (result.success) {
+          setIsFavorite(true);
+          notifyFavoritesUpdated();
+        } else {
+          console.error("Error al añadir a favoritos:", result.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error al cambiar favorito:", error);
+    } finally {
+      setLoadingFavorite(false);
     }
-    const eventIdStr = event.id.toString();
-    if (isFavorite) {
-      const updated = favorites.filter(id => id !== eventIdStr);
-      localStorage.setItem("favoriteEvents", JSON.stringify(updated));
-      setIsFavorite(false);
-    } else {
-      favorites.push(eventIdStr);
-      localStorage.setItem("favoriteEvents", JSON.stringify(favorites));
-      setIsFavorite(true);
-    }
-    notifyFavoritesUpdated();
   };
 
   const loadParticipantsInfo = async () => {
@@ -130,8 +163,7 @@ export default function EventModal({
   // si en tu config usas "cat" como código, lo mapeamos a "ca"
   const lang = baseLang === "cat" ? "ca" : baseLang;
 
-
-    // Elegir locale según el idioma actual de i18n
+  // Elegir locale según el idioma actual de i18n
   const localeMap = {
     es: "es-ES",
     ca: "ca-ES",
@@ -145,7 +177,6 @@ export default function EventModal({
   const locale = localeMap[lang] || "es-ES";
 
   console.log("[EventModal] rawLang =", rawLang, "| baseLang =", baseLang, "| lang =", lang, "| locale =", locale);
-
 
   let start = t("EventModal.dateFallback");
   if (event.startDate) {
@@ -161,7 +192,6 @@ export default function EventModal({
     }
   }
 
-
   const currentParticipants = event.participants?.length || 0;
   const availableSpots = event.capacity - currentParticipants;
 
@@ -172,24 +202,34 @@ export default function EventModal({
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content">
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button className="modal-close" onClick={onClose}>
+          ✕
+        </button>
 
         <button
-          className="modal-favorite-btn"
+          className={`modal-favorite-btn ${loadingFavorite ? "loading" : ""}`}
           onClick={toggleFavorite}
+          disabled={loadingFavorite}
           aria-label={
             isFavorite
               ? t("EventModal.aria.removeFavorite")
               : t("EventModal.aria.addFavorite")
           }
           title={
-            isFavorite
+            !isAuthenticated()
+              ? t("EventModal.aria.loginToFavorite")
+              : isFavorite
               ? t("EventModal.aria.removeFavorite")
               : t("EventModal.aria.addFavorite")
           }
         >
-          {isFavorite ? <FaBookmark className="favorite-icon favorite-icon-filled" />
-                      : <FaRegBookmark className="favorite-icon favorite-icon-outline" />}
+          {loadingFavorite ? (
+            <span className="favorite-loading">⏳</span>
+          ) : isFavorite ? (
+            <FaBookmark className="favorite-icon favorite-icon-filled" />
+          ) : (
+            <FaRegBookmark className="favorite-icon favorite-icon-outline" />
+          )}
         </button>
 
         <div className="modal-header">
@@ -236,8 +276,7 @@ export default function EventModal({
                 <div className="meta-item">
                   <span className="meta-icon">🌐</span>
                   <span className="meta-text">
-                    {t("EventModal.meta.languages")}:{" "}
-                    {event.languages.join(", ")}
+                    {t("EventModal.meta.languages")}: {event.languages.join(", ")}
                   </span>
                 </div>
               )}
@@ -267,10 +306,12 @@ export default function EventModal({
                 <strong>{t("EventModal.details.capacity")}</strong> {event.capacity}
               </div>
               <div className="detail-item">
-                <strong>{t("EventModal.details.currentParticipants")}</strong> {currentParticipants}
+                <strong>{t("EventModal.details.currentParticipants")}</strong>{" "}
+                {currentParticipants}
               </div>
               <div className="detail-item">
-                <strong>{t("EventModal.details.availableSpots")}</strong> {availableSpots}
+                <strong>{t("EventModal.details.availableSpots")}</strong>{" "}
+                {availableSpots}
               </div>
             </div>
           </div>
@@ -308,7 +349,7 @@ export default function EventModal({
                         <div className="participant-avatar">
                           <img
                             src={avatar}
-                            alt={`Avatar`}
+                            alt="Avatar"
                             className="participant-avatar-img"
                           />
                         </div>
@@ -357,9 +398,7 @@ export default function EventModal({
               onClick={onJoin}
               disabled={isFull}
             >
-              {isFull
-                ? t("EventModal.eventFull")
-                : t("EventModal.join")}
+              {isFull ? t("EventModal.eventFull") : t("EventModal.join")}
             </button>
           )}
 

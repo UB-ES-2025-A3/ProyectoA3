@@ -16,7 +16,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     plazasDisponibles: '',
     edadMinima: '',
     lugar: '',
-    descripcion: ''
+    descripcion: '',
+    latitud: '',
+    longitud: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -86,6 +88,26 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
       newErrors.lugar = t("createEvent.validation.placeRequired");
     }
 
+    // Validación de latitud
+    if (!formData.latitud && formData.latitud !== 0) {
+      newErrors.latitud = 'La latitud es requerida';
+    } else {
+      const lat = parseFloat(formData.latitud);
+      if (isNaN(lat) || lat < -90 || lat > 90) {
+        newErrors.latitud = 'Latitud inválida';
+      }
+    }
+
+    // Validación de longitud
+    if (!formData.longitud && formData.longitud !== 0) {
+      newErrors.longitud = 'La longitud es requerida';
+    } else {
+      const lng = parseFloat(formData.longitud);
+      if (isNaN(lng) || lng < -180 || lng > 180) {
+        newErrors.longitud = 'Longitud inválida';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -108,6 +130,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,
+        latitud: parseFloat(formData.latitud),
+        longitud: parseFloat(formData.longitud),
         restricciones: {
           idiomasRequerido: formData.idioma ? [formData.idioma] : [],
           plazasDisponibles: parseInt(formData.plazasDisponibles),
@@ -126,7 +150,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         plazasDisponibles: '',
         edadMinima: '',
         lugar: '',
-        descripcion: ''
+        descripcion: '',
+        latitud: '',
+        longitud: ''
       });
 
       if (onSuccess) {
@@ -401,6 +427,44 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 disabled={loading}
               />
               {errors.lugar && <span className="error-message">{errors.lugar}</span>}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="latitud">Latitud *</label>
+              <input
+                type="number"
+                id="latitud"
+                name="latitud"
+                value={formData.latitud}
+                onChange={handleChange}
+                step="any"
+                min="-90"
+                max="90"
+                placeholder="Ej: 41.3851"
+                className={errors.latitud ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.latitud && <span className="error-message">{errors.latitud}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="longitud">Longitud *</label>
+              <input
+                type="number"
+                id="longitud"
+                name="longitud"
+                value={formData.longitud}
+                onChange={handleChange}
+                step="any"
+                min="-180"
+                max="180"
+                placeholder="Ej: 2.1734"
+                className={errors.longitud ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.longitud && <span className="error-message">{errors.longitud}</span>}
             </div>
           </div>
 
