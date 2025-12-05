@@ -64,6 +64,7 @@
     "correoRequired": "El correu és obligatori",
     "correoInvalid": "El correu no és vàlid",
     "fechaNacimientoRequired": "La data de naixement és obligatòria",
+    "fechaNacimientoInvalid": "La data de naixement no es válida",
     "passwordRequired": "La contrasenya és obligatòria",
     "passwordRequirements": "La contrasenya no compleix els requisits mínims",
     "unexpected": "Error inesperat en registrar l'usuari"

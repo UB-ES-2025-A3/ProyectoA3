@@ -32,6 +32,17 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    
+    if (name === 'fechaNacimiento') {
+    const [year] = value.split('-'); // "YYYY-MM-DD" → ["YYYY", "MM", "DD"]
+
+    // Si el usuario intenta meter más de 4 dígitos en el año, no actualizamos el estado
+    if (year && year.length > 4) {
+      return;
+    }
+  }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -88,9 +99,29 @@ const RegisterForm = ({ onSuccess, onError }) => {
       newErrors.correo = t("Register.errors.correoInvalid");
     }
 
-    if (!formData.fechaNacimiento) {
-      newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoRequired");
+if (!formData.fechaNacimiento) {
+  newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoRequired");
+} else {
+  // Esperamos formato "YYYY-MM-DD"
+  const match = formData.fechaNacimiento.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    // Formato inválido (año con más o menos de 4 dígitos, etc.)
+    newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
+  } else {
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+
+    // Aquí puedes ajustar los rangos según lo que tenga sentido para vuestra app
+    if (year < 1900 || year > 2100) {
+      newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
+    } else if (month < 1 || month > 12 || day < 1 || day > 31) {
+      newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
     }
+  }
+}
+
 
     if (!formData.password) {
       newErrors.password = t("Register.errors.passwordRequired");
