@@ -25,9 +25,10 @@ export default function NavBar() {
       <div className="nav__brand">{t("nav.brand")}</div>
 
       <div className="nav__links">
-        <NavLink to="/events">{t("nav.events")}</NavLink>
-        <NavLink to="/profile">{t("nav.profile")}</NavLink>
-        <NavLink to="/my-events">{t("nav.myEvents")}</NavLink>
+        <NavLink to="/home">Inicio</NavLink>
+        <NavLink to="/events">Eventos</NavLink>
+        <NavLink to="/profile">Perfil</NavLink>
+        <NavLink to="/my-events">Mis eventos</NavLink>
       </div>
 
       <div className="nav__right">
