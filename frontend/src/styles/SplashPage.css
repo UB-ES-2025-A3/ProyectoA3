@@ -150,27 +150,44 @@
 /* Sección Quiénes Somos */
 .about-us {
   padding: 5rem 2rem;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
   min-height: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-us::before {
+  content: '';
+  position: absolute;
+  width: 150vmax;
+  height: 150vmax;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 45% 55% 40% 60%;
+  filter: blur(1px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .about-us__container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .about-us__title {
   font-size: clamp(2rem, 4vw, 3rem);
   text-align: center;
   margin-bottom: 1rem;
-  color: #2c3e50;
+  color: #ffffff;
   font-weight: 700;
 }
 
 .about-us__subtitle {
   text-align: center;
   font-size: 1.2rem;
-  color: #6c757d;
+  color: #f0fbff;
   margin-bottom: 3rem;
   max-width: 600px;
   margin-left: auto;
