@@ -192,12 +192,6 @@ const handleChange = (e) => {
         }
       });
 
-      // Añadir coordenadas si están disponibles
-      if (formData.latitude && formData.longitude) {
-        eventData.latitude = parseFloat(formData.latitude);
-        eventData.longitude = parseFloat(formData.longitude);
-      }
-
       console.log('Evento creado exitosamente:', response);
 
       setFormData({
