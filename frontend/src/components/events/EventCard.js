@@ -3,13 +3,15 @@ import React from "react";
 import "./EventCard.css";
 import { useTranslation } from "react-i18next";
 
-export default function EventCard({
+const EventCard = React.memo(function EventCard({
   event,
   isEnrolled,
   isFull,
   onJoin,
   onLeave,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   isJoining = false,
 }) {
   const { t, i18n } = useTranslation();
@@ -57,7 +59,12 @@ export default function EventCard({
   const availableSpots = event.capacity - currentParticipants;
 
   return (
-    <article className="event-card" onClick={onClick}>
+    <article 
+      className="event-card" 
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <div className="event-card__media">
         <img src={event.imageUrl} alt={event.name} />
         <div className="event-card__status">
@@ -155,4 +162,6 @@ export default function EventCard({
       </div>
     </article>
   );
-}
+});
+
+export default EventCard;
