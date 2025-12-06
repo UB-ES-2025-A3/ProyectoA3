@@ -477,4 +477,33 @@
   .participant-card {
     padding: 12px;
   }
+
+  .event-chat-tab {
+    position: absolute;
+    top: 50%;
+    right: -28px; /* Lo coloca justo fuera del borde */
+    transform: translateY(-50%);
+
+    width: 45px;
+    height: 90px;
+
+    background: #ffffff;
+    border: 2px solid #e2e2e2;
+    border-radius: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    font-size: 20px;
+
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .event-chat-tab:hover {
+    right: -24px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+  }
 }

@@ -421,6 +421,15 @@ export default function EventModal({
         </div>
       </div>
 
+      {isEnrolled && (
+          <button
+              className="event-chat-tab"
+              onClick={() => console.log("click en el botón lateral")}
+          >
+            ➜
+          </button>
+      )}
+
       <UserProfileModal
         userId={selectedUserId}
         isOpen={isProfileModalOpen}
