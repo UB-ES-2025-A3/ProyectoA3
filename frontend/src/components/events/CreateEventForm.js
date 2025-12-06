@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLocation, initialCoordinates}) {
   const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     titulo: '',
     etiquetas: '',
@@ -16,8 +17,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLoc
     edadMinima: '',
     lugar: '',
     descripcion: '',
-    latitude: '',
-    longitude: ''
+    latitud: '',
+    longitud: ''
   });
 
   // Resetear el formulario cuando se cierre
@@ -53,8 +54,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLoc
       if (initialCoordinates) {
         setFormData(prev => ({
           ...prev,
-          latitude: initialCoordinates.latitude?.toString() || '',
-          longitude: initialCoordinates.longitude?.toString() || ''
+          latitud: initialCoordinates.latitude?.toString() || '',
+          longitud: initialCoordinates.longitude?.toString() || ''
         }));
       }
     }
