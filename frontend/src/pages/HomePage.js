@@ -1,6 +1,5 @@
 // src/pages/HomePage.js
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { joinEvent, leaveEvent } from "../services/eventService";
 import { homePageMockEvents } from "../mocks/homePageEvents.mock";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
@@ -10,7 +9,7 @@ import EventMap from "../components/map/EventMap";
 import "../styles/HomePage.css";
 
 // Iconos
-import { FaLanguage, FaUsers, FaSearch, FaMapMarkerAlt, FaFeatherAlt, FaBookmark } from "react-icons/fa"; 
+import { FaLanguage, FaUsers, FaSearch, FaFeatherAlt, FaBookmark } from "react-icons/fa";
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);

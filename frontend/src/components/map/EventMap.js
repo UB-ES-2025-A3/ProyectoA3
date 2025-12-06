@@ -208,11 +208,6 @@ const EventMap = React.memo(function EventMap({ selectedEvent, events = [], onUn
     }
   }, [searchQuery, searchLocation]);
 
-  // Filtrar eventos que tengan coordenadas válidas (memoizado)
-  const eventsWithCoords = useMemo(() => 
-    events.filter(e => e.latitude && e.longitude),
-    [events]
-  );
 
   // Si hay un evento seleccionado, usar sus coordenadas (memoizado)
   // Si hay una búsqueda activa, usar esas coordenadas
