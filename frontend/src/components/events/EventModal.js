@@ -212,54 +212,57 @@ export default function EventModal({
 
   return (
     <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-wrapper">
-        {isEnrolled && (
-            <button className="event-chat-tab" onClick={toggleChat}>
-              ➜
-            </button>
-        )}
+      <div className={`modal-wrapper ${isChatOpen ? "isChatOpen" : ""}`}>
+        <div className={`chat-panel ${isChatOpen ? "open" : ""}`}>
+          <h2>Chat del evento</h2>
+        </div>
         <div className="modal-content">
+          {isEnrolled && (
+              <button className="chat-floating-btn" onClick={toggleChat}>
+                💬
+              </button>
+          )}
           <button className="modal-close" onClick={onClose}>
             ✕
           </button>
 
           <button
-            className={`modal-favorite-btn ${loadingFavorite ? "loading" : ""}`}
-            onClick={toggleFavorite}
-            disabled={loadingFavorite}
-            aria-label={
-              isFavorite
-                ? t("EventModal.aria.removeFavorite")
-                : t("EventModal.aria.addFavorite")
-            }
-            title={
-              !isAuthenticated()
-                ? t("EventModal.aria.loginToFavorite")
-                : isFavorite
-                ? t("EventModal.aria.removeFavorite")
-                : t("EventModal.aria.addFavorite")
-            }
+              className={`modal-favorite-btn ${loadingFavorite ? "loading" : ""}`}
+              onClick={toggleFavorite}
+              disabled={loadingFavorite}
+              aria-label={
+                isFavorite
+                    ? t("EventModal.aria.removeFavorite")
+                    : t("EventModal.aria.addFavorite")
+              }
+              title={
+                !isAuthenticated()
+                    ? t("EventModal.aria.loginToFavorite")
+                    : isFavorite
+                        ? t("EventModal.aria.removeFavorite")
+                        : t("EventModal.aria.addFavorite")
+              }
           >
             {loadingFavorite ? (
-              <span className="favorite-loading">⏳</span>
+                <span className="favorite-loading">⏳</span>
             ) : isFavorite ? (
-              <FaBookmark className="favorite-icon favorite-icon-filled" />
+                <FaBookmark className="favorite-icon favorite-icon-filled"/>
             ) : (
-              <FaRegBookmark className="favorite-icon favorite-icon-outline" />
+                <FaRegBookmark className="favorite-icon favorite-icon-outline"/>
             )}
           </button>
 
           <div className="modal-header">
             <div className="modal-image">
-              <img src={event.imageUrl} alt={event.name} />
+              <img src={event.imageUrl} alt={event.name}/>
               <div className="modal-status">
                 {isFull ? (
-                  <span className="status-badge status-full">
+                    <span className="status-badge status-full">
                     {t("EventModal.status.full")}
                   </span>
                 ) : (
-                  <span className="status-badge status-available">
-                    {t("EventModal.status.availableSpots", { count: availableSpots })}
+                    <span className="status-badge status-available">
+                    {t("EventModal.status.availableSpots", {count: availableSpots})}
                   </span>
                 )}
               </div>
@@ -290,12 +293,12 @@ export default function EventModal({
                 </div>
 
                 {event.languages?.length > 0 && (
-                  <div className="meta-item">
-                    <span className="meta-icon">🌐</span>
-                    <span className="meta-text">
+                    <div className="meta-item">
+                      <span className="meta-icon">🌐</span>
+                      <span className="meta-text">
                       {t("EventModal.meta.languages")}: {event.languages.join(", ")}
                     </span>
-                  </div>
+                    </div>
                 )}
               </div>
             </div>
@@ -308,12 +311,12 @@ export default function EventModal({
             </div>
 
             {event.restrictions && (
-              <div className="modal-section">
-                <h3>{t("EventModal.sections.restrictions")}</h3>
-                <div className="modal-restrictions">
-                  <span className="restriction-badge">⚠️ {event.restrictions}</span>
+                <div className="modal-section">
+                  <h3>{t("EventModal.sections.restrictions")}</h3>
+                  <div className="modal-restrictions">
+                    <span className="restriction-badge">⚠️ {event.restrictions}</span>
+                  </div>
                 </div>
-              </div>
             )}
 
             <div className="modal-section">
@@ -334,115 +337,109 @@ export default function EventModal({
             </div>
 
             {currentParticipants > 0 && (
-              <div className="modal-section">
-                <h3>
-                  {t("EventModal.sections.registeredParticipants", {
-                    count: currentParticipants
-                  })}
-                </h3>
+                <div className="modal-section">
+                  <h3>
+                    {t("EventModal.sections.registeredParticipants", {
+                      count: currentParticipants
+                    })}
+                  </h3>
 
-                {loadingParticipants ? (
-                  <div className="participants-loading">
-                    <div className="loading-spinner"></div>
-                    <p>{t("EventModal.sections.loadingParticipants")}</p>
-                  </div>
-                ) : participants.length > 0 ? (
-                  <div className="participants-list">
-                    {participants.map((participant) => {
-                      const isCreator = participant.id === event.creatorId;
-                      const avatar = getAvatarForUser(participant.id);
+                  {loadingParticipants ? (
+                      <div className="participants-loading">
+                        <div className="loading-spinner"></div>
+                        <p>{t("EventModal.sections.loadingParticipants")}</p>
+                      </div>
+                  ) : participants.length > 0 ? (
+                      <div className="participants-list">
+                        {participants.map((participant) => {
+                          const isCreator = participant.id === event.creatorId;
+                          const avatar = getAvatarForUser(participant.id);
 
-                      return (
-                        <div
-                          key={participant.id}
-                          className="participant-card"
-                          onClick={() => {
-                            setSelectedUserId(participant.id);
-                            setIsProfileModalOpen(true);
-                          }}
-                          style={{ cursor: "pointer" }}
-                          title={t("EventModal.clickToViewProfile")}
-                        >
-                          <div className="participant-avatar">
-                            <img
-                              src={avatar}
-                              alt="Avatar"
-                              className="participant-avatar-img"
-                            />
-                          </div>
+                          return (
+                              <div
+                                  key={participant.id}
+                                  className="participant-card"
+                                  onClick={() => {
+                                    setSelectedUserId(participant.id);
+                                    setIsProfileModalOpen(true);
+                                  }}
+                                  style={{cursor: "pointer"}}
+                                  title={t("EventModal.clickToViewProfile")}
+                              >
+                                <div className="participant-avatar">
+                                  <img
+                                      src={avatar}
+                                      alt="Avatar"
+                                      className="participant-avatar-img"
+                                  />
+                                </div>
 
-                          <div className="participant-info">
-                            <div className="participant-name">
-                              {participant.nombre} {participant.apellidos}
-                              {isCreator && (
-                                <span
-                                  className="creator-badge"
-                                  title={t("EventModal.creatorBadge")}
-                                >
+                                <div className="participant-info">
+                                  <div className="participant-name">
+                                    {participant.nombre} {participant.apellidos}
+                                    {isCreator && (
+                                        <span
+                                            className="creator-badge"
+                                            title={t("EventModal.creatorBadge")}
+                                        >
                                   {t("EventModal.creatorStar")}
                                 </span>
-                              )}
-                            </div>
+                                    )}
+                                  </div>
 
-                            <div className="participant-details">
+                                  <div className="participant-details">
                               <span className="participant-username">
                                 @{participant.username}
                               </span>
-                              {participant.ciudad && (
-                                <span className="participant-location">
+                                    {participant.ciudad && (
+                                        <span className="participant-location">
                                   📍 {participant.ciudad}
                                 </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="participants-empty">
-                    <p>{t("EventModal.sections.participantsError")}</p>
-                  </div>
-                )}
-              </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                          );
+                        })}
+                      </div>
+                  ) : (
+                      <div className="participants-empty">
+                        <p>{t("EventModal.sections.participantsError")}</p>
+                      </div>
+                  )}
+                </div>
             )}
           </div>
 
           <div className="modal-footer">
             {!isEnrolled && (
-              <button
-                className="btn btn-primary btn-large"
-                onClick={onJoin}
-                disabled={isFull}
-              >
-                {isFull ? t("EventModal.eventFull") : t("EventModal.join")}
-              </button>
+                <button
+                    className="btn btn-primary btn-large"
+                    onClick={onJoin}
+                    disabled={isFull}
+                >
+                  {isFull ? t("EventModal.eventFull") : t("EventModal.join")}
+                </button>
             )}
 
             {isEnrolled && (
-              <div className="modal-enrolled-box">
-                <div className="enrolled-message">
-                  {t("EventModal.alreadyEnrolled")}
+                <div className="modal-enrolled-box">
+                  <div className="enrolled-message">
+                    {t("EventModal.alreadyEnrolled")}
+                  </div>
+                  <button className="btn btn-primary btn-large" onClick={onLeave}>
+                    {t("EventModal.leave")}
+                  </button>
                 </div>
-                <button className="btn btn-primary btn-large" onClick={onLeave}>
-                  {t("EventModal.leave")}
-                </button>
-              </div>
             )}
           </div>
         </div>
       </div>
-      {isChatOpen && (
-          <div className="chat-panel">
-            <h2>Chat del evento</h2>
-            {/* tu chat aquí */}
-          </div>
-      )}
 
       <UserProfileModal
-        userId={selectedUserId}
-        isOpen={isProfileModalOpen}
-        onClose={() => {
+          userId={selectedUserId}
+          isOpen={isProfileModalOpen}
+          onClose={() => {
           setIsProfileModalOpen(false);
           setSelectedUserId(null);
         }}
