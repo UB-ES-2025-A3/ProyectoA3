@@ -360,58 +360,6 @@ export default function EventModal({
                 <div className="detail-item">
                   <strong>{t("EventModal.details.capacity")}</strong> {event.capacity}
                 </div>
-              ) : Array.isArray(participants) && participants.length > 0 ? (
-                <div className="participants-list">
-                  {participants.map((participant) => {
-                    const isCreator = participant.id === event.creatorId;
-                    const avatar = getAvatarForUser(participant.id);
-
-                    return (
-                      <div
-                        key={participant.id}
-                        className="participant-card"
-                        onClick={() => {
-                          setSelectedUserId(participant.id);
-                          setIsProfileModalOpen(true);
-                        }}
-                        style={{ cursor: "pointer" }}
-                        title={t("EventModal.clickToViewProfile")}
-                      >
-                        <div className="participant-avatar">
-                          <img
-                            src={avatar}
-                            alt="Avatar"
-                            className="participant-avatar-img"
-                          />
-                        </div>
-
-                        <div className="participant-info">
-                          <div className="participant-name">
-                            {participant.nombre} {participant.apellidos}
-                            {isCreator && (
-                              <span
-                                className="creator-badge"
-                                title={t("EventModal.creatorBadge")}
-                              >
-                                {t("EventModal.creatorStar")}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="participant-details">
-                            <span className="participant-username">
-                              @{participant.username}
-                            </span>
-                            {participant.ciudad && (
-                              <span className="participant-location">
-                                📍 {participant.ciudad}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
                 <div className="detail-item">
                   <strong>{t("EventModal.details.currentParticipants")}</strong>{" "}
                   {currentParticipants}
@@ -436,7 +384,7 @@ export default function EventModal({
                         <div className="loading-spinner"></div>
                         <p>{t("EventModal.sections.loadingParticipants")}</p>
                       </div>
-                  ) : participants.length > 0 ? (
+                  ) : Array.isArray(participants) && participants.length > 0 ? (
                       <div className="participants-list">
                         {participants.map((participant) => {
                           const isCreator = participant.id === event.creatorId;
@@ -469,19 +417,19 @@ export default function EventModal({
                                             className="creator-badge"
                                             title={t("EventModal.creatorBadge")}
                                         >
-                                  {t("EventModal.creatorStar")}
-                                </span>
+                                          {t("EventModal.creatorStar")}
+                                        </span>
                                     )}
                                   </div>
 
                                   <div className="participant-details">
-                              <span className="participant-username">
-                                @{participant.username}
-                              </span>
+                                    <span className="participant-username">
+                                      @{participant.username}
+                                    </span>
                                     {participant.ciudad && (
                                         <span className="participant-location">
-                                  📍 {participant.ciudad}
-                                </span>
+                                          📍 {participant.ciudad}
+                                        </span>
                                     )}
                                   </div>
                                 </div>

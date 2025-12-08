@@ -202,6 +202,8 @@ async function transformEvents(data, enrolledIds) {
         tags,
         isEnrolled,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -408,6 +410,8 @@ export async function getUserEvents() {
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -457,6 +461,8 @@ export async function getMyCreatedEvents() {
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -518,6 +524,8 @@ export async function getFavoriteEvents() {
           tags,
           creatorId: event.idCreador,
           isFavorite: true,
+          latitude: event.latitud ?? null,
+          longitude: event.longitud ?? null,
         };
       })
     );
