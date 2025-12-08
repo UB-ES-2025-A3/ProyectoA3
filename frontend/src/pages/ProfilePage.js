@@ -8,15 +8,19 @@ import MessageBanner from '../components/common/MessageBanner';
 // 👇 IMPORTA AQUÍ TUS IMÁGENES DE AVATAR
 // Asegúrate de crear estos archivos o adaptar las rutas a las que tú tengas
 import avatarDefault from '../assets/avatars/avatar-default.jpg';
-// import avatar1 from '../assets/avatars/avatar-1.jpg';
-// import avatar2 from '../assets/avatars/avatar-2.jpg';
-// import avatar3 from '../assets/avatars/avatar-3.jpg';
-
 import avatar1 from '../assets/avatars/avatar-1.png';
 import avatar2 from '../assets/avatars/avatar-2.png';
 import avatar3 from '../assets/avatars/avatar-3.png';
 import avatar4 from '../assets/avatars/avatar-4.png';
 import avatar5 from '../assets/avatars/avatar-5.png';
+
+import bgDefault from '../assets/avatars/bgdefault.jpg';
+import bgBlue from '../assets/avatars/bgBlue.png';
+import bgGreen from '../assets/avatars/bgGreen.png';
+import bgPurple from '../assets/avatars/bgPurple.png';
+import bgOrange from '../assets/avatars/bgOrange.png';
+import bgPink from '../assets/avatars/bgPink.png';
+import bgDark from '../assets/avatars/bgdefault.jpg';
 
 // 👇 Opciones de avatar disponibles
 const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
@@ -32,11 +36,24 @@ const THEME_MAP = {
   dark: '#2d2d2d'
 };
 
+const BACKGROUND_MAP = {
+  default: bgDefault,
+  blue: bgBlue,
+  green: bgGreen,
+  purple: bgPurple,
+  orange: bgOrange,
+  pink: bgPink,
+  dark: bgDark
+};
+
 // Lista de temas disponibles
 const THEME_OPTIONS = Object.keys(THEME_MAP);
 
 // Función para obtener el color de un tema
 const getThemeColor = (theme) => THEME_MAP[theme] || THEME_MAP.default;
+
+const getBackgroundForTheme = (theme) =>
+  BACKGROUND_MAP[theme] || BACKGROUND_MAP.default;
 
 export default function ProfilePage() {
   const [userData, setUserData] = useState(null);
@@ -348,12 +365,20 @@ export default function ProfilePage() {
   const fullName = `${userData.nombre} ${userData.apellidos}`;
 
   return (
-    <div className="profile-page">
+    <div className="profile-page"
+      style={{ backgroundImage: `url(${getBackgroundForTheme(previewTheme)})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+
+    }}
+    
+    >
       <div className="profile-container" >
         {/* Header with Profile Picture */}
         <div className="profile-header" >
           <div className="profile-avatar-container" >
-            {/* 👇 AQUÍ CAMBIAMOS LA LETRA POR LA IMAGEN */}
+            {/* AQUÍ CAMBIAMOS LA LETRA POR LA IMAGEN */}
             <div
               className="profile-avatar"
               style={{
