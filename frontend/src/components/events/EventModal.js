@@ -1,5 +1,5 @@
 // src/components/events/EventModal.js
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import "./EventModal.css";
 import userService from "../../services/userService";
@@ -8,6 +8,7 @@ import {
   addEventToFavorites,
   removeEventFromFavorites
 } from "../../services/eventService";
+import { getEventMessages, sendEventMessage } from "../../services/chatService";
 import UserProfileModal from "../users/UserProfileModal";
 import { useTranslation } from "react-i18next";
 
@@ -49,9 +50,98 @@ export default function EventModal({
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [chatError, setChatError] = useState("");
+  const chatMessagesEndRef = useRef(null);
+  const chatMessagesContainerRef = useRef(null);
 
   const toggleChat = () => {
     setIsChatOpen(prev => !prev);
+  };
+
+  // Función para hacer scroll al final del chat
+  const scrollToBottom = useCallback(() => {
+    if (chatMessagesEndRef.current) {
+      chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  // Cargar mensajes del chat cuando se abre
+  useEffect(() => {
+    const loadChatMessages = async () => {
+      if (!isChatOpen || !event?.id || !isEnrolled) {
+        setChatMessages([]);
+        setChatError("");
+        return;
+      }
+
+      setLoadingChat(true);
+      setChatError("");
+      try {
+        const messages = await getEventMessages(event.id);
+        setChatMessages(messages || []);
+        // Scroll al final después de cargar
+        setTimeout(scrollToBottom, 100);
+      } catch (error) {
+        console.error("Error al cargar mensajes del chat:", error);
+        setChatMessages([]);
+        setChatError("No se pudieron cargar los mensajes. Intenta recargar el chat.");
+      } finally {
+        setLoadingChat(false);
+      }
+    };
+
+    loadChatMessages();
+  }, [isChatOpen, event?.id, isEnrolled, scrollToBottom]);
+
+  // Scroll al final cuando se agregan nuevos mensajes
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      scrollToBottom();
+    }
+  }, [chatMessages.length, scrollToBottom]);
+
+  // Enviar mensaje
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || !event?.id || sendingMessage) return;
+
+    const messageText = chatInput.trim();
+    
+    // Validar longitud en frontend
+    if (messageText.length > 5000) {
+      setChatError("El mensaje no puede exceder 5000 caracteres");
+      return;
+    }
+
+    setChatInput("");
+    setSendingMessage(true);
+    setChatError("");
+
+    try {
+      const newMessage = await sendEventMessage(event.id, messageText);
+      // Agregar el nuevo mensaje al final (estilo WhatsApp)
+      setChatMessages(prev => [...prev, newMessage]);
+      // Scroll al final después de enviar
+      setTimeout(scrollToBottom, 100);
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+      setChatError(error.message || "No se pudo enviar el mensaje. Intenta de nuevo.");
+      // Restaurar el texto del input si falla
+      setChatInput(messageText);
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Manejar Enter en el input
+  const handleChatInputKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   const notifyFavoritesUpdated = () => {
@@ -218,37 +308,240 @@ export default function EventModal({
             <h2>Chat</h2>
           </header>
 
-          <div className="chat-messages">
-
-            {/*ESTO ES UNA PRUEBA DE CHAT*/}
-
-            <div className="message user">
-              <div className="bubble">Hola, ¿qué tal?</div>
-              <div className="avatarWrapper">
-                <img
-                    className="avatarUsuario"
-                    src={getAvatarForUser(localStorage.getItem("userId"))}
-                    alt=""
-                />
-                <img className="crownIcon" src="/icons/crown.svg" alt="crown"/> {/*TODO: Hacer todo el tema de la logica de ver si es creador, me falta ver como se consiguen los mensajes de backend para hacerlo*/}
+          <div className="chat-messages" ref={chatMessagesContainerRef}>
+            {chatError && (
+              <div className="chat-error">
+                <p>{chatError}</p>
+                <button onClick={() => setChatError("")}>✕</button>
               </div>
-            </div>
+            )}
+            {loadingChat ? (
+              <div className="chat-loading">
+                <p>Cargando mensajes...</p>
+              </div>
+            ) : chatMessages.length === 0 ? (
+              <div className="chat-empty">
+                <p>No hay mensajes aún. ¡Sé el primero en escribir!</p>
+              </div>
+            ) : (
+              (() => {
+                // Agrupar mensajes por fecha
+                const messagesByDate = {};
+                chatMessages.forEach((msg) => {
+                  // Validar que el mensaje tenga fecha
+                  if (!msg || !msg.sendedDate) {
+                    console.warn("Mensaje sin fecha:", msg);
+                    return;
+                  }
+                  const dateKey = msg.sendedDate;
+                  if (!messagesByDate[dateKey]) {
+                    messagesByDate[dateKey] = [];
+                  }
+                  messagesByDate[dateKey].push(msg);
+                });
 
-            <div className="message notUser">
-              {/*Anañir imagen de perfil*/}
-              <div className="bubble">Todo bien, ¿y tú?</div>
-            </div>
+                // Ordenar las fechas
+                const sortedDates = Object.keys(messagesByDate).sort();
 
+                return sortedDates.map((dateKey) => {
+                  const messages = messagesByDate[dateKey];
+                  
+                  // Formatear la fecha del separador
+                  let dateDisplay = dateKey; // Fallback
+                  try {
+                    if (!dateKey || typeof dateKey !== 'string') {
+                      throw new Error("Fecha inválida");
+                    }
+                    
+                    const dateObj = new Date(dateKey + 'T00:00:00');
+                    
+                    if (isNaN(dateObj.getTime())) {
+                      // Intentar parsear manualmente
+                      const [year, month, day] = dateKey.split('-').map(Number);
+                      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+                        const parsedDate = new Date(year, month - 1, day);
+                        if (!isNaN(parsedDate.getTime())) {
+                          const now = new Date();
+                          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                          const messageDay = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+                          
+                          if (messageDay.getTime() === today.getTime()) {
+                            dateDisplay = "Hoy";
+                          } else if (messageDay.getTime() === today.getTime() - 86400000) {
+                            dateDisplay = "Ayer";
+                          } else {
+                            dateDisplay = parsedDate.toLocaleDateString(locale, {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric"
+                            });
+                          }
+                        }
+                      }
+                    } else {
+                      const now = new Date();
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const messageDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+                      
+                      if (messageDay.getTime() === today.getTime()) {
+                        dateDisplay = "Hoy";
+                      } else if (messageDay.getTime() === today.getTime() - 86400000) {
+                        dateDisplay = "Ayer";
+                      } else {
+                        dateDisplay = dateObj.toLocaleDateString(locale, {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric"
+                        });
+                      }
+                    }
+                  } catch (e) {
+                    console.error("Error formateando fecha del separador:", e, dateKey);
+                    dateDisplay = dateKey || "Fecha desconocida";
+                  }
 
+                  return (
+                    <div key={dateKey} className="chat-date-group">
+                      <div className="chat-date-separator">
+                        <span>{dateDisplay}</span>
+                      </div>
+                      {messages.map((msg) => {
+                        const currentUserId = localStorage.getItem("userId");
+                        const isCurrentUser = currentUserId && msg.clientId.toString() === currentUserId.toString();
+                        
+                        // Parsear fecha y hora correctamente
+                        let messageDate;
+                        let formattedTime = "??:??";
+                        
+                        try {
+                          if (!msg.sendedDate || !msg.sendedHour) {
+                            throw new Error("Fecha u hora faltante");
+                          }
+
+                          const dateTimeStr = `${msg.sendedDate}T${msg.sendedHour}`;
+                          messageDate = new Date(dateTimeStr);
+                          
+                          if (isNaN(messageDate.getTime())) {
+                            // Intentar parsear manualmente
+                            const [datePart, timePart] = dateTimeStr.split('T');
+                            if (!datePart || !timePart) {
+                              throw new Error("Formato de fecha inválido");
+                            }
+                            
+                            const [year, month, day] = datePart.split('-').map(Number);
+                            const timeParts = timePart.split(':');
+                            const hours = Number(timeParts[0]) || 0;
+                            const minutes = Number(timeParts[1]) || 0;
+                            const seconds = timeParts[2] ? Number(timeParts[2].split('.')[0]) : 0;
+                            
+                            if (isNaN(year) || isNaN(month) || isNaN(day)) {
+                              throw new Error("Fecha inválida");
+                            }
+                            
+                            messageDate = new Date(year, month - 1, day, hours, minutes, seconds);
+                            
+                            if (isNaN(messageDate.getTime())) {
+                              throw new Error("Fecha no válida después del parseo");
+                            }
+                          }
+
+                          // Solo mostrar la hora
+                          formattedTime = messageDate.toLocaleTimeString(locale, {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          });
+                        } catch (e) {
+                          console.error("Error parsing date:", e, msg);
+                          // Usar valores por defecto si falla el parsing
+                          formattedTime = "??:??";
+                        }
+
+                        return (
+                          <div key={msg.id} className={`message-wrapper ${isCurrentUser ? "user" : "notUser"}`}>
+                            <div className={`message ${isCurrentUser ? "user" : "notUser"}`}>
+                              {isCurrentUser ? (
+                                <>
+                                  <div className="bubble">
+                                    <div className="message-text">{msg.message}</div>
+                                    <div className="message-meta">
+                                      <span className="message-time">{formattedTime}</span>
+                                    </div>
+                                  </div>
+                                  <div className="avatarWrapper">
+                                    <img
+                                      className="avatarUsuario"
+                                      src={getAvatarForUser(msg.clientId)}
+                                      alt={msg.clientUsername}
+                                    />
+                                    {msg.isCreator && (
+                                      <img
+                                        className="crownIcon"
+                                        src="/icons/crown.svg"
+                                        alt="Creador del evento"
+                                        title="Creador del evento"
+                                      />
+                                    )}
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="avatarWrapper">
+                                    <img
+                                      className="avatarUsuario"
+                                      src={getAvatarForUser(msg.clientId)}
+                                      alt={msg.clientUsername}
+                                    />
+                                    {msg.isCreator && (
+                                      <img
+                                        className="crownIcon"
+                                        src="/icons/crown.svg"
+                                        alt="Creador del evento"
+                                        title="Creador del evento"
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="bubble">
+                                    <div className="message-sender">{msg.clientName}</div>
+                                    <div className="message-text">{msg.message}</div>
+                                    <div className="message-meta">
+                                      <span className="message-time">{formattedTime}</span>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                });
+              })()
+            )}
+            <div ref={chatMessagesEndRef} />
           </div>
 
           <div className="chat-input-area">
             <input
-                type="text"
-                placeholder="Escribe un mensaje…"
-                className="chat-input"
+              type="text"
+              placeholder="Escribe un mensaje…"
+              className="chat-input"
+              value={chatInput}
+              onChange={(e) => {
+                setChatInput(e.target.value);
+                setChatError(""); // Limpiar error al escribir
+              }}
+              onKeyPress={handleChatInputKeyPress}
+              disabled={sendingMessage || !isEnrolled}
+              maxLength={5000}
             />
-            <button className="chat-send">Enviar</button>
+            <button
+              className="chat-send"
+              onClick={handleSendMessage}
+              disabled={sendingMessage || !chatInput.trim() || !isEnrolled}
+            >
+              {sendingMessage ? "Enviando..." : "Enviar"}
+            </button>
           </div>
         </div>
         <div className="modal-content">
