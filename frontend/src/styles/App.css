@@ -29,7 +29,7 @@
   --primary-color: #1565c0;
   --accent-color: #42a5f5;
   --background-color: #e3f2fd;
-  --surface-color: #ffffff;
+  --surface-color: #e3f2fd;
   --text-color: #0d47a1;
   --text-muted: #5472d3;
   --text-light: #ffffff;
@@ -38,7 +38,7 @@
   --shadow-md: 0 0.5rem 1rem rgba(21, 101, 192, 0.15);
   --navbar-gradient: linear-gradient(135deg, #42a5f5 0%, #1976d2 50%, #0d47a1 100%);
   --btn-primary-bg: linear-gradient(135deg, #42a5f5 0%, #1976d2 50%, #0d47a1 100%);
-  --card-bg: #ffffff;
+  --card-bg: #e3f2fd;
   --card-border: #bbdefb;
   --card-title-color: #1565c0;
   --success-color: #2e7d32;
@@ -50,8 +50,8 @@
   --app-bg-color: #e8f5e9;
   --primary-color: #2e7d32;
   --accent-color: #66bb6a;
-  --background-color: #e8f5e9;
-  --surface-color: #ffffff;
+  --background-color: #dcf6de;
+  --surface-color: #dcf6de;
   --text-color: #1b5e20;
   --text-muted: #4caf50;
   --text-light: #ffffff;
@@ -60,7 +60,7 @@
   --shadow-md: 0 0.5rem 1rem rgba(46, 125, 50, 0.15);
   --navbar-gradient: linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #1b5e20 100%);
   --btn-primary-bg: linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #1b5e20 100%);
-  --card-bg: #ffffff;
+  --card-bg: #dcf6de;
   --card-border: #c8e6c9;
   --card-title-color: #2e7d32;
   --success-color: #1b5e20;
@@ -72,8 +72,8 @@
   --app-bg-color: #f3e5f5;
   --primary-color: #7b1fa2;
   --accent-color: #ab47bc;
-  --background-color: #f3e5f5;
-  --surface-color: #ffffff;
+  --background-color: #f3d3f8;
+  --surface-color: #f3d3f8;
   --text-color: #4a148c;
   --text-muted: #9c27b0;
   --text-light: #ffffff;
@@ -82,7 +82,7 @@
   --shadow-md: 0 0.5rem 1rem rgba(123, 31, 162, 0.15);
   --navbar-gradient: linear-gradient(135deg, #ab47bc 0%, #8e24aa 50%, #4a148c 100%);
   --btn-primary-bg: linear-gradient(135deg, #ab47bc 0%, #8e24aa 50%, #4a148c 100%);
-  --card-bg: #ffffff;
+  --card-bg: #f3d3f8;
   --card-border: #e1bee7;
   --card-title-color: #7b1fa2;
   --success-color: #2e7d32;
@@ -94,8 +94,8 @@
   --app-bg-color: #fff3e0;
   --primary-color: #e65100;
   --accent-color: #ff9800;
-  --background-color: #fff3e0;
-  --surface-color: #ffffff;
+  --background-color: #f9e7cb;
+  --surface-color: #f9e7cb;
   --text-color: #bf360c;
   --text-muted: #f57c00;
   --text-light: #ffffff;
@@ -104,7 +104,7 @@
   --shadow-md: 0 0.5rem 1rem rgba(230, 81, 0, 0.15);
   --navbar-gradient: linear-gradient(135deg, #ffb74d 0%, #f57c00 50%, #e65100 100%);
   --btn-primary-bg: linear-gradient(135deg, #ffb74d 0%, #f57c00 50%, #e65100 100%);
-  --card-bg: #ffffff;
+  --card-bg: #f9e7cb;
   --card-border: #ffe0b2;
   --card-title-color: #e65100;
   --success-color: #2e7d32;
@@ -117,7 +117,7 @@
   --primary-color: #c2185b;
   --accent-color: #f06292;
   --background-color: #fce4ec;
-  --surface-color: #ffffff;
+  --surface-color: #fce4ec;
   --text-color: #880e4f;
   --text-muted: #e91e63;
   --text-light: #ffffff;
@@ -126,7 +126,7 @@
   --shadow-md: 0 0.5rem 1rem rgba(194, 24, 91, 0.15);
   --navbar-gradient: linear-gradient(135deg, #f06292 0%, #e91e63 50%, #880e4f 100%);
   --btn-primary-bg: linear-gradient(135deg, #f06292 0%, #e91e63 50%, #880e4f 100%);
-  --card-bg: #ffffff;
+  --card-bg: #fce4ec;
   --card-border: #f8bbd9;
   --card-title-color: #c2185b;
   --success-color: #2e7d32;
@@ -137,8 +137,10 @@
 [data-theme="dark"] {
   --app-bg-color: #121212;
   --primary-color: #bb86fc;
-  --accent-color: #03dac6;
+  --accent-color: #da0b8b;
   --background-color: #121212;
+  --card-bg:#252525;
+  --card-border: #404040;
   --surface-color: #1e1e1e;
   --text-color: #f0f0f0;
   --text-muted: #b0b0b0;
@@ -147,7 +149,7 @@
   --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
   --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
   --navbar-gradient: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 50%, #121212 100%);
-  --btn-primary-bg: linear-gradient(135deg, #bb86fc 0%, #9c64fb 50%, #7c4dff 100%);
+  --btn-primary-bg: linear-gradient(135deg, #8a8a8a 0%, #666666 50%, #424242 100%);
   --card-bg: #252525;
   --card-border: #404040;
   --card-title-color: #f0f0f0;

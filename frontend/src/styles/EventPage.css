@@ -3,8 +3,8 @@
 :root {
   --primary-color: #000000;
   --accent-color: #4f4f50;
-  --background-color: #f8f9fa;
-  --surface-color: #ffffff;
+  --background-color: var(--background-color, #f8f9fa);
+  --surface-color:var(--background-color);
   --text-color: #343a40;
   --text-muted: #6c757d;
   --border-color: #e9ecef;
@@ -16,7 +16,7 @@
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #f8f9fa;
+  background-color: var(--background-color, #f8f9fa);
   min-height: 100vh;
 }
 
@@ -41,19 +41,21 @@
   grid-template-columns: 320px 1fr;
   gap: 32px;
   align-items: flex-start;
+  background-color: var(--background-color, #f8f9fa);
 }
 
 .event-filters-panel {
   display: flex;
   flex-direction: column;
+
 }
 
 .filters-card {
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   border-radius: 18px;
   padding: 24px;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--card-border, rgba(0, 0, 0, 0.05));
   position: sticky;
   top: 100px;
 }
@@ -156,7 +158,6 @@
 .event-card .btn-primary,
 .event-page-header .btn-primary {
   background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
-  color: #fff;
 }
 
 .event-card .btn-primary:hover,
