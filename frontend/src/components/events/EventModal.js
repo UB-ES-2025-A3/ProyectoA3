@@ -219,7 +219,20 @@ export default function EventModal({
           </header>
 
           <div className="chat-messages">
-            {/* mensajes van aquí */}
+
+            {/*ESTO ES UNA PRUEBA DE CHAT*/}
+
+            <div className="message user">
+              <div className="bubble">Hola, ¿qué tal?</div>
+              <img className="avatarUsuario" src={getAvatarForUser(localStorage.getItem("userId"))} alt=""/>
+            </div>
+
+            <div className="message notUser">
+              {/*Anañir imagen de perfil*/}
+              <div className="bubble">Todo bien, ¿y tú?</div>
+            </div>
+
+
           </div>
 
           <div className="chat-input-area">
