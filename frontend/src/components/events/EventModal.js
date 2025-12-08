@@ -104,7 +104,7 @@ export default function EventModal({
 
       const result = await userService.getParticipantsByIds(participantIds);
 
-      if (result.success) {
+      if (result.success && Array.isArray(result.data)) {
         setParticipants(result.data);
         if (event.creatorId) {
           const creatorResult = await userService.getUserProfile(event.creatorId);
@@ -384,7 +384,7 @@ export default function EventModal({
                         <div className="loading-spinner"></div>
                         <p>{t("EventModal.sections.loadingParticipants")}</p>
                       </div>
-                  ) : participants.length > 0 ? (
+                  ) : Array.isArray(participants) && participants.length > 0 ? (
                       <div className="participants-list">
                         {participants.map((participant) => {
                           const isCreator = participant.id === event.creatorId;
@@ -417,19 +417,19 @@ export default function EventModal({
                                             className="creator-badge"
                                             title={t("EventModal.creatorBadge")}
                                         >
-                                  {t("EventModal.creatorStar")}
-                                </span>
+                                          {t("EventModal.creatorStar")}
+                                        </span>
                                     )}
                                   </div>
 
                                   <div className="participant-details">
-                              <span className="participant-username">
-                                @{participant.username}
-                              </span>
+                                    <span className="participant-username">
+                                      @{participant.username}
+                                    </span>
                                     {participant.ciudad && (
                                         <span className="participant-location">
-                                  📍 {participant.ciudad}
-                                </span>
+                                          📍 {participant.ciudad}
+                                        </span>
                                     )}
                                   </div>
                                 </div>

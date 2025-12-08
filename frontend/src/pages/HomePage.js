@@ -1,23 +1,20 @@
 // src/pages/HomePage.js
-import React, { useEffect, useState, useCallback } from "react";
-import { getEvents, joinEvent, leaveEvent } from "../services/eventService";
-import userService from '../services/userService';
-import { mockEvents } from "../mocks/events.mock";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { homePageMockEvents } from "../mocks/homePageEvents.mock";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
 import CreateEventForm from "../components/events/CreateEventForm";
 import MessageBanner from "../components/common/MessageBanner";
+import EventMap from "../components/map/EventMap";
 import "../styles/HomePage.css";
 
 // Iconos
-import { FaLanguage, FaUsers, FaSearch, FaMapMarkerAlt, FaFeatherAlt } from "react-icons/fa"; 
+import { FaLanguage, FaUsers, FaSearch, FaFeatherAlt, FaBookmark } from "react-icons/fa";
 
 export default function HomePage() {
   const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [banner, setBanner] = useState({ type: "success", message: "" });
-  const [me, setMe] = useState(null);
   
   // Estados para los filtros
   const [filters, setFilters] = useState({
@@ -26,24 +23,148 @@ export default function HomePage() {
     language: "",
     minAge: "",
     maxPersons: "",
-    tags: []
+    tags: [],
+    onlyFavorites: false
   });
 
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
-  const [availableTags, setAvailableTags] = useState([]);
   const [joiningEventId, setJoiningEventId] = useState(null);
+  const [favoriteEventIds, setFavoriteEventIds] = useState([]);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  // Estado para el evento que está siendo hover (para centrar el mapa)
+  const [hoveredEvent, setHoveredEvent] = useState(null);
+  
+  // Estado para el evento fijado en el mapa (se mantiene incluso al cerrar el modal)
+  const [pinnedEvent, setPinnedEvent] = useState(null);
+  
   // Estado para el formulario de crear evento
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [createFormInitialLocation, setCreateFormInitialLocation] = useState(null);
+  const [createFormInitialCoordinates, setCreateFormInitialCoordinates] = useState(null);
+  
+  // Estado para el modal de confirmación de creación desde el mapa
+  const [mapClickConfirmation, setMapClickConfirmation] = useState({
+    isOpen: false,
+    location: null,
+    coordinates: null
+  });
 
-  // Función para aplicar filtros (memoizada para evitar error de dependencias)
-  const applyFilters = useCallback(() => {
-    let filtered = events.filter(event => {
+  // Función para obtener favoritos del localStorage
+  const getStoredFavoriteIds = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return [];
+    }
+
+    try {
+      const stored = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
+      return Array.isArray(stored) ? stored : [];
+    } catch (error) {
+      console.warn('No se pudieron cargar los favoritos almacenados.', error);
+      return [];
+    }
+  }, []);
+
+
+  // Cargar eventos mock al montar el componente (solo para HomePage)
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        setLoading(true);
+        // Usar mocks con coordenadas para el mapa
+        // Transformar los eventos mock al formato del frontend (similar a eventService.transformEvents)
+        const eventsData = homePageMockEvents.map(event => {
+          // Construir startDate desde fecha y hora
+          const startDate = event.fecha && event.hora 
+            ? `${event.fecha}T${event.hora}Z`
+            : event.startDate || new Date().toISOString();
+          
+          // Normalizar tags
+          const tags = Array.isArray(event.tags) ? event.tags : [];
+          
+          // Normalizar languages desde idiomas_permitidos
+          const languages = event.idiomas_permitidos 
+            ? event.idiomas_permitidos.split(',').map(l => l.trim()).filter(l => l)
+            : event.languages || [];
+          
+          // Normalizar participants
+          const participants = event.participants 
+            ? event.participants.map(p => typeof p === 'object' ? p.id : p)
+            : [];
+          
+          // Construir restrictions string
+          let restrictions = "";
+          if (event.restricciones) {
+            if (typeof event.restricciones === 'object') {
+              if (event.restricciones.edad_minima) {
+                restrictions = `Edad mínima: ${event.restricciones.edad_minima} años`;
+              } else if (event.restricciones.requisitos) {
+                restrictions = event.restricciones.requisitos;
+              } else if (event.restricciones.max_personas) {
+                restrictions = `Grupo máx. ${event.restricciones.max_personas}`;
+              }
+            } else {
+              restrictions = event.restricciones;
+            }
+          }
+          
+          return {
+            id: event.id?.toString() || `mock-${Math.random()}`,
+            name: event.titulo || event.name || "Evento sin título",
+            location: event.lugar || event.location || "Ubicación por confirmar",
+            startDate,
+            description: event.descripcion || event.description || "",
+            restrictions,
+            imageUrl: event.imageUrl || "",
+            capacity: event.max_personas || event.capacity || 10,
+            participants,
+            languages: languages.length ? languages : ["es"],
+            tags,
+            isEnrolled: event.isEnrolled || false,
+            id_creador: event.id_creador,
+            creatorId: event.id_creador, // Alias para compatibilidad
+            latitude: event.latitude,
+            longitude: event.longitude,
+          };
+        });
+        
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Error cargando eventos:', error);
+        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
+  // Calcular tags disponibles según los eventos cargados (memoizado)
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set();
+    events.forEach(event => {
+      if (Array.isArray(event.tags)) {
+        event.tags.forEach(tag => {
+          if (tag && typeof tag === "string") {
+            tagsSet.add(tag);
+          }
+        });
+      }
+    });
+    return Array.from(tagsSet).sort((a, b) => a.localeCompare(b));
+  }, [events]);
+
+  // Calcular eventos filtrados usando useMemo para optimización
+  const filteredEvents = useMemo(() => {
+    const favoritesSet = new Set(favoriteEventIds.map(id => id.toString()));
+
+    return events.filter(event => {
       // Filtro por texto (título o descripción)
       if (filters.searchText) {
         const searchLower = filters.searchText.toLowerCase();
@@ -62,7 +183,7 @@ export default function HomePage() {
 
       // Filtro por capacidad máxima
       if (filters.maxPersons) {
-        if (event.capacity > parseInt(filters.maxPersons)) {
+        if (event.capacity > parseInt(filters.maxPersons, 10)) {
           return false;
         }
       }
@@ -83,66 +204,40 @@ export default function HomePage() {
         }
       }
 
+      // Filtro por favoritos
+      if (filters.onlyFavorites) {
+        if (!favoritesSet.has(event.id?.toString())) {
+          return false;
+        }
+      }
+
       return true;
     });
+  }, [events, filters, favoriteEventIds]);
 
-   setFilteredEvents(filtered);
-}, [events, filters]);
-
-  // Cargar eventos al montar el componente
+  // Cargar favoritos al montar el componente
   useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoading(true);
-        const eventsData = await getEvents();
-        setEvents(eventsData);
-      } catch (error) {
-        console.error('Error cargando eventos:', error);
-        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
-      } finally {
-        setLoading(false);
-      }
+    setFavoriteEventIds(getStoredFavoriteIds());
+  }, [getStoredFavoriteIds]);
+
+  // Escuchar cambios en favoritos
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const handleFavoritesUpdated = () => {
+      setFavoriteEventIds(getStoredFavoriteIds());
     };
 
-    loadEvents();
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdated);
+    window.addEventListener('storage', handleFavoritesUpdated);
 
-    (async () => {
-      const uid = localStorage.getItem('userId') || localStorage.getItem('id') || null;
-      if (!uid) return;
-      try {
-        const res = await userService.getUserProfile(uid);
-        if (res.success) {
-          const user = res.data?.data ?? res.data;
-          setMe(user);
-        } else {
-          console.warn('No se pudo cargar perfil:', res.error);
-        }
-      } catch (err) {
-        console.warn('Error cargando perfil:', err);
-      }
-    })();
-  }, []);
-
-  // Calcular tags disponibles según los eventos cargados
-  useEffect(() => {
-    const tagsSet = new Set();
-    events.forEach(event => {
-      if (Array.isArray(event.tags)) {
-        event.tags.forEach(tag => {
-          if (tag && typeof tag === "string") {
-            tagsSet.add(tag);
-          }
-        });
-      }
-    });
-    setAvailableTags(Array.from(tagsSet).sort((a, b) => a.localeCompare(b)));
-  }, [events]);
-
-  // Aplicar filtros cuando cambien eventos o filtros
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
+    return () => {
+      window.removeEventListener('favoritesUpdated', handleFavoritesUpdated);
+      window.removeEventListener('storage', handleFavoritesUpdated);
+    };
+  }, [getStoredFavoriteIds]);
 
 
   // Cerrar filtros al hacer clic fuera
@@ -187,27 +282,86 @@ export default function HomePage() {
     });
   };
 
-  // Función para abrir el modal
+  // Función para resetear todos los filtros
+  const resetFilters = () => {
+    setFilters({
+      searchText: "",
+      location: "",
+      language: "",
+      minAge: "",
+      maxPersons: "",
+      tags: [],
+      onlyFavorites: false
+    });
+  };
+
+  // Función para abrir el modal (click en la tarjeta)
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
+    // Fijar el evento en el mapa cuando se hace click
+    if (event && event.latitude && event.longitude) {
+      setPinnedEvent(event);
+    }
+  };
+  
+  // Función para centrar el mapa cuando se hace hover sobre un evento
+  const handleEventHover = (event) => {
+    if (event && event.latitude && event.longitude) {
+      setHoveredEvent(event);
+    }
+  };
+  
+  // Función para quitar el hover del mapa
+  const handleEventHoverLeave = () => {
+    setHoveredEvent(null);
   };
 
   // Función para cerrar el modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
+    // No se quita pinnedEvent, así el mapa mantiene la ubicación
   };
+  
+  // Función para desfijar el evento del mapa
+  const handleUnpinEvent = useCallback(() => {
+    setPinnedEvent(null);
+  }, []);
 
-  // Función para abrir el formulario de creación
-  const handleOpenCreateForm = () => {
-    setIsCreateFormOpen(true);
-  };
 
   // Función para cerrar el formulario de creación
   const handleCloseCreateForm = () => {
     setIsCreateFormOpen(false);
+    setCreateFormInitialLocation(null);
+    setCreateFormInitialCoordinates(null);
   };
+
+  // Función para manejar clicks en el mapa
+  const handleMapClick = useCallback((locationData) => {
+    // Mostrar modal de confirmación en lugar de abrir directamente el formulario
+    setMapClickConfirmation({
+      isOpen: true,
+      location: locationData.location,
+      coordinates: {
+        latitude: locationData.latitude,
+        longitude: locationData.longitude
+      }
+    });
+  }, []);
+
+  // Función para confirmar la creación de evento desde el mapa
+  const handleConfirmMapClick = useCallback(() => {
+    setCreateFormInitialLocation(mapClickConfirmation.location);
+    setCreateFormInitialCoordinates(mapClickConfirmation.coordinates);
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+    setIsCreateFormOpen(true);
+  }, [mapClickConfirmation]);
+
+  // Función para cancelar la creación de evento desde el mapa
+  const handleCancelMapClick = useCallback(() => {
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+  }, []);
 
   // Función para manejar la creación de evento exitosa
   const handleEventCreated = () => {
@@ -215,10 +369,13 @@ export default function HomePage() {
     setBanner({ type: "success", message: "Evento creado correctamente!" });
     setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     
-    // Recargar eventos
+    // Recargar eventos mock (en HomePage usamos mocks)
     const loadEvents = async () => {
       try {
-        const eventsData = await getEvents();
+        const eventsData = homePageMockEvents.map(event => ({
+          ...event,
+          participants: event.participants.map(p => p.id),
+        }));
         setEvents(eventsData);
       } catch (error) {
         console.error('Error recargando eventos:', error);
@@ -227,19 +384,11 @@ export default function HomePage() {
     loadEvents();
   };
 
-  // Función para unirse a un evento
+  // Función para unirse a un evento (simulado con mocks en HomePage)
   const handleJoinEvent = async (eventId) => {
     try {
       setJoiningEventId(eventId);
-      // Primero recargar eventos para tener el estado más actualizado
-      const currentEvents = await getEvents();
-      const event = currentEvents.find(e => e.id === eventId);
-      
-      if (!event) {
-        setBanner({ type: "error", message: "Evento no encontrado." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-        return;
-      }
+      const event = events.find(e => e.id === eventId);
       
       if (!event) {
         setBanner({ type: "error", message: "Evento no encontrado." });
@@ -255,17 +404,24 @@ export default function HomePage() {
       }
       
       // Verificar si ya está apuntado
-      if (event.isEnrolled) {
+      const currentUserId = localStorage.getItem('userId') || 'me';
+      if (event.participants.includes(currentUserId) || event.isEnrolled) {
         setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Llamar al servicio
-      await joinEvent(eventId);
-      
-      // Recargar los eventos para obtener el estado actualizado
-      const updatedEvents = await getEvents();
+      // Simular unirse al evento (en HomePage usamos mocks, no llamamos al backend)
+      const updatedEvents = events.map(e => {
+        if (e.id === eventId) {
+          return {
+            ...e,
+            participants: [...e.participants, currentUserId],
+            isEnrolled: true
+          };
+        }
+        return e;
+      });
       setEvents(updatedEvents);
       
       // Actualizar el evento seleccionado si está abierto el modal
@@ -280,7 +436,6 @@ export default function HomePage() {
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     } catch (error) {
       console.error('Error al apuntarse al evento:', error);
-      // Si el error es que ya está apuntado, mostrar mensaje apropiado
       const errorMessage = error.message || '';
       if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
           errorMessage.toLowerCase().includes('apuntado')) {
@@ -295,7 +450,7 @@ export default function HomePage() {
     }
   };
 
-  // Función para salirse de un evento
+  // Función para salirse de un evento (simulado con mocks en HomePage)
   const handleLeaveEvent = async (eventId) => {
     try {
       const event = events.find(e => e.id === eventId);
@@ -307,17 +462,24 @@ export default function HomePage() {
       }
       
       // Verificar si está apuntado
-      if (!event.isEnrolled) {
+      const currentUserId = localStorage.getItem('userId') || 'me';
+      if (!event.participants.includes(currentUserId) && !event.isEnrolled) {
         setBanner({ type: "warning", message: "No estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Llamar al servicio
-      await leaveEvent(eventId);
-      
-      // Recargar los eventos para obtener el estado actualizado
-      const updatedEvents = await getEvents();
+      // Simular salirse del evento (en HomePage usamos mocks, no llamamos al backend)
+      const updatedEvents = events.map(e => {
+        if (e.id === eventId) {
+          return {
+            ...e,
+            participants: e.participants.filter(id => id !== currentUserId),
+            isEnrolled: false
+          };
+        }
+        return e;
+      });
       setEvents(updatedEvents);
       
       // Actualizar el evento seleccionado si está abierto el modal
@@ -349,10 +511,10 @@ export default function HomePage() {
               <div>
                 <h1>Encuentra tu próximo evento</h1>
                 <p>Explora intercambios culturales y reuniones cerca de ti.</p>
+                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '8px' }}>
+                  💡 Haz clic en el mapa para crear un nuevo evento
+                </p>
               </div>
-              <button className="btn btn-primary btn-create" onClick={handleOpenCreateForm}>
-                + Crear Evento
-              </button>
             </div>
             
             {/* Buscador Principal */}
@@ -656,20 +818,24 @@ export default function HomePage() {
                     </div>
                   )}
                 </div>
+
+                <button
+                  type="button"
+                  className={`filter-icon-btn favorite-filter-btn ${filters.onlyFavorites ? 'active' : ''}`}
+                  onClick={() => handleFilterChange('onlyFavorites', !filters.onlyFavorites)}
+                  title="Mostrar solo eventos guardados"
+                >
+                  <FaBookmark />
+                  <span>Solo favoritos</span>
+                  <span className="favorite-count">{favoriteEventIds.length}</span>
+                </button>
               </div>
               
               {/* Botón para limpiar filtros */}
-              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons || (filters.tags && filters.tags.length > 0)) && (
+              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons || filters.onlyFavorites || (filters.tags && filters.tags.length > 0)) && (
                 <button 
                   className="clear-filters-btn"
-                  onClick={() => setFilters({
-                    searchText: "",
-                    location: "",
-                    language: "",
-                    minAge: "",
-                    maxPersons: "",
-                    tags: []
-                  })}
+                  onClick={resetFilters}
                 >
                   Limpiar filtros
                 </button>
@@ -698,6 +864,8 @@ export default function HomePage() {
                       onJoin={() => handleJoinEvent(event.id)}
                       onLeave={() => handleLeaveEvent(event.id)}
                       onClick={() => handleEventClick(event)}
+                      onMouseEnter={() => handleEventHover(event)}
+                      onMouseLeave={handleEventHoverLeave}
                     />
                   );
                 })}
@@ -707,14 +875,7 @@ export default function HomePage() {
                 <p>No se encontraron eventos con los filtros aplicados.</p>
                 <button 
                   className="btn btn-outline"
-                  onClick={() => setFilters({
-                    searchText: "",
-                    location: "",
-                    language: "",
-                    minAge: "",
-                    maxPersons: "",
-                    tags: []
-                  })}
+                  onClick={resetFilters}
                 >
                   Limpiar filtros
                 </button>
@@ -723,19 +884,15 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* MITAD DERECHA: Mapa (placeholder por ahora) */}
+        {/* MITAD DERECHA: Mapa */}
         <div className="home-right">
-          <div className="map-placeholder">
-            <h3>🗺️ Mapa de Eventos</h3>
-            <p>Aquí se mostrará un mapa interactivo con la ubicación de los eventos.</p>
-            <p><strong>Próximas implementaciones:</strong></p>
-            <ul>
-              <li>Integración con Google Maps API</li>
-              <li>Marcadores de eventos en el mapa</li>
-              <li>Filtrado en tiempo real</li>
-              <li>Información de eventos al hacer clic en marcadores</li>
-            </ul>
-          </div>
+          <EventMap 
+            selectedEvent={hoveredEvent || pinnedEvent || selectedEvent} 
+            events={filteredEvents}
+            onUnpin={handleUnpinEvent}
+            isPinned={!!pinnedEvent}
+            onMapClick={handleMapClick}
+          />
         </div>
       </div>
       {banner.message && <MessageBanner type={banner.type} message={banner.message} />}
@@ -750,13 +907,7 @@ export default function HomePage() {
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
-            // Recargar eventos y actualizar el evento seleccionado
-            const updatedEvents = await getEvents();
-            setEvents(updatedEvents);
-            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
-            if (updatedEvent) {
-              setSelectedEvent(updatedEvent);
-            }
+            // handleJoinEvent ya actualiza el estado internamente
           }}
           onLeave={async () => {
             await handleLeaveEvent(selectedEvent.id);
@@ -764,11 +915,39 @@ export default function HomePage() {
         />
       )}
 
+      {/* Modal de Confirmación para crear evento desde el mapa */}
+      {mapClickConfirmation.isOpen && (
+        <div className="modal-overlay" onClick={handleCancelMapClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>¿Crear evento aquí?</h2>
+              <button className="modal-close" onClick={handleCancelMapClick}>✕</button>
+            </div>
+            <div className="modal-body">
+              <p>¿Quieres añadir un evento en esta ubicación?</p>
+              <p className="modal-location-info">
+                <strong>Ubicación:</strong> {mapClickConfirmation.location}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-outline" onClick={handleCancelMapClick}>
+                Cancelar
+              </button>
+              <button className="btn btn-primary" onClick={handleConfirmMapClick}>
+                Sí, crear evento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Crear Evento */}
       <CreateEventForm
         isOpen={isCreateFormOpen}
         onClose={handleCloseCreateForm}
         onSuccess={handleEventCreated}
+        initialLocation={createFormInitialLocation}
+        initialCoordinates={createFormInitialCoordinates}
       />
     </div>
   );

@@ -59,7 +59,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--background-color, rgba(0, 0, 0, 0.1));
   border: none;
   border-radius: 50%;
   width: 45px;
@@ -75,12 +75,12 @@
 }
 
 .modal-close:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--border-color, rgba(0, 0, 0, 0.2));
   color: var(--text-color, #333);
 }
 
 .modal-header {
-  display: grid;
+  display: flex;
   grid-template-columns: 300px 1fr;
   gap: 30px;
   padding: 30px;
@@ -88,15 +88,13 @@
 }
 
 .modal-image {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  height: 200px;
+  flex: 0 0 250px; /* ancho fijo para la imagen */
 }
 
 .modal-image img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  border-radius: 12px;
   object-fit: cover;
 }
 
@@ -104,6 +102,8 @@
   position: absolute;
   top: 15px;
   right: 15px;
+  padding-top: 10px;
+  padding-right: 50px;
 }
 
 .status-badge {
@@ -144,8 +144,8 @@
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  background: var(--surface-color, rgba(255, 255, 255, 0.9));
+  border: 1px solid var(--border-color, transparent);
   cursor: pointer;
   padding: 12px;
   display: flex;
@@ -153,14 +153,14 @@
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.15));
   z-index: 10;
 }
 
 .modal-favorite-btn:hover {
-  background: rgba(255, 255, 255, 1);
+  background: var(--background-color, rgba(255, 255, 255, 1));
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.2));
 }
 
 .modal-favorite-btn:active {
@@ -238,8 +238,8 @@
 }
 
 .restriction-badge {
-  background: #fff3cd;
-  color: #7a3b00;
+  background: var(--border-color, #fff3cd);
+  color: var(--text-color, #7a3b00);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -254,9 +254,11 @@
 
 .detail-item {
   padding: 15px;
-  background: var(--background-color, #f8f9fa);
+  background: var(--card-bg, #f8f9fa);
   border-radius: 8px;
   font-size: 0.95rem;
+  color: var(--text-color, #333);
+  border: 1px solid var(--border-color, transparent);
 }
 
 .detail-item strong {
@@ -679,7 +681,7 @@
   .modal-body {
     padding: 20px;
   }
-  
+
   .modal-footer {
     padding: 20px;
   }
