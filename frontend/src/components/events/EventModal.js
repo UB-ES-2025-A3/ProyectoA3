@@ -224,7 +224,14 @@ export default function EventModal({
 
             <div className="message user">
               <div className="bubble">Hola, ¿qué tal?</div>
-              <img className="avatarUsuario" src={getAvatarForUser(localStorage.getItem("userId"))} alt=""/>
+              <div className="avatarWrapper">
+                <img
+                    className="avatarUsuario"
+                    src={getAvatarForUser(localStorage.getItem("userId"))}
+                    alt=""
+                />
+                <img className="crownIcon" src="/icons/crown.svg" alt="crown"/> {/*TODO: Hacer todo el tema de la logica de ver si es creador, me falta ver como se consiguen los mensajes de backend para hacerlo*/}
+              </div>
             </div>
 
             <div className="message notUser">

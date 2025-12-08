@@ -568,11 +568,28 @@
   border-bottom-left-radius: 4px;
 }
 
+.avatarWrapper {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+}
+
 .avatarUsuario {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+
+.crownIcon {
+  position: absolute;
+  top: -12px;     /* sube la corona */
+  left: 50%;
+  transform: translateX(-50%);  /* centra justo sobre la cabeza */
+  width: 22px;    /* ajusta tamaño */
+  height: auto;
+  pointer-events: none;
 }
 
 .chat-input-area {
