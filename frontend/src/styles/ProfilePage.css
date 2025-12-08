@@ -141,6 +141,16 @@
   transition: all 0.3s ease;
 }
 
+/* Espaciado uniforme: las secciones fuera de profile-content (como Tema) deben tener el mismo gap (24px) */
+.profile-container > .profile-section {
+  margin-bottom: 24px;
+}
+
+/* Correcció d'espaiat per assegurar un GAP uniforme entre caixetes */
+.profile-section > *:last-child {
+  margin-bottom: 0!important;
+}
+
 .section-title {
   font-size: 1.45rem;
   font-weight: 600;
