@@ -141,7 +141,7 @@
 /* Sección Quiénes Somos */
 .about-us {
   padding: 5rem 2rem;
-  background: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+  background: linear-gradient(135deg, #4f4f50 0%, #222222 50%, #000000 100%);
   min-height: auto;
   position: relative;
   overflow: hidden;
@@ -181,7 +181,7 @@
 }
 
 .team-member {
-  background: #ffffff;
+  background: linear-gradient(135deg, #cbcbcb 0%, #828282 50%, #4f4f50 100%);
   border-radius: 16px;
   padding: 2rem;
   text-align: center;
@@ -213,13 +213,13 @@
 .team-member__name {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #18222b;
   margin-bottom: 0.5rem;
 }
 
 .team-member__role {
   font-size: 1rem;
-  color: #828282;
+  color: #383838;
   font-weight: 600;
   margin-bottom: 1rem;
   text-transform: uppercase;
@@ -228,7 +228,7 @@
 
 .team-member__description {
   font-size: 0.95rem;
-  color: #6c757d;
+  color: #343333;
   line-height: 1.6;
   margin: 0;
 }
