@@ -214,7 +214,22 @@ export default function EventModal({
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className={`modal-wrapper ${isChatOpen ? "isChatOpen" : ""}`}>
         <div className={`chat-panel ${isChatOpen ? "open" : ""}`}>
-          <h2>Chat del evento</h2>
+          <header className="chat-header">
+            <h2>Chat</h2>
+          </header>
+
+          <div className="chat-messages">
+            {/* mensajes van aquí */}
+          </div>
+
+          <div className="chat-input-area">
+            <input
+                type="text"
+                placeholder="Escribe un mensaje…"
+                className="chat-input"
+            />
+            <button className="chat-send">Enviar</button>
+          </div>
         </div>
         <div className="modal-content">
           {isEnrolled && (
