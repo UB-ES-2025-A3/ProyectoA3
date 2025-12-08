@@ -119,19 +119,17 @@ public class EventoService {
       if (req.fecha().isBefore(LocalDate.now())) {
         throw new ValidationException("La fecha del evento no puede ser anterior a hoy");
       }
-      // Validación de latitud
-      if (req.latitud() == null) {
-        throw new ValidationException("La latitud es requerida");
+      // Validación de latitud (opcional, pero si se proporciona debe ser válida)
+      if (req.latitud() != null) {
+        if (req.latitud() < -90 || req.latitud() > 90) {
+          throw new ValidationException("Latitud inválida");
+        }
       }
-      if (req.latitud() < -90 || req.latitud() > 90) {
-        throw new ValidationException("Latitud inválida");
-      }
-      // Validación de longitud
-      if (req.longitud() == null) {
-        throw new ValidationException("La longitud es requerida");
-      }
-      if (req.longitud() < -180 || req.longitud() > 180) {
-        throw new ValidationException("Longitud inválida");
+      // Validación de longitud (opcional, pero si se proporciona debe ser válida)
+      if (req.longitud() != null) {
+        if (req.longitud() < -180 || req.longitud() > 180) {
+          throw new ValidationException("Longitud inválida");
+        }
       }
       var e = new Evento();
       e.setFecha(req.fecha());

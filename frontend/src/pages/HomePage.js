@@ -1,6 +1,6 @@
 // src/pages/HomePage.js
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { homePageMockEvents } from "../mocks/homePageEvents.mock";
+import { getEvents, joinEvent, leaveEvent, getFavoriteEvents } from "../services/eventService";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
 import CreateEventForm from "../components/events/CreateEventForm";
@@ -54,85 +54,33 @@ export default function HomePage() {
     coordinates: null
   });
 
-  // Función para obtener favoritos del localStorage
-  const getStoredFavoriteIds = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return [];
+  // Cargar favoritos desde la API
+  const loadFavoriteIds = useCallback(async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setFavoriteEventIds([]);
+      return;
     }
 
     try {
-      const stored = JSON.parse(localStorage.getItem('favoriteEvents') || '[]');
-      return Array.isArray(stored) ? stored : [];
+      const favoriteEvents = await getFavoriteEvents();
+      const ids = favoriteEvents.map(event => event.id?.toString()).filter(Boolean);
+      setFavoriteEventIds(ids);
     } catch (error) {
-      console.warn('No se pudieron cargar los favoritos almacenados.', error);
-      return [];
+      console.warn('No se pudieron cargar los favoritos desde la API.', error);
+      setFavoriteEventIds([]);
     }
   }, []);
 
 
-  // Cargar eventos mock al montar el componente (solo para HomePage)
+  // Cargar eventos al montar el componente
   useEffect(() => {
     const loadEvents = async () => {
       try {
         setLoading(true);
-        // Usar mocks con coordenadas para el mapa
-        // Transformar los eventos mock al formato del frontend (similar a eventService.transformEvents)
-        const eventsData = homePageMockEvents.map(event => {
-          // Construir startDate desde fecha y hora
-          const startDate = event.fecha && event.hora 
-            ? `${event.fecha}T${event.hora}Z`
-            : event.startDate || new Date().toISOString();
-          
-          // Normalizar tags
-          const tags = Array.isArray(event.tags) ? event.tags : [];
-          
-          // Normalizar languages desde idiomas_permitidos
-          const languages = event.idiomas_permitidos 
-            ? event.idiomas_permitidos.split(',').map(l => l.trim()).filter(l => l)
-            : event.languages || [];
-          
-          // Normalizar participants
-          const participants = event.participants 
-            ? event.participants.map(p => typeof p === 'object' ? p.id : p)
-            : [];
-          
-          // Construir restrictions string
-          let restrictions = "";
-          if (event.restricciones) {
-            if (typeof event.restricciones === 'object') {
-              if (event.restricciones.edad_minima) {
-                restrictions = `Edad mínima: ${event.restricciones.edad_minima} años`;
-              } else if (event.restricciones.requisitos) {
-                restrictions = event.restricciones.requisitos;
-              } else if (event.restricciones.max_personas) {
-                restrictions = `Grupo máx. ${event.restricciones.max_personas}`;
-              }
-            } else {
-              restrictions = event.restricciones;
-            }
-          }
-          
-          return {
-            id: event.id?.toString() || `mock-${Math.random()}`,
-            name: event.titulo || event.name || "Evento sin título",
-            location: event.lugar || event.location || "Ubicación por confirmar",
-            startDate,
-            description: event.descripcion || event.description || "",
-            restrictions,
-            imageUrl: event.imageUrl || "",
-            capacity: event.max_personas || event.capacity || 10,
-            participants,
-            languages: languages.length ? languages : ["es"],
-            tags,
-            isEnrolled: event.isEnrolled || false,
-            id_creador: event.id_creador,
-            creatorId: event.id_creador, // Alias para compatibilidad
-            latitude: event.latitude,
-            longitude: event.longitude,
-          };
-        });
-        
-        setEvents(eventsData);
+        // Usar getEvents() que respeta la configuración USE_MOCKS y puede usar la base de datos
+        const eventsData = await getEvents();
+        setEvents(eventsData || []);
       } catch (error) {
         console.error('Error cargando eventos:', error);
         setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
@@ -188,6 +136,20 @@ export default function HomePage() {
         }
       }
 
+      // Filtro por edad mínima
+      if (filters.minAge) {
+        const filterMinAge = parseInt(filters.minAge, 10);
+        if (!isNaN(filterMinAge)) {
+          // Si el evento tiene edad mínima y es mayor que el filtro, excluirlo
+          if (event.edadMinima !== undefined && event.edadMinima !== null) {
+            const eventMinAge = parseInt(event.edadMinima, 10);
+            if (!isNaN(eventMinAge) && eventMinAge > filterMinAge) {
+              return false;
+            }
+          }
+        }
+      }
+
       // Filtro por idioma
       if (filters.language) {
         if (!event.languages || !event.languages.includes(filters.language)) {
@@ -217,27 +179,25 @@ export default function HomePage() {
 
   // Cargar favoritos al montar el componente
   useEffect(() => {
-    setFavoriteEventIds(getStoredFavoriteIds());
-  }, [getStoredFavoriteIds]);
+    loadFavoriteIds();
+  }, [loadFavoriteIds]);
 
-  // Escuchar cambios en favoritos
+  // Escuchar actualizaciones de favoritos
   useEffect(() => {
     if (typeof window === 'undefined') {
       return undefined;
     }
 
     const handleFavoritesUpdated = () => {
-      setFavoriteEventIds(getStoredFavoriteIds());
+      loadFavoriteIds();
     };
 
     window.addEventListener('favoritesUpdated', handleFavoritesUpdated);
-    window.addEventListener('storage', handleFavoritesUpdated);
 
     return () => {
       window.removeEventListener('favoritesUpdated', handleFavoritesUpdated);
-      window.removeEventListener('storage', handleFavoritesUpdated);
     };
-  }, [getStoredFavoriteIds]);
+  }, [loadFavoriteIds]);
 
 
   // Cerrar filtros al hacer clic fuera
@@ -364,71 +324,57 @@ export default function HomePage() {
   }, []);
 
   // Función para manejar la creación de evento exitosa
-  const handleEventCreated = () => {
+  const handleEventCreated = async () => {
     setIsCreateFormOpen(false);
     setBanner({ type: "success", message: "Evento creado correctamente!" });
     setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     
-    // Recargar eventos mock (en HomePage usamos mocks)
-    const loadEvents = async () => {
-      try {
-        const eventsData = homePageMockEvents.map(event => ({
-          ...event,
-          participants: event.participants.map(p => p.id),
-        }));
-        setEvents(eventsData);
-      } catch (error) {
-        console.error('Error recargando eventos:', error);
-      }
-    };
-    loadEvents();
+    // Recargar eventos desde el backend
+    try {
+      const eventsData = await getEvents();
+      setEvents(eventsData || []);
+    } catch (error) {
+      console.error('Error recargando eventos:', error);
+      setBanner({ type: "error", message: "Error al recargar los eventos." });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
   };
 
-  // Función para unirse a un evento (simulado con mocks en HomePage)
+  // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
       setJoiningEventId(eventId);
+
       const event = events.find(e => e.id === eventId);
-      
       if (!event) {
         setBanner({ type: "error", message: "Evento no encontrado." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
-      
-      // Verificar si ya está lleno
+
       if (event.participants.length >= event.capacity) {
         setBanner({ type: "error", message: "El evento está completo. No puedes apuntarte." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
-      
-      // Verificar si ya está apuntado
-      const currentUserId = localStorage.getItem('userId') || 'me';
-      if (event.participants.includes(currentUserId) || event.isEnrolled) {
+
+      if (event.isEnrolled) {
         setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Simular unirse al evento (en HomePage usamos mocks, no llamamos al backend)
-      const updatedEvents = events.map(e => {
-        if (e.id === eventId) {
-          return {
-            ...e,
-            participants: [...e.participants, currentUserId],
-            isEnrolled: true
-          };
-        }
-        return e;
-      });
-      setEvents(updatedEvents);
+      await joinEvent(eventId);
+
+      // Recargar eventos desde el backend
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents || []);
       
       // Actualizar el evento seleccionado si está abierto el modal
       if (selectedEvent && selectedEvent.id === eventId) {
-        const updatedEvent = updatedEvents.find(e => e.id === eventId);
-        if (updatedEvent) {
-          setSelectedEvent(updatedEvent);
+        const updatedSelected = updatedEvents.find(e => e.id === eventId);
+        if (updatedSelected) {
+          setSelectedEvent(updatedSelected);
         }
       }
       
@@ -438,19 +384,19 @@ export default function HomePage() {
       console.error('Error al apuntarse al evento:', error);
       const errorMessage = error.message || '';
       if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
-          errorMessage.toLowerCase().includes('apuntado')) {
+          errorMessage.toLowerCase().includes('apuntado') ||
+          errorMessage.toLowerCase().includes('already')) {
         setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
       } else {
         setBanner({ type: "error", message: errorMessage || "Error al apuntarse al evento." });
       }
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
-    }
-    finally {
+    } finally {
       setJoiningEventId(null);
     }
   };
 
-  // Función para salirse de un evento (simulado con mocks en HomePage)
+  // Función para salirse de un evento
   const handleLeaveEvent = async (eventId) => {
     try {
       const event = events.find(e => e.id === eventId);
@@ -461,32 +407,23 @@ export default function HomePage() {
         return;
       }
       
-      // Verificar si está apuntado
-      const currentUserId = localStorage.getItem('userId') || 'me';
-      if (!event.participants.includes(currentUserId) && !event.isEnrolled) {
+      if (!event.isEnrolled) {
         setBanner({ type: "warning", message: "No estás apuntado a este evento." });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Simular salirse del evento (en HomePage usamos mocks, no llamamos al backend)
-      const updatedEvents = events.map(e => {
-        if (e.id === eventId) {
-          return {
-            ...e,
-            participants: e.participants.filter(id => id !== currentUserId),
-            isEnrolled: false
-          };
-        }
-        return e;
-      });
-      setEvents(updatedEvents);
+      await leaveEvent(eventId);
+
+      // Recargar eventos desde el backend
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents || []);
       
       // Actualizar el evento seleccionado si está abierto el modal
       if (selectedEvent && selectedEvent.id === eventId) {
-        const updatedEvent = updatedEvents.find(e => e.id === eventId);
-        if (updatedEvent) {
-          setSelectedEvent(updatedEvent);
+        const updatedSelected = updatedEvents.find(e => e.id === eventId);
+        if (updatedSelected) {
+          setSelectedEvent(updatedSelected);
         }
       }
       

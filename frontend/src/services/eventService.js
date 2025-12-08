@@ -195,6 +195,7 @@ async function transformEvents(data, enrolledIds) {
         startDate,
         description: event.descripcion ?? "",
         restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+        edadMinima: event.edadMinima ?? null,
         imageUrl,
         capacity,
         participants,
@@ -258,7 +259,9 @@ export async function createEvent(eventData) {
     tags: eventData.etiquetas ? [eventData.etiquetas] : [],  // Convertir a array de tags
     titulo: eventData.titulo,
     descripcion: eventData.descripcion || "",
-    idCreador: creatorId
+    idCreador: creatorId,
+    latitud: eventData.latitud !== undefined && eventData.latitud !== null ? eventData.latitud : null,
+    longitud: eventData.longitud !== undefined && eventData.longitud !== null ? eventData.longitud : null
   };
 
   console.log("Enviando evento al backend:", eventoCreateDTO);

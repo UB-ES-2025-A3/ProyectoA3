@@ -34,8 +34,8 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLoc
         edadMinima: '',
         lugar: '',
         descripcion: '',
-        latitude: '',
-        longitude: ''
+        latitud: '',
+        longitud: ''
       });
       setErrors({});
       setSubmitError('');
@@ -52,10 +52,18 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLoc
         }));
       }
       if (initialCoordinates) {
+        // Convertir a string y reemplazar comas por puntos (formato europeo -> internacional)
+        const lat = initialCoordinates.latitude != null 
+          ? String(initialCoordinates.latitude).replace(',', '.') 
+          : '';
+        const lng = initialCoordinates.longitude != null 
+          ? String(initialCoordinates.longitude).replace(',', '.') 
+          : '';
+        
         setFormData(prev => ({
           ...prev,
-          latitud: initialCoordinates.latitude?.toString() || '',
-          longitud: initialCoordinates.longitude?.toString() || ''
+          latitud: lat,
+          longitud: lng
         }));
       }
     }
@@ -142,23 +150,56 @@ const handleChange = (e) => {
       newErrors.lugar = t("createEvent.validation.placeRequired");
     }
 
+    // Validación de latitud y longitud
+    // Si vienen del mapa (initialCoordinates), son requeridas
+    // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+    const hasInitialCoordinates = initialCoordinates?.latitude != null && initialCoordinates?.longitude != null;
+    
     // Validación de latitud
-    if (!formData.latitud && formData.latitud !== 0) {
-      newErrors.latitud = 'La latitud es requerida';
+    if (hasInitialCoordinates) {
+      // Si vienen del mapa, deben estar rellenas
+      if (!formData.latitud || formData.latitud.trim() === '') {
+        newErrors.latitud = 'La latitud es requerida';
+      } else {
+        // Convertir coma a punto para parseFloat
+        const latStr = String(formData.latitud).replace(',', '.');
+        const lat = parseFloat(latStr);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          newErrors.latitud = 'Latitud inválida';
+        }
+      }
     } else {
-      const lat = parseFloat(formData.latitud);
-      if (isNaN(lat) || lat < -90 || lat > 90) {
-        newErrors.latitud = 'Latitud inválida';
+      // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+      if (formData.latitud && formData.latitud.trim() !== '') {
+        const latStr = String(formData.latitud).replace(',', '.');
+        const lat = parseFloat(latStr);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          newErrors.latitud = 'Latitud inválida';
+        }
       }
     }
 
     // Validación de longitud
-    if (!formData.longitud && formData.longitud !== 0) {
-      newErrors.longitud = 'La longitud es requerida';
+    if (hasInitialCoordinates) {
+      // Si vienen del mapa, deben estar rellenas
+      if (!formData.longitud || formData.longitud.trim() === '') {
+        newErrors.longitud = 'La longitud es requerida';
+      } else {
+        // Convertir coma a punto para parseFloat
+        const lngStr = String(formData.longitud).replace(',', '.');
+        const lng = parseFloat(lngStr);
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          newErrors.longitud = 'Longitud inválida';
+        }
+      }
     } else {
-      const lng = parseFloat(formData.longitud);
-      if (isNaN(lng) || lng < -180 || lng > 180) {
-        newErrors.longitud = 'Longitud inválida';
+      // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+      if (formData.longitud && formData.longitud.trim() !== '') {
+        const lngStr = String(formData.longitud).replace(',', '.');
+        const lng = parseFloat(lngStr);
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          newErrors.longitud = 'Longitud inválida';
+        }
       }
     }
 
@@ -177,6 +218,13 @@ const handleChange = (e) => {
     setSubmitError('');
 
     try {
+      // Convertir coordenadas, reemplazando coma por punto si es necesario
+      const latStr = formData.latitud ? String(formData.latitud).replace(',', '.') : '';
+      const lngStr = formData.longitud ? String(formData.longitud).replace(',', '.') : '';
+      
+      const lat = latStr ? parseFloat(latStr) : null;
+      const lng = lngStr ? parseFloat(lngStr) : null;
+
       const response = await createEvent({
         titulo: formData.titulo,
         descripcion: formData.descripcion,
@@ -184,8 +232,8 @@ const handleChange = (e) => {
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,
-        latitud: parseFloat(formData.latitud),
-        longitud: parseFloat(formData.longitud),
+        latitud: lat,
+        longitud: lng,
         restricciones: {
           idiomasRequerido: formData.idioma ? [formData.idioma] : [],
           plazasDisponibles: parseInt(formData.plazasDisponibles),
@@ -466,69 +514,27 @@ const handleChange = (e) => {
           </div>
 
           <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="lugar">Lugar *</label>
-            <input
-              type="text"
-              id="lugar"
-              name="lugar"
-              value={formData.lugar}
-              onChange={handleChange}
-              placeholder="Ej: Café Central"
-              className={errors.lugar ? 'error' : ''}
-              disabled={loading}
-            />
-            {errors.lugar && <span className="error-message">{errors.lugar}</span>}
+            <div className="form-group">
+              <label htmlFor="lugar">Lugar *</label>
+              <input
+                type="text"
+                id="lugar"
+                name="lugar"
+                value={formData.lugar}
+                onChange={handleChange}
+                placeholder="Ej: Café Central"
+                className={errors.lugar ? 'error' : ''}
+                disabled={loading}
+              />
+              {errors.lugar && <span className="error-message">{errors.lugar}</span>}
+            </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="latitude">Latitud (opcional)</label>
-              <input
-                type="number"
-                id="latitude"
-                name="latitude"
-                value={formData.latitude}
-                onChange={handleChange}
-                placeholder="Ej: 40.4168"
-                step="any"
-                disabled={loading}
-                readOnly={!!initialCoordinates?.latitude}
-                style={initialCoordinates?.latitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
-              />
-              {initialCoordinates?.latitude && (
-                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
-                  Rellenado automáticamente desde el mapa
-                </span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="longitude">Longitud (opcional)</label>
-              <input
-                type="number"
-                id="longitude"
-                name="longitude"
-                value={formData.longitude}
-                onChange={handleChange}
-                placeholder="Ej: -3.7038"
-                step="any"
-                disabled={loading}
-                readOnly={!!initialCoordinates?.longitude}
-                style={initialCoordinates?.longitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
-              />
-              {initialCoordinates?.longitude && (
-                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
-                  Rellenado automáticamente desde el mapa
-                </span>
-              )}
-            </div>
-          </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="latitud">Latitud *</label>
+              <label htmlFor="latitud">
+                Latitud {initialCoordinates?.latitude != null ? '*' : '(opcional)'}
+              </label>
               <input
                 type="number"
                 id="latitud"
@@ -541,12 +547,21 @@ const handleChange = (e) => {
                 placeholder="Ej: 41.3851"
                 className={errors.latitud ? 'error' : ''}
                 disabled={loading}
+                readOnly={!!initialCoordinates?.latitude}
+                style={initialCoordinates?.latitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
+              {initialCoordinates?.latitude && (
+                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
+                  Rellenado automáticamente desde el mapa
+                </span>
+              )}
               {errors.latitud && <span className="error-message">{errors.latitud}</span>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="longitud">Longitud *</label>
+              <label htmlFor="longitud">
+                Longitud {initialCoordinates?.longitude != null ? '*' : '(opcional)'}
+              </label>
               <input
                 type="number"
                 id="longitud"
@@ -559,7 +574,14 @@ const handleChange = (e) => {
                 placeholder="Ej: 2.1734"
                 className={errors.longitud ? 'error' : ''}
                 disabled={loading}
+                readOnly={!!initialCoordinates?.longitude}
+                style={initialCoordinates?.longitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
+              {initialCoordinates?.longitude && (
+                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
+                  Rellenado automáticamente desde el mapa
+                </span>
+              )}
               {errors.longitud && <span className="error-message">{errors.longitud}</span>}
             </div>
           </div>
