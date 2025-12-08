@@ -109,7 +109,7 @@ export default function ProfilePage() {
         // 3. Eventos Creados
         setUserEvents(createdEventsData);
 
-        // 4. Cargar tema desde API
+        // 4. Cargar tema desde API (con fallback a localStorage)
         if (temaResult.success && temaResult.data?.tema) {
           const theme = temaResult.data.tema;
           setSavedTheme(theme);
@@ -118,10 +118,15 @@ export default function ProfilePage() {
           // Disparar evento para que el resto de la app sepa el tema
           window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme } }));
         } else {
-          setSavedTheme('default');
-          setPreviewTheme('default');
-          localStorage.setItem('profileTheme', 'default');
-          window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: 'default' } }));
+          // Si falla la API, usar tema de localStorage como fallback
+          const cachedTheme = localStorage.getItem('profileTheme') || 'default';
+          setSavedTheme(cachedTheme);
+          setPreviewTheme(cachedTheme);
+          // No sobrescribir localStorage ni disparar evento si ya tenemos un tema válido cacheado
+          if (!localStorage.getItem('profileTheme')) {
+            localStorage.setItem('profileTheme', 'default');
+            window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: 'default' } }));
+          }
         }
 
         // 5. Avatar desde localStorage

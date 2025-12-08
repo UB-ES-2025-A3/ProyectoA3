@@ -64,9 +64,14 @@ function App() {
         }
       } catch (error) {
         console.error('Error cargando tema:', error);
-        // Usar tema por defecto si hay error
-        setCurrentTheme(DEFAULT_THEME);
-        applyTheme(DEFAULT_THEME);
+        const cachedTheme = localStorage.getItem('profileTheme');
+        if (cachedTheme) {
+          setCurrentTheme(cachedTheme);
+          applyTheme(cachedTheme);
+        } else {
+          setCurrentTheme(DEFAULT_THEME);
+          applyTheme(DEFAULT_THEME);
+        }
       }
     };
 
