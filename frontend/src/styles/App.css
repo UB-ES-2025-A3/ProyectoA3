@@ -294,6 +294,34 @@
   color: var(--text-color);
 }
 
+/* Modal en tema oscuro */
+[data-theme="dark"] .modal-content {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-section h3 {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .participant-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .detail-item {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
 
 
 

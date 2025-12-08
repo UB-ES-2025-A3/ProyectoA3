@@ -52,7 +52,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--background-color, rgba(0, 0, 0, 0.1));
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -68,7 +68,7 @@
 }
 
 .modal-close:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--border-color, rgba(0, 0, 0, 0.2));
   color: var(--text-color, #333);
 }
 
@@ -135,8 +135,8 @@
   position: absolute;
   bottom: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  background: var(--surface-color, rgba(255, 255, 255, 0.9));
+  border: 1px solid var(--border-color, transparent);
   cursor: pointer;
   padding: 12px;
   display: flex;
@@ -144,14 +144,14 @@
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.15));
   z-index: 10;
 }
 
 .modal-favorite-btn:hover {
-  background: rgba(255, 255, 255, 1);
+  background: var(--background-color, rgba(255, 255, 255, 1));
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.2));
 }
 
 .modal-favorite-btn:active {
@@ -229,8 +229,8 @@
 }
 
 .restriction-badge {
-  background: #fff3cd;
-  color: #7a3b00;
+  background: var(--border-color, #fff3cd);
+  color: var(--text-color, #7a3b00);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -245,9 +245,11 @@
 
 .detail-item {
   padding: 15px;
-  background: var(--background-color, #f8f9fa);
+  background: var(--card-bg, #f8f9fa);
   border-radius: 8px;
   font-size: 0.95rem;
+  color: var(--text-color, #333);
+  border: 1px solid var(--border-color, transparent);
 }
 
 .detail-item strong {
