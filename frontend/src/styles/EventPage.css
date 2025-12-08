@@ -152,6 +152,21 @@
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
+/* Botones específicos que usan el color del tema: Apuntarse, Desapuntarse, +Crear Evento */
+.event-card .btn-primary,
+.event-page-header .btn-primary {
+  background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
+  color: #fff;
+}
+
+.event-card .btn-primary:hover,
+.event-page-header .btn-primary:hover {
+  background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
 .btn-large {
   padding: 15px 30px;
   font-size: 1.1rem;
