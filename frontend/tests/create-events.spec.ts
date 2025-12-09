@@ -1,27 +1,17 @@
 import { test, expect, Page } from '@playwright/test';
 
-// Helper de login reutilizable
 async function login(page: Page) {
-  // Ir a la pantalla de login
   await page.goto('/#/login');
 
-  await page.getByLabel('Nombre de Usuario o Correo').fill('no_borrar');
+  await page.getByLabel('Nombre de Usuario o Correo').fill('d');
   await page.getByLabel('Contraseña').fill('123456aA_');
 
-  const loginButton = page.getByRole('button', { name: /iniciar sesión/i });
-  const currentUrl = page.url();
+  await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
-  // Esperar a que la URL cambie (si se queda en /#/login es que el login no ha ido bien)
-  await Promise.all([
-    page.waitForURL(
-      url => url.toString() !== currentUrl,
-      { timeout: 30000 }
-    ),
-    loginButton.click(),
-  ]);
-
-  console.log('URL después de login:', page.url());
+  // Esperar a que cargue la página de inicio
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 }
+
 
 // Helper para abrir el modal de crear evento desde el mapa
 async function abrirModalCrearEvento(page: Page) {
