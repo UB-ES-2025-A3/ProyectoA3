@@ -50,7 +50,7 @@ test('CreateEvent - muestra errores cuando los campos obligatorios están vacío
 
   // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
   // Necesitamos limpiarlo para probar la validación
-  const lugarInput = page.getByLabelText(/lugar/i);
+  const lugarInput = page.getByLabel(/Lugar/i);
   if (await lugarInput.isVisible({ timeout: 2000 }).catch(() => false)) {
     await lugarInput.clear();
   }
