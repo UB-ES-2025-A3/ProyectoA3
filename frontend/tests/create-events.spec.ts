@@ -4,13 +4,13 @@ import { test, expect, Page } from '@playwright/test';
 async function login(page: Page) {
   await page.goto('/#/login');
 
-  await page.getByLabel('Nombre de Usuario o Correo').fill('d');
+  await page.getByLabel('Nombre de Usuario o Correo').fill('no_borrar');
   await page.getByLabel('Contraseña').fill('123456aA_');
 
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
   // Página de inicio cargada
-  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
+  await expect(page.getByTestId('home-title')).toBeVisible();
 }
 
 async function abrirModalCrearEvento(page: Page) {

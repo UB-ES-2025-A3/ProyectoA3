@@ -444,7 +444,9 @@ export default function HomePage() {
           <header className="home-main-header">
             <div className="header-top">
               <div>
-                <h1>{t("HomePage.header.title")}</h1>
+<h1 data-testid="home-title">
+  {t("HomePage.header.title")}
+</h1>
                 <p>{t("HomePage.header.subtitle")}</p>
                 <p
                   style={{
