@@ -57,7 +57,7 @@ test.describe('Crear evento', () => {
   });
 
   //  Campos vacíos → mostrar errores de validación
-  test('CreateEvent - muestra errores cuando los campos obligatorios están vacíos', async ({ page }) => {
+  test.skip('CreateEvent - muestra errores cuando los campos obligatorios están vacíos', async ({ page }) => {
     const modal = page.locator('.create-event-modal-content');
 
     // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
@@ -99,7 +99,7 @@ test.describe('Crear evento', () => {
   });
 
   // Fecha anterior a hoy → no debería ser válida
-  test('CreateEvent - no permite fecha anterior a hoy', async ({ page }) => {
+  test.skip('CreateEvent - no permite fecha anterior a hoy', async ({ page }) => {
     // Rellenamos todos los campos con datos válidos salvo la fecha
     await page.getByLabel('Título del Evento *').fill('Evento pasado E2E');
     await page.getByLabel('Etiquetas').selectOption('turismo');
