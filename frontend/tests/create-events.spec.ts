@@ -7,27 +7,38 @@ async function login(page: Page) {
   await page.getByLabel('Nombre de Usuario o Correo').fill('no_borrar');
   await page.getByLabel('Contraseña').fill('123456aA_');
 
-  await page.getByRole('button', { name: /iniciar sesión/i }).click();
+  await Promise.all([
+    // Espera a que cambie la URL a la home (ajusta el patrón a tu app)
+    page.waitForURL('**/#/**'), // ejemplo; usa el hash real de tu ruta de home
+    page.getByRole('button', { name: /iniciar sesión/i }).click(),
+  ]);
 
-  // Página de inicio cargada
+  // Y ahora espera a algo típico de la página de inicio
+  await page.waitForSelector('.leaflet-container', { timeout: 30000 });
 }
 
 async function abrirModalCrearEvento(page: Page) {
-  // En HomePage, el evento se crea haciendo clic en el mapa
-  // Primero esperamos a que el mapa esté visible
-  await page.waitForSelector('.leaflet-container', { timeout: 10000 });
-  // Esperar un poco más para que el mapa esté completamente cargado
-  await page.waitForTimeout(1000);
-  
-  // Hacer clic en el mapa (coordenadas aproximadas del centro)
+  // Aquí ya deberíamos estar en la home y con el mapa visible
   const mapContainer = page.locator('.leaflet-container');
+
+  // (Por si acaso, un pequeño wait extra o assert)
+  await expect(mapContainer).toBeVisible({ timeout: 5000 });
+
+  // Hacer clic en el mapa (coordenadas aproximadas del centro)
   await mapContainer.click({ position: { x: 400, y: 300 } });
-  
-  // Esperar y confirmar el modal de confirmación
+
+  // Esperar un poco para que salga el modal de confirmación
   await page.waitForTimeout(1000);
+
   const confirmButton = page.getByRole('button', { name: /sí|confirmar|aceptar|crear/i });
-  if (await confirmButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+
+  // isVisible no hace auto-wait largo, así que el timeout de 3000 no sirve de mucho.
+  // Mejor usar waitFor con catch:
+  try {
+    await confirmButton.waitFor({ state: 'visible', timeout: 3000 });
     await confirmButton.click();
+  } catch {
+    // Si no hay modal de confirmación, seguimos sin más.
   }
 
   // Esperar a que aparezca el formulario de crear evento

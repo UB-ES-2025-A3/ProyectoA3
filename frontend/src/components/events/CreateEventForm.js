@@ -286,9 +286,12 @@ const handleChange = (e) => {
         </button>
         
         <div className="modal-header">
-          <h2>{t("createEvent.modal.title")}</h2>
+          <h2 data-testid="create-event-title">
+            {t("createEvent.modal.title")}
+          </h2>
           <p>{t("createEvent.modal.subtitle")}</p>
         </div>
+
 
         {submitError && (
           <div
