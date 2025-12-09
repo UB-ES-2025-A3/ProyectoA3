@@ -62,6 +62,7 @@ function SplashPage() {
   return (
     <>
       <section className="splash">
+
         <div className="splash__overlay" />
         <div className="splash__content">
           <p className="splash__tagline">Organiza, comparte y vive experiencias</p>
@@ -79,10 +80,20 @@ function SplashPage() {
             </button>
           </div>
         </div>
+        <button
+          className="about-scroll-btn"
+          onClick={() =>
+            document.getElementById("about-us-section").scrollIntoView({ behavior: "smooth" })
+          }
+        >
+          Quiénes somos ↓
+        </button>
+
       </section>
 
-      <section className="about-us">
+      <section className="about-us" id="about-us-section">
         <div className="about-us__container">
+          
           <h2 className="about-us__title">Quiénes Somos</h2>
           <p className="about-us__subtitle">
             Un equipo de desarrolladores apasionados por crear soluciones innovadoras

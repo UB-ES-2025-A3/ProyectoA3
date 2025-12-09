@@ -138,6 +138,34 @@
   }
 }
 
+.about-scroll-btn {
+  position: relative;
+  position: absolute;
+  top: 73%;       /* distancia desde arriba */
+  left: 50%;      /* distancia desde la izquierda */
+  transform: translateX(-50%);
+  color: #bdbdbd;
+  background: none;
+  border: none;
+  font-family: 'Voga', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.about-scroll-btn:hover {
+  opacity: 0.7;
+}
+
+.about-scroll-btn:focus {
+  outline: none;
+}
+
+
 /* Sección Quiénes Somos */
 .about-us {
   padding: 5rem 2rem;
