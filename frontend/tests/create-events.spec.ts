@@ -48,6 +48,13 @@ test('CreateEvent - muestra errores cuando los campos obligatorios están vacío
   
   const modal = page.locator('.create-event-modal-content');
 
+  // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
+  // Necesitamos limpiarlo para probar la validación
+  const lugarInput = page.getByLabelText(/lugar/i);
+  if (await lugarInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await lugarInput.clear();
+  }
+
   await modal.getByRole('button', { name: 'Crear Evento' }).click();
 
   await expect(
