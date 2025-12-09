@@ -417,6 +417,26 @@
     color: var(--text-color);
 }
 
+/* Botón de filtro de favoritos */
+.favorite-filter-btn {
+    position: relative;
+}
+
+.favorite-count {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: inherit;
+}
+
+.favorite-filter-btn.active .favorite-count {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
 
 /* ----------------------------------- */
 /* Mitad Derecha (home-right) */
@@ -427,8 +447,9 @@
     padding: 20px;
     background-color: var(--surface-color);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
+    min-height: 0; /* Importante para que el mapa se ajuste correctamente */
 }
 
 .events-section h2 {

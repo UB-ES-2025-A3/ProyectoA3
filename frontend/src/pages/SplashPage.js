@@ -10,6 +10,7 @@ import avatar5 from "../assets/avatars/avatar-5.png";
 import avatarDefault from "../assets/avatars/avatar-default.jpg";
 
 function SplashPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogin = () => {

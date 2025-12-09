@@ -256,7 +256,9 @@ export async function createEvent(eventData) {
     tags: eventData.etiquetas ? [eventData.etiquetas] : [],  // Convertir a array de tags
     titulo: eventData.titulo,
     descripcion: eventData.descripcion || "",
-    idCreador: creatorId
+    idCreador: creatorId,
+    longitud: eventData.longitud || null,
+    latitud: eventData.latitud || null
   };
 
   console.log("Enviando evento al backend:", eventoCreateDTO);

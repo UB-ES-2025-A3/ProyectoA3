@@ -1,9 +1,29 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
+// 🔹 Mock de i18n para estos tests
+jest.mock('react-i18next', () => ({
+  useTranslation: () => {
+    const translations = {
+      // Mensajes de error/no usuario
+      'profile.noUserLogged': 'No hay usuario logueado',
+      'profile.loadError': 'No se pudo cargar el perfil',
+
+      // (el resto de claves las dejamos como key por defecto)
+    };
+
+    return {
+      t: (key) => translations[key] || key,
+      i18n: { language: 'es', changeLanguage: () => Promise.resolve() },
+    };
+  },
+}));
+
 import ProfilePage from './ProfilePage';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
+
 
 // Mocks
 jest.mock('../services/userService');

@@ -4,16 +4,41 @@ import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import SplashPage from './SplashPage';
 
-// Mock del hook useNavigate
+// 🔹 Mock de useNavigate
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
 }));
 
+// 🔹 Mock de i18n para SplashPage
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      // 👇 OJO AL ORDEN: primero subtitle, luego tagline, luego title
+      if (/subtitle/i.test(key)) {
+        return "Gestiona els teus esdeveniments des d'un sol lloc. Col·labora amb el teu equip i inspira a nous participants.";
+      }
+      if (/tagline/i.test(key)) {
+        return "Organitza, comparteix i viu experiències";
+      }
+      if (/title/i.test(key)) {
+        return "EventManager";
+      }
+      if (/login/i.test(key)) {
+        return "Iniciar sesión";
+      }
+      if (/register/i.test(key)) {
+        return "Registrarse";
+      }
+      return key;
+    },
+    i18n: { language: 'ca', changeLanguage: () => Promise.resolve() },
+  }),
+}));
+
 describe('SplashPage', () => {
   beforeEach(() => {
-    // Limpiar mocks antes de cada test
     mockNavigate.mockClear();
   });
 
@@ -24,18 +49,13 @@ describe('SplashPage', () => {
       </BrowserRouter>
     );
 
-    // Verificar que el título principal está presente
     expect(screen.getByText('EventManager')).toBeInTheDocument();
-
-    // Verificar que el tagline está presente
-    expect(screen.getByText('Organitza, comparteix i viu experiències')).toBeInTheDocument();
-
-    // Verificar que el subtítulo está presente
+    expect(
+      screen.getByText('Organitza, comparteix i viu experiències')
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Gestiona els teus esdeveniments des d'un sol lloc/i)
     ).toBeInTheDocument();
-
-    // Verificar que los botones están presentes
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /registrarse/i })).toBeInTheDocument();
   });
