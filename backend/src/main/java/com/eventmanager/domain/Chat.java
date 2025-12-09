@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "\"Chat\"")
+@Table(name = "chat_evento")
 public class Chat {
 
   @Id
@@ -29,7 +29,7 @@ public class Chat {
 
   @NotNull
   @ManyToOne
-  @JoinColumn(name = "event_id", nullable = false)
+  @JoinColumn(name = "evento_id", nullable = false)
   private Evento evento;
 
   @NotBlank
