@@ -1,0 +1,74 @@
+name: Frontend Test & Coverage
+
+on:
+  push:
+    branches: [ main, pre_prod, dev ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-test-coverage.yml'
+  pull_request:
+    branches: [ main, pre_prod, dev ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-test-coverage.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run tests with coverage
+        working-directory: ./frontend
+        env:
+          CI: true
+        run: npm run test:coverage
+
+      - name: Upload coverage HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/lcov-report
+
+      - name: Upload coverage lcov file
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-lcov
+          path: frontend/coverage/lcov.info
+
+      # --- Generar resumen de coverage en markdown ---
+      - name: Generate coverage summary
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: frontend/coverage/lcov.info
+          format: markdown
+          output: file
+          badge: false
+          fail_below_min: false
+
+      # --- Comentar en la PR con resumen de COVERAGE del FRONTEND ---
+      - name: Comment coverage summary on PR
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: code-coverage-results.md
+          header: frontend-coverage
