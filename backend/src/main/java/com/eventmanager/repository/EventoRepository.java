@@ -1,12 +1,13 @@
 package com.eventmanager.repository;
 
-import com.eventmanager.domain.Evento;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-import java.util.Optional;
+import com.eventmanager.domain.Evento;
 
 public interface EventoRepository extends JpaRepository<Evento, Long> {
   
@@ -15,7 +16,7 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
 
   @Query(value = """
     SELECT e.*
-    FROM evento e
+    FROM eventos_new e
     WHERE
         (
             e.restricciones->>'edad_minima' IS NULL
@@ -24,13 +25,13 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
         AND (
               (
                   SELECT COUNT(*)
-                  FROM evento_cliente ec
+                  FROM participantes_evento ec
                   WHERE ec.evento_id = e.id
               ) < (e.restricciones->>'max_personas')::int
         
             OR EXISTS (
-                SELECT 1 FROM evento_cliente ec2
-                WHERE ec2.evento_id = e.id AND ec2.cliente_id = :userId
+                SELECT 1 FROM participantes_evento ec2
+                WHERE ec2.evento_id = e.id AND ec2.participante_id = :userId
             )
         )
     ORDER BY e.fecha ASC, e.hora ASC
