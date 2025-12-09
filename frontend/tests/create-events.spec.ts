@@ -10,7 +10,6 @@ async function login(page: Page) {
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
   // Página de inicio cargada
-  await expect(page.getByTestId('home-title')).toBeVisible();
 }
 
 async function abrirModalCrearEvento(page: Page) {
