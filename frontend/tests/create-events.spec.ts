@@ -2,43 +2,56 @@ import { test, expect, Page } from '@playwright/test';
 
 // Helper de login reutilizable
 async function login(page: Page) {
+  // Ir a la pantalla de login
   await page.goto('/#/login');
 
   await page.getByLabel('Nombre de Usuario o Correo').fill('no_borrar');
   await page.getByLabel('Contraseña').fill('123456aA_');
 
+  const loginButton = page.getByRole('button', { name: /iniciar sesión/i });
+  const currentUrl = page.url();
+
+  // Esperar a que la URL cambie (si se queda en /#/login es que el login no ha ido bien)
   await Promise.all([
-    // Espera a que cambie la URL a la home (ajusta el patrón a tu app)
-    page.waitForURL('**/#/**'), // ejemplo; usa el hash real de tu ruta de home
-    page.getByRole('button', { name: /iniciar sesión/i }).click(),
+    page.waitForURL(
+      url => url.toString() !== currentUrl,
+      { timeout: 30000 }
+    ),
+    loginButton.click(),
   ]);
 
-  // Y ahora espera a algo típico de la página de inicio
-  await page.waitForSelector('.leaflet-container', { timeout: 30000 });
+  console.log('URL después de login:', page.url());
 }
 
+// Helper para abrir el modal de crear evento desde el mapa
 async function abrirModalCrearEvento(page: Page) {
-  // Aquí ya deberíamos estar en la home y con el mapa visible
+  console.log('abrirModalCrearEvento, URL actual:', page.url());
+
   const mapContainer = page.locator('.leaflet-container');
 
-  // (Por si acaso, un pequeño wait extra o assert)
-  await expect(mapContainer).toBeVisible({ timeout: 5000 });
+  try {
+    // Esperar a que el mapa sea visible (hasta 30s, para CI)
+    await mapContainer.waitFor({ state: 'visible', timeout: 30000 });
+  } catch (e) {
+    console.error('El mapa (.leaflet-container) no se ha renderizado a tiempo');
+    // Captura para ver qué hay en CI cuando esto falle
+    await page.screenshot({ path: 'no-map.png', fullPage: true });
+    throw e;
+  }
 
   // Hacer clic en el mapa (coordenadas aproximadas del centro)
   await mapContainer.click({ position: { x: 400, y: 300 } });
 
-  // Esperar un poco para que salga el modal de confirmación
+  // Esperar un poco a que salga el modal de confirmación (si lo hay)
   await page.waitForTimeout(1000);
 
   const confirmButton = page.getByRole('button', { name: /sí|confirmar|aceptar|crear/i });
 
-  // isVisible no hace auto-wait largo, así que el timeout de 3000 no sirve de mucho.
-  // Mejor usar waitFor con catch:
   try {
     await confirmButton.waitFor({ state: 'visible', timeout: 3000 });
     await confirmButton.click();
   } catch {
-    // Si no hay modal de confirmación, seguimos sin más.
+    // Si no hay modal de confirmación, seguimos sin romper
   }
 
   // Esperar a que aparezca el formulario de crear evento
@@ -54,49 +67,49 @@ test.describe('Crear evento', () => {
   });
 
   //  Campos vacíos → mostrar errores de validación
-test('CreateEvent - muestra errores cuando los campos obligatorios están vacíos', async ({ page }) => {
-  
-  const modal = page.locator('.create-event-modal-content');
+  test('CreateEvent - muestra errores cuando los campos obligatorios están vacíos', async ({ page }) => {
+    const modal = page.locator('.create-event-modal-content');
 
-  // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
-  // Necesitamos limpiarlo para probar la validación
-  const lugarInput = page.getByLabel(/Lugar/i);
-  if (await lugarInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await lugarInput.clear();
-  }
+    // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
+    // Necesitamos limpiarlo para probar la validación
+    const lugarInput = page.getByLabel(/Lugar/i);
+    try {
+      await lugarInput.waitFor({ state: 'visible', timeout: 2000 });
+      await lugarInput.clear();
+    } catch {
+      // Si no está visible por lo que sea, seguimos; el expect de error fallará y lo veremos
+      console.warn('El input de Lugar no estaba visible para limpiar su valor');
+    }
 
-  await modal.getByRole('button', { name: 'Crear Evento' }).click();
+    await modal.getByRole('button', { name: 'Crear Evento' }).click();
 
-  await expect(
-    page.getByText('El título del evento es requerido')
-  ).toBeVisible();
+    await expect(
+      page.getByText('El título del evento es requerido')
+    ).toBeVisible();
 
-  await expect(
-    page.getByText('La fecha es requerida')
-  ).toBeVisible();
+    await expect(
+      page.getByText('La fecha es requerida')
+    ).toBeVisible();
 
-  await expect(
-    page.getByText('La hora es requerida')
-  ).toBeVisible();
+    await expect(
+      page.getByText('La hora es requerida')
+    ).toBeVisible();
 
-  await expect(
-    page.getByText('Debes seleccionar un idioma')
-  ).toBeVisible();
+    await expect(
+      page.getByText('Debes seleccionar un idioma')
+    ).toBeVisible();
 
-  await expect(
-    page.getByText('Las plazas disponibles son requeridas')
-  ).toBeVisible();
+    await expect(
+      page.getByText('Las plazas disponibles son requeridas')
+    ).toBeVisible();
 
-  await expect(
-    page.getByText('El lugar es requerido')
-  ).toBeVisible();
-});
-
+    await expect(
+      page.getByText('El lugar es requerido')
+    ).toBeVisible();
+  });
 
   // Fecha anterior a hoy → no debería ser válida
   test('CreateEvent - no permite fecha anterior a hoy', async ({ page }) => {
-
-
     // Rellenamos todos los campos con datos válidos salvo la fecha
     await page.getByLabel('Título del Evento *').fill('Evento pasado E2E');
     await page.getByLabel('Etiquetas').selectOption('turismo');
@@ -116,14 +129,14 @@ test('CreateEvent - muestra errores cuando los campos obligatorios están vacío
 
     // 1º intentamos ver si tu validación de React se ejecuta
     const reactError = page.getByText('La fecha no puede ser anterior a hoy');
-    if (await reactError.count()) {
+    if ((await reactError.count()) > 0) {
       await expect(reactError).toBeVisible();
       return;
     }
 
     // 2º fallback: comprobamos la validación HTML5 del propio input (min=HOY)
     const isValid = await fechaInput.evaluate(
-      (el) => (el as HTMLInputElement).checkValidity()
+      el => (el as HTMLInputElement).checkValidity()
     );
 
     expect(isValid).toBe(false);
@@ -155,7 +168,5 @@ test('CreateEvent - muestra errores cuando los campos obligatorios están vacío
     await expect(
       page.getByText('Evento creado correctamente!')
     ).toBeVisible();
-
-
   });
 });
