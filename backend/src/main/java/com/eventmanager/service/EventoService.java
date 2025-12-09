@@ -157,7 +157,7 @@ public class EventoService {
       return toView(saved);
     } catch (DataAccessException ex) {
       var det = SqlErrorDetails.from(ex);
-      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex); 
     } catch (PersistenceException ex) {
       var det = SqlErrorDetails.from(ex);
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
