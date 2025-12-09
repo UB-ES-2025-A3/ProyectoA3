@@ -8,8 +8,8 @@ async function login(page: Page) {
 
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
-  // Esperar a que cargue la página de eventos
-  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+  // Esperar a que cargue la página de inicio
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 }
 
 
@@ -19,9 +19,9 @@ test.describe('Página de eventos', () => {
   });
 
 test('Events - Filtrado de eventos por texto de búsqueda', async ({ page }) => {
-  // Asegurarnos de que estamos en la página de eventos
-  const subtitle = page.getByText('Descubre y guarda tus próximos planes.');
-  await expect(subtitle).toBeVisible();
+  // Asegurarnos de que estamos en la página de inicio
+  const title = page.getByText('Encuentra tu próximo evento');
+  await expect(title).toBeVisible();
 
   // Esperar a que termine el "Cargando eventos..."
   const loadingText = page.getByText('Cargando eventos...');
@@ -78,9 +78,9 @@ test('Events - Filtrado de eventos por texto de búsqueda', async ({ page }) => 
 
 
 test('Events - Apuntarse y desapuntarse de un evento desde la tarjeta', async ({ page }) => {
-  // Asegurarnos de que estamos en la página de eventos
-  const subtitle = page.getByText('Descubre y guarda tus próximos planes.');
-  await expect(subtitle).toBeVisible();
+  // Asegurarnos de que estamos en la página de inicio
+  const title = page.getByText('Encuentra tu próximo evento');
+  await expect(title).toBeVisible();
 
   // Esperar a que termine el "Cargando eventos..."
   const loadingText = page.getByText('Cargando eventos...');
