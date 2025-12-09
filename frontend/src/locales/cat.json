@@ -2,6 +2,91 @@
  
 
 
+  "HomePage": {
+  "header": {
+    "title": "Troba el teu proper esdeveniment",
+    "subtitle": "Explora intercanvis culturals i trobades a prop teu.",
+    "tip": "💡 Fes clic al mapa per crear un nou esdeveniment"
+  },
+  "search": {
+    "placeholder": "Cerca esdeveniments per nom o descripció..."
+  },
+  "filters": {
+    "clearButton": "Neteja filtres",
+    "language": {
+      "title": "Filtra per idioma",
+      "label": "Idioma",
+      "searchPlaceholder": "Cerca idioma...",
+      "any": "Qualsevol idioma",
+      "spanish": "Espanyol",
+      "english": "Anglès",
+      "french": "Francès",
+      "german": "Alemany",
+      "italian": "Italià",
+      "portuguese": "Portuguès",
+      "russian": "Rus"
+    },
+    "age": {
+      "title": "Filtra per edat mínima",
+      "label": "Edat",
+      "minAgeLabel": "Edat mínima:",
+      "placeholder": "Ex: 18",
+      "unit": "anys",
+      "noLimit": "Sense límit",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filtra per aforament màxim",
+      "label": "Capacitat",
+      "maxLabel": "Capacitat màxima:",
+      "placeholder": "Ex: 10",
+      "unit": "persones",
+      "noLimit": "Sense límit",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filtra per etiquetes",
+      "label": "Tags",
+      "empty": "Encara no hi ha etiquetes disponibles.",
+      "clear": "Neteja tags"
+    },
+    "favorites": {
+      "title": "Mostra només esdeveniments desats",
+      "label": "Només favorits"
+    }
+  },
+  "eventsList": {
+    "title": "Esdeveniments disponibles",
+    "loading": "Carregant esdeveniments...",
+    "empty": "No s'han trobat esdeveniments amb els filtres aplicats.",
+    "clearFilters": "Neteja filtres"
+  },
+  "mapModal": {
+    "title": "Crear un esdeveniment aquí?",
+    "question": "Vols afegir un esdeveniment en aquesta ubicació?",
+    "locationLabel": "Ubicació:",
+    "cancel": "Cancel·la",
+    "confirm": "Sí, crea l'esdeveniment"
+  },
+  "banners": {
+    "loadEventsError": "Error en carregar els esdeveniments. Torna-ho a provar.",
+    "eventCreatedSuccess": "Esdeveniment creat correctament!",
+    "reloadEventsError": "Error en tornar a carregar els esdeveniments.",
+    "eventNotFound": "Esdeveniment no trobat.",
+    "eventFull": "L'esdeveniment és complet. No t'hi pots apuntar.",
+    "alreadyEnrolled": "Ja estàs apuntat a aquest esdeveniment.",
+    "joinSuccess": "T'has apuntat a l'esdeveniment correctament!",
+    "joinGenericError": "Error en apuntar-te a l'esdeveniment.",
+    "notEnrolled": "No estàs apuntat a aquest esdeveniment.",
+    "leaveSuccess": "T'has desapuntat de l'esdeveniment correctament.",
+    "leaveGenericError": "Error en desapuntar-te de l'esdeveniment."
+  }
+},
+
+
   "UserProfile": {
   "loading": "Carregant perfil...",
   "loadError": "Error en carregar el perfil de l'usuari",
