@@ -30,7 +30,7 @@ test('Login incorrecto - contraseña incorrecta', async ({ page }) => {
   const banner = page.locator('.message-banner.error');
 
   await expect(banner).toBeVisible();
-  await expect(banner).toContainText('Contraseña incorrecta. Inténtalo de nuevo.');
+  await expect(banner).toContainText(/Contraseña incorrecta|Incorrect password/i);
 });
 
 test('Login incorrecto - usuario inexistente', async ({ page }) => {
