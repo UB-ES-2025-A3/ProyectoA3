@@ -46,21 +46,22 @@ function App() {
       }
 
       try {
-        // Primero intentar cargar desde localStorage (cache rápido)
-        const cachedTheme = localStorage.getItem('profileTheme');
-        if (cachedTheme) {
-          setCurrentTheme(cachedTheme);
-          applyTheme(cachedTheme);
+        const result = await userService.getTema(userId);
+        if (result.success) {
+          const themeName =
+            (typeof result.data === 'string' && result.data) ||
+            result.data?.tema;
+
+          if (themeName) {
+            setCurrentTheme(themeName);
+            applyTheme(themeName);
+            return;
+          }
         }
 
-        // Luego cargar desde API para sincronizar
-        const result = await userService.getTema(userId);
-        if (result.success && result.data?.tema) {
-          const themeName = result.data.tema;
-          setCurrentTheme(themeName);
-          localStorage.setItem('profileTheme', themeName);
-          applyTheme(themeName);
-        }
+        // Si no hay tema en backend, usar el default
+        setCurrentTheme(DEFAULT_THEME);
+        applyTheme(DEFAULT_THEME);
       } catch (error) {
         console.error('Error cargando tema:', error);
         // Usar tema por defecto si hay error
@@ -84,19 +85,6 @@ function App() {
 
     window.addEventListener('themeChange', handleThemeChange);
     return () => window.removeEventListener('themeChange', handleThemeChange);
-  }, []);
-
-  // Escuchar cambios en localStorage (para sincronizar tema entre pestañas)
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'profileTheme' && e.newValue) {
-        setCurrentTheme(e.newValue);
-        applyTheme(e.newValue);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (

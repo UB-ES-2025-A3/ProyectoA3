@@ -114,17 +114,22 @@ export default function ProfilePage() {
         setUserEvents(createdEventsData);
 
         // 4. Cargar tema desde API
-        if (temaResult.success && temaResult.data?.tema) {
-          const theme = temaResult.data.tema;
-          setSavedTheme(theme);
-          setPreviewTheme(theme);
-          // Guardar el nombre del tema en localStorage
-          localStorage.setItem('profileTheme', theme);
+        if (temaResult.success) {
+          const theme =
+            (typeof temaResult.data === 'string' && temaResult.data) ||
+            temaResult.data?.tema;
+
+          if (theme) {
+            setSavedTheme(theme);
+            setPreviewTheme(theme);
+          } else {
+            setSavedTheme('default');
+            setPreviewTheme('default');
+          }
         } else {
           // Si no hay tema en la API, usar el default
           setSavedTheme('default');
           setPreviewTheme('default');
-          localStorage.setItem('profileTheme', 'default');
         }
 
         // 5. Avatar desde localStorage
@@ -314,9 +319,14 @@ export default function ProfilePage() {
       const result = await userService.updateTema(userId, previewTheme);
       
       if (result.success) {
-        setSavedTheme(previewTheme);
+        const savedThemeName =
+          (typeof result.data === 'string' && result.data) ||
+          result.data?.tema ||
+          previewTheme;
+
+        setSavedTheme(savedThemeName);
+        setPreviewTheme(savedThemeName);
         setThemeChanged(false);
-        localStorage.setItem('profileTheme', previewTheme);
         setBanner({ type: "success", message: "Tema guardado correctamente" });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
       } else {

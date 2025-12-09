@@ -143,7 +143,16 @@ const userService = {
           Authorization: token ? `Bearer ${token}` : undefined,
         },
       });
-      return { success: true, data: response.data };
+
+      // Normalizar posibles formas de respuesta: string o { tema } o { data: { tema } }
+      const raw = response.data;
+      const tema =
+        (typeof raw === 'string' && raw) ||
+        raw?.tema ||
+        raw?.data?.tema ||
+        null;
+
+      return { success: true, data: { tema } };
     } catch (error) {
       return {
         success: false,
@@ -172,7 +181,16 @@ const userService = {
           "Content-Type": "application/json",
         },
       });
-      return { success: true, data: response.data };
+
+      // Normalizar respuesta a { tema }
+      const raw = response.data;
+      const temaResp =
+        (typeof raw === 'string' && raw) ||
+        raw?.tema ||
+        raw?.data?.tema ||
+        tema;
+
+      return { success: true, data: { tema: temaResp } };
     } catch (error) {
       return {
         success: false,
