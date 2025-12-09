@@ -40,6 +40,25 @@ const EventCard = React.memo(function EventCard({
 
 
   let start = t("EventModal.dateFallback");
+  // Verificar si el evento fue creado por el usuario actual
+  const isUserEvent = React.useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    const userId = localStorage.getItem('userId');
+    if (!userId || !event) return false;
+
+    const creatorId = event.id_creador !== undefined ? event.id_creador : event.creatorId;
+    if (creatorId === null || creatorId === undefined) return false;
+
+    const creatorIdNum = Number(creatorId);
+    const userIdNum = Number(userId);
+
+    if (!isNaN(creatorIdNum) && !isNaN(userIdNum)) {
+      return creatorIdNum === userIdNum;
+    }
+
+    return String(creatorId) === String(userId);
+  }, [event]);
+
   if (event.startDate) {
     const date = new Date(event.startDate);
     if (!isNaN(date.getTime())) {
@@ -59,8 +78,8 @@ const EventCard = React.memo(function EventCard({
   const availableSpots = event.capacity - currentParticipants;
 
   return (
-    <article 
-      className="event-card" 
+    <article
+      className="event-card"
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -82,15 +101,27 @@ const EventCard = React.memo(function EventCard({
 
       <div className="event-card__body">
         <div className="event-card__main">
-          <h3 className="event-card__title">{event.name}</h3>
-
-          <p className="event-card__location">
-            {t("EventCard.location", { location: event.location })}
-          </p>
-
-          <p className="event-card__date">
-            {t("EventCard.date", { date: start })}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <h3 className="event-card__title">{event.name}</h3>
+            {isUserEvent && (
+              <span
+                style={{
+                  fontSize: '12px',
+                  padding: '2px 8px',
+                  backgroundColor: '#2196F3',
+                  color: 'white',
+                  borderRadius: '12px',
+                  fontWeight: '500',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Evento creado por ti"
+              >
+                Tu evento
+              </span>
+            )}
+          </div>
+          <p className="event-card__location">📍 {event.location}</p>
+          <p className="event-card__date">📅 {start}</p>
         </div>
 
         <div className="event-card__sidebar">

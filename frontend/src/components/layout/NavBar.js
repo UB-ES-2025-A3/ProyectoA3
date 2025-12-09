@@ -26,9 +26,39 @@ export default function NavBar() {
 
       <div className="nav__links">
         <NavLink to="/home">Inicio</NavLink>
-        <NavLink to="/events">Eventos</NavLink>
+        {/* <NavLink to="/events">Eventos</NavLink> */}
         <NavLink to="/profile">Perfil</NavLink>
         <NavLink to="/my-events">Mis eventos</NavLink>
+      </div>
+
+      <div className="nav__right">
+        {/* Selector de idioma */}
+        <div className="nav__lang">
+          <span
+            className={i18n.language === "es" ? "lang active" : "lang"}
+            onClick={() => changeLang("es")}
+          >
+            es
+          </span>
+          {" | "}
+          <span
+            className={i18n.language === "en" ? "lang active" : "lang"}
+            onClick={() => changeLang("en")}
+          >
+            en
+          </span>
+          {" | "}
+          <span
+            className={i18n.language === "cat" ? "lang active" : "lang"}
+            onClick={() => changeLang("cat")}
+          >
+            ca
+          </span>
+        </div>
+
+        <button className="nav__logout" onClick={handleLogout}>
+          {t("nav.logout")}
+        </button>
       </div>
     </nav>
   );

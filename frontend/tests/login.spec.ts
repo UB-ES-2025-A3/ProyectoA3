@@ -12,7 +12,7 @@ test('Login correcto', async ({ page }) => {
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
   // Esperar redirección / comprobar login correcto
-  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 });
 
 test('Login incorrecto - contraseña incorrecta', async ({ page }) => {

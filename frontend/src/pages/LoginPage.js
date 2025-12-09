@@ -23,7 +23,7 @@ const LoginPage = () => {
     }
 
     setTimeout(() => {
-      navigate('/events');
+      navigate('/home');
     }, 2000);
   };
 

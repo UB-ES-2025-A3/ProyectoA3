@@ -9,17 +9,32 @@ async function login(page: Page) {
 
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
-  // Página de eventos cargada
-  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+  // Página de inicio cargada
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 }
 
 async function abrirModalCrearEvento(page: Page) {
-  // Botón "+ Crear Evento" de la EventPage
-  await page.getByRole('button', { name: /crear evento/i }).click();
+  // En HomePage, el evento se crea haciendo clic en el mapa
+  // Primero esperamos a que el mapa esté visible
+  await page.waitForSelector('.leaflet-container', { timeout: 10000 });
+  // Esperar un poco más para que el mapa esté completamente cargado
+  await page.waitForTimeout(1000);
+  
+  // Hacer clic en el mapa (coordenadas aproximadas del centro)
+  const mapContainer = page.locator('.leaflet-container');
+  await mapContainer.click({ position: { x: 400, y: 300 } });
+  
+  // Esperar y confirmar el modal de confirmación
+  await page.waitForTimeout(1000);
+  const confirmButton = page.getByRole('button', { name: /sí|confirmar|aceptar|crear/i });
+  if (await confirmButton.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await confirmButton.click();
+  }
 
+  // Esperar a que aparezca el formulario de crear evento
   await expect(
-    page.getByRole('heading', { name: 'Crear Nuevo Evento' })
-  ).toBeVisible();
+    page.getByRole('heading', { name: /crear nuevo evento/i })
+  ).toBeVisible({ timeout: 5000 });
 }
 
 test.describe('Crear evento', () => {
@@ -32,6 +47,13 @@ test.describe('Crear evento', () => {
 test('CreateEvent - muestra errores cuando los campos obligatorios están vacíos', async ({ page }) => {
   
   const modal = page.locator('.create-event-modal-content');
+
+  // Cuando se abre desde el mapa, el campo "lugar" se rellena automáticamente
+  // Necesitamos limpiarlo para probar la validación
+  const lugarInput = page.getByLabel(/Lugar/i);
+  if (await lugarInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await lugarInput.clear();
+  }
 
   await modal.getByRole('button', { name: 'Crear Evento' }).click();
 
