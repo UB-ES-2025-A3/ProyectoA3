@@ -1,6 +1,91 @@
 {
 
 
+  "HomePage": {
+  "header": {
+    "title": "Find your next event",
+    "subtitle": "Discover cultural exchanges and meetups near you.",
+    "tip": "💡 Click on the map to create a new event"
+  },
+  "search": {
+    "placeholder": "Search events by name or description..."
+  },
+  "filters": {
+    "clearButton": "Clear filters",
+    "language": {
+      "title": "Filter by language",
+      "label": "Language",
+      "searchPlaceholder": "Search language...",
+      "any": "Any language",
+      "spanish": "Spanish",
+      "english": "English",
+      "french": "French",
+      "german": "German",
+      "italian": "Italian",
+      "portuguese": "Portuguese",
+      "russian": "Russian"
+    },
+    "age": {
+      "title": "Filter by minimum age",
+      "label": "Age",
+      "minAgeLabel": "Minimum age:",
+      "placeholder": "E.g. 18",
+      "unit": "years",
+      "noLimit": "No limit",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filter by maximum capacity",
+      "label": "Capacity",
+      "maxLabel": "Maximum capacity:",
+      "placeholder": "E.g. 10",
+      "unit": "people",
+      "noLimit": "No limit",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filter by tags",
+      "label": "Tags",
+      "empty": "There are no tags available yet.",
+      "clear": "Clear tags"
+    },
+    "favorites": {
+      "title": "Show only saved events",
+      "label": "Only favorites"
+    }
+  },
+  "eventsList": {
+    "title": "Available events",
+    "loading": "Loading events...",
+    "empty": "No events found with the applied filters.",
+    "clearFilters": "Clear filters"
+  },
+  "mapModal": {
+    "title": "Create an event here?",
+    "question": "Do you want to add an event at this location?",
+    "locationLabel": "Location:",
+    "cancel": "Cancel",
+    "confirm": "Yes, create event"
+  },
+  "banners": {
+    "loadEventsError": "Error loading events. Please try again.",
+    "eventCreatedSuccess": "Event created successfully!",
+    "reloadEventsError": "Error reloading events.",
+    "eventNotFound": "Event not found.",
+    "eventFull": "The event is full. You can’t join.",
+    "alreadyEnrolled": "You are already enrolled in this event.",
+    "joinSuccess": "You have successfully joined the event!",
+    "joinGenericError": "Error joining the event.",
+    "notEnrolled": "You are not enrolled in this event.",
+    "leaveSuccess": "You have successfully left the event.",
+    "leaveGenericError": "Error leaving the event."
+  }
+},
+
+
   "UserProfile": {
   "loading": "Loading profile...",
   "loadError": "Error loading user profile",
@@ -63,6 +148,8 @@
     "correoRequired": "Email is required",
     "correoInvalid": "Email is not valid",
     "fechaNacimientoRequired": "Date of birth is required",
+    "fechaNacimientoInvalid": "Date of birth is not valid",
+
     "passwordRequired": "Password is required",
     "passwordRequirements": "Password does not meet the minimum requirements",
     "unexpected": "Unexpected error while registering user"

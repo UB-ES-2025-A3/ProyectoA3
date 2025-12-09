@@ -1,5 +1,88 @@
 {
 
+  "HomePage": {
+  "header": {
+    "title": "Encuentra tu próximo evento",
+    "subtitle": "Explora intercambios culturales y reuniones cerca de ti.",
+    "tip": "💡 Haz clic en el mapa para crear un nuevo evento"
+  },
+  "search": {
+    "placeholder": "Buscar eventos por nombre o descripción..."
+  },
+  "filters": {
+    "clearButton": "Limpiar filtros",
+    "language": {
+      "title": "Filtrar por idioma",
+      "label": "Idioma",
+      "searchPlaceholder": "Buscar idioma...",
+      "any": "Cualquier idioma",
+      "spanish": "Español",
+      "english": "Inglés",
+      "french": "Francés",
+      "german": "Alemán",
+      "italian": "Italiano",
+      "portuguese": "Portugués",
+      "russian": "Ruso"
+    },
+    "age": {
+      "title": "Filtrar por edad mínima",
+      "label": "Edad",
+      "minAgeLabel": "Edad mínima:",
+      "placeholder": "Ej: 18",
+      "unit": "años",
+      "noLimit": "Sin límite",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filtrar por capacidad máxima",
+      "label": "Capacidad",
+      "maxLabel": "Capacidad máxima:",
+      "placeholder": "Ej: 10",
+      "unit": "personas",
+      "noLimit": "Sin límite",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filtrar por etiquetas",
+      "label": "Tags",
+      "empty": "No hay etiquetas disponibles todavía.",
+      "clear": "Limpiar tags"
+    },
+    "favorites": {
+      "title": "Mostrar solo eventos guardados",
+      "label": "Solo favoritos"
+    }
+  },
+  "eventsList": {
+    "title": "Eventos disponibles",
+    "loading": "Cargando eventos...",
+    "empty": "No se encontraron eventos con los filtros aplicados.",
+    "clearFilters": "Limpiar filtros"
+  },
+  "mapModal": {
+    "title": "¿Crear evento aquí?",
+    "question": "¿Quieres añadir un evento en esta ubicación?",
+    "locationLabel": "Ubicación:",
+    "cancel": "Cancelar",
+    "confirm": "Sí, crear evento"
+  },
+  "banners": {
+    "loadEventsError": "Error al cargar los eventos. Inténtalo de nuevo.",
+    "eventCreatedSuccess": "Evento creado correctamente!",
+    "reloadEventsError": "Error al recargar los eventos.",
+    "eventNotFound": "Evento no encontrado.",
+    "eventFull": "El evento está completo. No puedes apuntarte.",
+    "alreadyEnrolled": "Ya estás apuntado a este evento.",
+    "joinSuccess": "¡Te has apuntado al evento correctamente!",
+    "joinGenericError": "Error al apuntarse al evento.",
+    "notEnrolled": "No estás apuntado a este evento.",
+    "leaveSuccess": "Te has desapuntado del evento correctamente.",
+    "leaveGenericError": "Error al desapuntarse del evento."
+  }
+},
 
   "UserProfile": {
   "loading": "Cargando perfil...",
