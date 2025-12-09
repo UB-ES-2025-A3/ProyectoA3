@@ -156,12 +156,12 @@
 }
 
 .btn-primary { 
-  background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
+  background: var(--primary-color, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
   color: var(--text-light, #fff); 
 }
 
 .btn-primary:hover {
-  background: var(--btn-primary-bg, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
+  background: var(--primary-color, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%));
   transform: translateY(-1px);
   filter: brightness(1.1);
 }
