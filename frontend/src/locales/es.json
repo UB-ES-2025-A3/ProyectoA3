@@ -1,18 +1,7 @@
 {
 
 
-  "profile": {
-  "theme": {
-    "sectionTitle": "Tema",
-    "save": "Guardar tema",
-    "savingShort": "Guardando...",
-    "saving": "Guardando tema...",
-    "cancel": "Cancelar",
-    "saveSuccess": "Tema guardado correctamente",
-    "saveError": "Error al guardar el tema",
-    "ariaLabel": "Seleccionar tema {{theme}}"
-  }
-},
+
 
   "SplashPage": {
   "tagline": "Organiza, comparte y vive experiencias",
@@ -518,6 +507,17 @@
   },
 
   "profile": {
+      "theme": {
+    "sectionTitle": "Tema",
+    "save": "Guardar tema",
+    "savingShort": "Guardando...",
+    "saving": "Guardando tema...",
+    "cancel": "Cancelar",
+    "saveSuccess": "Tema guardado correctamente",
+    "saveError": "Error al guardar el tema",
+    "ariaLabel": "Seleccionar tema {{theme}}"
+  },
+  
     "loading": "Cargando perfil...",
     "loadError": "No se pudo cargar el perfil del usuario",
     "loadErrorWithMessage": "Error al cargar los datos: {{error}}",
