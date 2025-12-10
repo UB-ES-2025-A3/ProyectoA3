@@ -139,10 +139,9 @@
 }
 
 .about-scroll-btn {
-  position: relative;
   position: absolute;
-  top: 73%;       /* distancia desde arriba */
-  left: 50%;      /* distancia desde la izquierda */
+  bottom: 2rem;
+  left: 50%;
   transform: translateX(-50%);
   color: #bdbdbd;
   background: none;
