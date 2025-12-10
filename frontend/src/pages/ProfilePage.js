@@ -23,6 +23,14 @@ import avatar3 from '../assets/avatars/avatar-3.png';
 import avatar4 from '../assets/avatars/avatar-4.png';
 import avatar5 from '../assets/avatars/avatar-5.png';
 
+import bgDefault from '../assets/avatars/bgdefault.jpg';
+import bgBlue from '../assets/avatars/bgBlue.png';
+import bgGreen from '../assets/avatars/bgGreen.png';
+import bgPurple from '../assets/avatars/bgPurple.png';
+import bgOrange from '../assets/avatars/bgOrange.png';
+import bgPink from '../assets/avatars/bgPink.png';
+import bgDark from '../assets/avatars/bgdefault.jpg';
+
 // Opciones de avatar disponibles
 const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
 
@@ -37,11 +45,24 @@ const THEME_MAP = {
   dark: '#2d2d2d'
 };
 
+const BACKGROUND_MAP = {
+  default: bgDefault,
+  blue: bgBlue,
+  green: bgGreen,
+  purple: bgPurple,
+  orange: bgOrange,
+  pink: bgPink,
+  dark: bgDark
+};
+
 // Lista de temas disponibles
 const THEME_OPTIONS = Object.keys(THEME_MAP);
 
 // Función para obtener el color de un tema
 const getThemeColor = (theme) => THEME_MAP[theme] || THEME_MAP.default;
+
+const getBackgroundForTheme = (theme) =>
+  BACKGROUND_MAP[theme] || BACKGROUND_MAP.default;
 
 export default function ProfilePage() {
   const { t, i18n } = useTranslation();
@@ -109,24 +130,23 @@ export default function ProfilePage() {
         // 3. Eventos Creados
         setUserEvents(createdEventsData);
 
-        // 4. Cargar tema desde API (con fallback a localStorage)
-        if (temaResult.success && temaResult.data?.tema) {
-          const theme = temaResult.data.tema;
-          setSavedTheme(theme);
-          setPreviewTheme(theme);
-          localStorage.setItem('profileTheme', theme);
-          // Disparar evento para que el resto de la app sepa el tema
-          window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme } }));
-        } else {
-          // Si falla la API, usar tema de localStorage como fallback
-          const cachedTheme = localStorage.getItem('profileTheme') || 'default';
-          setSavedTheme(cachedTheme);
-          setPreviewTheme(cachedTheme);
-          // No sobrescribir localStorage ni disparar evento si ya tenemos un tema válido cacheado
-          if (!localStorage.getItem('profileTheme')) {
-            localStorage.setItem('profileTheme', 'default');
-            window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: 'default' } }));
+        // 4. Cargar tema desde API
+        if (temaResult.success) {
+          const theme =
+            (typeof temaResult.data === 'string' && temaResult.data) ||
+            temaResult.data?.tema;
+
+          if (theme) {
+            setSavedTheme(theme);
+            setPreviewTheme(theme);
+          } else {
+            setSavedTheme('default');
+            setPreviewTheme('default');
           }
+        } else {
+          // Si no hay tema en la API, usar el default
+          setSavedTheme('default');
+          setPreviewTheme('default');
         }
 
         // 5. Avatar desde localStorage
@@ -317,11 +337,16 @@ export default function ProfilePage() {
       const result = await userService.updateTema(userId, previewTheme);
 
       if (result.success) {
-        setSavedTheme(previewTheme);
+        const savedThemeName =
+          (typeof result.data === 'string' && result.data) ||
+          result.data?.tema ||
+          previewTheme;
+
+        setSavedTheme(savedThemeName);
+        setPreviewTheme(savedThemeName);
         setThemeChanged(false);
-        localStorage.setItem('profileTheme', previewTheme);
-        setBanner({ type: 'success', message: 'Tema guardado correctamente' });
-        setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
+        setBanner({ type: "success", message: "Tema guardado correctamente" });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
       } else {
         setBanner({
           type: 'error',
@@ -370,11 +395,20 @@ export default function ProfilePage() {
   const fullName = `${userData.nombre} ${userData.apellidos}`;
 
   return (
-    <div className="profile-page">
-      <div className="profile-container">
-        {/* Header con foto de perfil */}
-        <div className="profile-header">
-          <div className="profile-avatar-container">
+    <div className="profile-page"
+      style={{ backgroundImage: `url(${getBackgroundForTheme(previewTheme)})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+
+    }}
+    
+    >
+      <div className="profile-container" >
+        {/* Header with Profile Picture */}
+        <div className="profile-header" >
+          <div className="profile-avatar-container" >
+            {/* AQUÍ CAMBIAMOS LA LETRA POR LA IMAGEN */}
             <div
               className="profile-avatar"
               style={{

@@ -1,6 +1,45 @@
 {
  
+"SplashPage": {
+  "tagline": "Organitza, comparteix i viu experiències",
+  "title": "EventManager",
+  "subtitle": "Gestiona els teus esdeveniments des d’un sol lloc. Col·labora amb el teu equip i inspira nous usuaris.",
+  "loginButton": "Iniciar Sessió",
+  "registerButton": "Registrar-se",
+  "scrollButton": "Qui som ↓",
 
+  "about": {
+    "title": "Qui Som",
+    "subtitle": "Un equip de desenvolupadors apassionats per crear solucions innovadores"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Desenvolupadora Full Stack",
+      "description": "Especialitzada en arquitectura d'aplicacions web i experiència d'usuari."
+    },
+    "Adrià": {
+      "role": "Desenvolupador Backend",
+      "description": "Expert en APIs REST i gestió de bases de dades relacionals."
+    },
+    "Sergi": {
+      "role": "Desenvolupador Full Stack",
+      "description": "Enfocat en integració de sistemes i optimització del rendiment."
+    },
+    "Arnau": {
+      "role": "Desenvolupador Frontend",
+      "description": "Especialista en interfícies modernes i experiència d'usuari interactiva."
+    },
+    "Chaofan": {
+      "role": "Desenvolupador Full Stack",
+      "description": "Expert en aplicacions escalables i arquitectura de programari."
+    },
+    "Andrés": {
+      "role": "Desenvolupador Backend",
+      "description": "Especialitzat en serveis web i lògica de negoci robusta."
+    }
+  }
+},
 
   "HomePage": {
   "header": {

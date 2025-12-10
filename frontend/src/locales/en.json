@@ -1,6 +1,47 @@
 {
 
 
+  "SplashPage": {
+  "tagline": "Organize, share and live experiences",
+  "title": "EventManager",
+  "subtitle": "Manage your events from a single place. Collaborate with your team and inspire new users.",
+  "loginButton": "Log In",
+  "registerButton": "Sign Up",
+  "scrollButton": "About Us ↓",
+
+  "about": {
+    "title": "About Us",
+    "subtitle": "A team of developers passionate about creating innovative solutions"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Full Stack Developer",
+      "description": "Specialized in web application architecture and user experience."
+    },
+    "Adrià": {
+      "role": "Backend Developer",
+      "description": "Expert in REST APIs and relational database management."
+    },
+    "Sergi": {
+      "role": "Full Stack Developer",
+      "description": "Focused on systems integration and performance optimization."
+    },
+    "Arnau": {
+      "role": "Frontend Developer",
+      "description": "Specialist in modern interfaces and interactive user experiences."
+    },
+    "Chaofan": {
+      "role": "Full Stack Developer",
+      "description": "Expert in scalable applications and software architecture."
+    },
+    "Andrés": {
+      "role": "Backend Developer",
+      "description": "Specialized in web services and robust business logic."
+    }
+  }
+},
+
   "HomePage": {
   "header": {
     "title": "Find your next event",

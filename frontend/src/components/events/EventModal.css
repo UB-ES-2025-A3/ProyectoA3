@@ -1,12 +1,10 @@
 /* src/components/events/EventModal.css */
-
 .modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,7 +276,18 @@
   font-size: 1.1rem;
   font-weight: 600;
   min-width: 200px;
+
+  background: var(--primary-color, linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%))!important; /* 👈 mismo color que el fondo */
+  color: var(--text-color, #333);   /* texto adaptado al tema */
+  border: 2px solid var(--border-color, #ddd);
+  border-radius: 10px;
+  transition: 0.2s ease;
 }
+
+.btn-large:hover {
+  filter: brightness(1.1); /* un poquito más claro/oscuro según tema */
+}
+
 
 /* Sección de Participantes */
 .participants-loading {
@@ -339,7 +348,7 @@
   height: 48px;
   min-width: 48px;
   border-radius: 50%;
-  background: var(--btn-primary-bg, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  background: var(--surface-color, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: var(--text-light, white);
   display: flex;
   align-items: center;

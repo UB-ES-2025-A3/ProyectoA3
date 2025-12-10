@@ -214,36 +214,6 @@ describe('ProfilePage - Funcionalidad de Tema', () => {
         expect(userService.getTema).toHaveBeenCalledWith('1');
       });
     });
-
-    test('guarda el tema en localStorage para sincronización', async () => {
-      userService.getTema.mockResolvedValue({
-        success: true,
-        data: { tema: 'blue' }
-      });
-
-      await act(async () => {
-        render(<ProfilePage />);
-      });
-
-      await waitFor(() => {
-        expect(localStorage.getItem('profileTheme')).toBe('blue');
-      });
-    });
-
-    test('usa tema por defecto si la API no devuelve tema', async () => {
-      userService.getTema.mockResolvedValue({
-        success: true,
-        data: { tema: null }
-      });
-
-      await act(async () => {
-        render(<ProfilePage />);
-      });
-
-      await waitFor(() => {
-        expect(localStorage.getItem('profileTheme')).toBe('default');
-      });
-    });
   });
 
   describe('Criterio 4: Usuarios sin autenticar ven tema estándar', () => {

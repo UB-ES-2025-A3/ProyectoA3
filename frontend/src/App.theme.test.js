@@ -126,24 +126,6 @@ describe('App - Tema Global', () => {
         expect(appElement).toHaveAttribute('data-theme', 'blue');
       });
     });
-
-    test('guarda tema en localStorage después de cargar de API', async () => {
-      localStorage.setItem('userId', '1');
-      localStorage.setItem('token', 'test-token');
-      
-      userService.getTema.mockResolvedValue({
-        success: true,
-        data: { tema: 'orange' }
-      });
-
-      await act(async () => {
-        renderApp('/');
-      });
-
-      await waitFor(() => {
-        expect(localStorage.getItem('profileTheme')).toBe('orange');
-      });
-    });
   });
 
   describe('Manejo de tema "default"', () => {
@@ -202,27 +184,6 @@ describe('App - Tema Global', () => {
         const appElement = document.querySelector('.App');
         expect(appElement).toBeInTheDocument();
       });
-    });
-  });
-
-  describe('Cache de tema en localStorage', () => {
-    test('usa tema cacheado mientras carga de API', async () => {
-      localStorage.setItem('userId', '1');
-      localStorage.setItem('token', 'test-token');
-      localStorage.setItem('profileTheme', 'pink');
-      
-      // API tarda en responder
-      userService.getTema.mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve({ success: true, data: { tema: 'blue' } }), 100))
-      );
-
-      await act(async () => {
-        renderApp('/');
-      });
-
-      // Primero debería usar el cache
-      const appElement = document.querySelector('.App');
-      expect(appElement).toHaveAttribute('data-theme', 'pink');
     });
   });
 
