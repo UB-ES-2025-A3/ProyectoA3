@@ -11,3 +11,21 @@ npx playwright install
 npx playwright test
 npx playwright test --debug
 npx playwright test tests/signup.spec.ts --debug
+
+
+# Tests que no son e2e
+
+local
+
+cd frontend
+
+npm test -- CreateEventForm.test.js
+...
+
+cuando salga todo verde
+
+
+
+# ver coverage
+
+npm run test:coverage

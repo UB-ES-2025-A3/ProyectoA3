@@ -17,6 +17,10 @@ const mockAxios = {
   interceptors: {
     request: { use: jest.fn(), eject: jest.fn() },
     response: { use: jest.fn(), eject: jest.fn() }
+  },
+  moduleNameMapper: {
+    "react-leaflet": "<rootDir>/__mocks__/react-leaflet.js",
+    "leaflet": "<rootDir>/__mocks__/react-leaflet.js"
   }
 };
 

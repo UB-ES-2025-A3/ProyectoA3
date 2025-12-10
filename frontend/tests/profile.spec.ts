@@ -7,8 +7,8 @@ async function login(page: Page) {
   await page.getByLabel('Contraseña').fill('Aa1234_');
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
-  // esperar a que cargue
-  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+  // esperar a que cargue la página de inicio
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 
 }
 

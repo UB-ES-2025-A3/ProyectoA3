@@ -195,6 +195,7 @@ async function transformEvents(data, enrolledIds) {
         startDate,
         description: event.descripcion ?? "",
         restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+        edadMinima: event.edadMinima ?? null,
         imageUrl,
         capacity,
         participants,
@@ -202,6 +203,8 @@ async function transformEvents(data, enrolledIds) {
         tags,
         isEnrolled,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -256,7 +259,9 @@ export async function createEvent(eventData) {
     tags: eventData.etiquetas ? [eventData.etiquetas] : [],  // Convertir a array de tags
     titulo: eventData.titulo,
     descripcion: eventData.descripcion || "",
-    idCreador: creatorId
+    idCreador: creatorId,
+    latitud: eventData.latitud !== undefined && eventData.latitud !== null ? eventData.latitud : null,
+    longitud: eventData.longitud !== undefined && eventData.longitud !== null ? eventData.longitud : null
   };
 
   console.log("Enviando evento al backend:", eventoCreateDTO);
@@ -408,6 +413,8 @@ export async function getUserEvents() {
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -457,6 +464,8 @@ export async function getMyCreatedEvents() {
         languages: normalizeLanguages(event.idiomasPermitidos),
         tags,
         creatorId: event.idCreador,
+        latitude: event.latitud ?? null,
+        longitude: event.longitud ?? null,
       };
     })
   );
@@ -464,4 +473,180 @@ export async function getMyCreatedEvents() {
   return transformed.sort(
     (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
   );
+}
+
+// ============================================================================
+// FUNCIONES DE FAVORITOS
+// ============================================================================
+
+/**
+ * Obtiene los eventos favoritos del usuario autenticado
+ */
+export async function getFavoriteEvents() {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+  
+  if (!userId) {
+    console.warn("[getFavoriteEvents] Usuario no autenticado");
+    return [];
+  }
+
+  try {
+    const res = await fetch(`${config.API_BASE_URL}/events/favorites`, {
+      headers: authHeaders(),
+    });
+
+    if (!res.ok) {
+      console.error("[getFavoriteEvents] Error al obtener favoritos:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    
+    // Transformar al formato del frontend
+    const transformed = await Promise.all(
+      data.map(async (event) => {
+        const tags = normalizeTags(event.tags);
+        const participants = normalizeParticipants(event.participantesIds);
+        const imageUrl = await chooseImageForTags(tags, DEFAULT_EVENT_IMAGE);
+
+        return {
+          id: event.id?.toString() ?? `tmp-${Math.random().toString(36).slice(2)}`,
+          name: event.titulo ?? "Evento sin título",
+          location: event.lugar ?? "Ubicación por confirmar",
+          startDate: buildIsoDate(event.fecha, event.hora),
+          description: event.descripcion ?? "",
+          restrictions: event.edadMinima ? `Edad mínima: ${event.edadMinima} años` : "",
+          imageUrl,
+          capacity:
+            typeof event.maxPersonas === "number" && !Number.isNaN(event.maxPersonas)
+              ? event.maxPersonas
+              : Math.max(participants.length, 10),
+          participants,
+          languages: normalizeLanguages(event.idiomasPermitidos),
+          tags,
+          creatorId: event.idCreador,
+          isFavorite: true,
+          latitude: event.latitud ?? null,
+          longitude: event.longitud ?? null,
+        };
+      })
+    );
+
+    return transformed.sort(
+      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    );
+  } catch (error) {
+    console.error("[getFavoriteEvents] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * Verifica si un evento es favorito del usuario autenticado
+ */
+export async function isEventFavorite(eventId) {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+  
+  if (!userId || !eventId) {
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${config.API_BASE_URL}/events/is-favorite/${eventId}`, {
+      headers: authHeaders(),
+    });
+
+    if (!res.ok) {
+      console.error("[isEventFavorite] Error:", res.status);
+      return false;
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("[isEventFavorite] Error:", error);
+    return false;
+  }
+}
+
+/**
+ * Añade un evento a favoritos
+ */
+export async function addEventToFavorites(eventId) {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+  
+  if (!userId) {
+    return { success: false, error: "Usuario no autenticado" };
+  }
+
+  try {
+    const res = await fetch(`${config.API_BASE_URL}/events/addfavorite`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        idEvento: parseInt(eventId, 10),
+        idUsuario: parseInt(userId, 10)
+      }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("[addEventToFavorites] Error:", res.status, errorText);
+      return { success: false, error: errorText || "Error al añadir a favoritos" };
+    }
+
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error("[addEventToFavorites] Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Elimina un evento de favoritos
+ */
+export async function removeEventFromFavorites(eventId) {
+  const config = getConfig();
+  const userId = localStorage.getItem('userId');
+  
+  if (!userId) {
+    return { success: false, error: "Usuario no autenticado" };
+  }
+
+  try {
+    const res = await fetch(`${config.API_BASE_URL}/events/removefavorite`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        idEvento: parseInt(eventId, 10),
+        idUsuario: parseInt(userId, 10)
+      }),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("[removeEventFromFavorites] Error:", res.status, errorText);
+      return { success: false, error: errorText || "Error al eliminar de favoritos" };
+    }
+
+    const data = await res.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error("[removeEventFromFavorites] Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Alterna el estado de favorito de un evento
+ */
+export async function toggleEventFavorite(eventId, currentIsFavorite) {
+  if (currentIsFavorite) {
+    return removeEventFromFavorites(eventId);
+  } else {
+    return addEventToFavorites(eventId);
+  }
 }

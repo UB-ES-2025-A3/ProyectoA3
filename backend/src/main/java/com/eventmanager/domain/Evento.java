@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "evento")
+@Table(name = "eventos_new")
 public class Evento {
 
   @Id
@@ -54,12 +54,14 @@ public class Evento {
 
   private List<String> tags = new ArrayList<>();
 
+  private Double latitud;
+  private Double longitud;
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
   @JoinTable(
-          name = "evento_cliente",
+          name = "participantes_evento",
           joinColumns = @JoinColumn(name = "evento_id"),
-          inverseJoinColumns = @JoinColumn(name = "cliente_id")
+          inverseJoinColumns = @JoinColumn(name = "participante_id")
   )
   private Set<Cliente> participantes = new HashSet<>();
 
@@ -97,6 +99,12 @@ public class Evento {
 
   public Long getIdCreador() { return idCreador; }
   public void setIdCreador(Long idCreador) { this.idCreador = idCreador; }
+
+  public Double getLatitud() { return latitud; }
+  public void setLatitud(Double latitud) { this.latitud = latitud; }
+
+  public Double getLongitud() { return longitud; }
+  public void setLongitud(Double longitud) { this.longitud = longitud; }
 
   public List<String> getTags() { return tags; }
   public void setTags(List<String> tags) { this.tags = tags; }

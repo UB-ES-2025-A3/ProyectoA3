@@ -13,6 +13,11 @@ public class ClienteDtos {
     LocalDate fechaNacimiento,
     String ciudad,
     List<String> idioma,
-    String descripcion
+    String descripcion,
+    String tema
+  ) {}
+
+  public static record TemaUpdate(
+    String tema
   ) {}
 }
