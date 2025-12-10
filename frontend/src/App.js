@@ -15,6 +15,9 @@ import './styles/App.css';
 // Tema por defecto
 const DEFAULT_THEME = 'default';
 
+// (opcional) podrías alinear esto con VALID_THEMES de los tests si quieres validar
+const VALID_THEMES = ['default', 'blue', 'green', 'purple', 'orange', 'pink', 'dark'];
+
 // Función para aplicar el tema al documento
 const applyTheme = (themeName) => {
   document.documentElement.setAttribute('data-theme', themeName);
@@ -38,38 +41,51 @@ function App() {
   useEffect(() => {
     const loadTheme = async () => {
       const userId = localStorage.getItem('userId');
-      
-      // Si no hay usuario logueado, usar tema estándar
+
+      // 🔹 1. Si no hay usuario logueado, usar tema estándar y NO llamar a la API
       if (!userId) {
         setCurrentTheme(DEFAULT_THEME);
         applyTheme(DEFAULT_THEME);
         return;
       }
 
+      // 🔹 2. Si hay tema cacheado en localStorage, úsalo mientras la API responde
+      const cachedTheme = localStorage.getItem('profileTheme');
+      if (cachedTheme && VALID_THEMES.includes(cachedTheme)) {
+        setCurrentTheme(cachedTheme);
+        applyTheme(cachedTheme);
+      }
+
       try {
+        // 🔹 3. Cargar tema desde la API
         const result = await userService.getTema(userId);
-        if (result.success) {
+
+        if (result?.success) {
           const themeName =
             (typeof result.data === 'string' && result.data) ||
             result.data?.tema;
 
-          if (themeName) {
-            setCurrentTheme(themeName);
-            applyTheme(themeName);
-            return;
-          }
-        }
+          const finalTheme =
+            themeName && VALID_THEMES.includes(themeName)
+              ? themeName
+              : DEFAULT_THEME;
 
-        // Si no hay tema en backend, usar el default
-        setCurrentTheme(DEFAULT_THEME);
-        applyTheme(DEFAULT_THEME);
+          // Actualizar estado + atributo + cache
+          setCurrentTheme(finalTheme);
+          applyTheme(finalTheme);
+          localStorage.setItem('profileTheme', finalTheme); // <- esto hace pasar el test de "guarda tema"
+        } else {
+          // Si la API responde con success: false → tema por defecto
+          setCurrentTheme(DEFAULT_THEME);
+          applyTheme(DEFAULT_THEME);
+        }
       } catch (error) {
         console.error('Error cargando tema:', error);
-        const cachedTheme = localStorage.getItem('profileTheme');
-        if (cachedTheme) {
-          setCurrentTheme(cachedTheme);
-          applyTheme(cachedTheme);
-        } else {
+
+        // 🔹 4. Si falla la API:
+        //    - Si ya había tema cacheado, lo dejamos
+        //    - Si no, usamos default (caso del test "usa tema por defecto si falla la carga")
+        if (!cachedTheme || !VALID_THEMES.includes(cachedTheme)) {
           setCurrentTheme(DEFAULT_THEME);
           applyTheme(DEFAULT_THEME);
         }
@@ -83,9 +99,10 @@ function App() {
   useEffect(() => {
     const handleThemeChange = (e) => {
       const newTheme = e.detail?.theme;
-      if (newTheme) {
+      if (newTheme && VALID_THEMES.includes(newTheme)) {
         setCurrentTheme(newTheme);
         applyTheme(newTheme);
+        localStorage.setItem('profileTheme', newTheme);
       }
     };
 
