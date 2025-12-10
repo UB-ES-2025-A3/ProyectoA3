@@ -1,6 +1,19 @@
 {
 
 
+  "profile": {
+  "theme": {
+    "sectionTitle": "Theme",
+    "save": "Save theme",
+    "savingShort": "Saving...",
+    "saving": "Saving theme...",
+    "cancel": "Cancel",
+    "saveSuccess": "Theme saved successfully",
+    "saveError": "Error saving theme",
+    "ariaLabel": "Select {{theme}} theme"
+  }
+},
+
   "SplashPage": {
   "tagline": "Organize, share and live experiences",
   "title": "EventManager",

@@ -1,5 +1,20 @@
 {
  
+
+  "profile": {
+  "theme": {
+    "sectionTitle": "Tema",
+    "save": "Desa el tema",
+    "savingShort": "Desant...",
+    "saving": "S'està desant el tema...",
+    "cancel": "Cancel·la",
+    "saveSuccess": "Tema desat correctament",
+    "saveError": "Error en desar el tema",
+    "ariaLabel": "Selecciona el tema {{theme}}"
+  }
+},
+
+
 "SplashPage": {
   "tagline": "Organitza, comparteix i viu experiències",
   "title": "EventManager",

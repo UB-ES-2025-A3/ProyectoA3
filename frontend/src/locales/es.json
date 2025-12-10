@@ -1,6 +1,19 @@
 {
 
 
+  "profile": {
+  "theme": {
+    "sectionTitle": "Tema",
+    "save": "Guardar tema",
+    "savingShort": "Guardando...",
+    "saving": "Guardando tema...",
+    "cancel": "Cancelar",
+    "saveSuccess": "Tema guardado correctamente",
+    "saveError": "Error al guardar el tema",
+    "ariaLabel": "Seleccionar tema {{theme}}"
+  }
+},
+
   "SplashPage": {
   "tagline": "Organiza, comparte y vive experiencias",
   "title": "EventManager",
