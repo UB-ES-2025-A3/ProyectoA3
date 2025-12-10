@@ -8,8 +8,10 @@ import avatar3 from "../assets/avatars/avatar-3.png";
 import avatar4 from "../assets/avatars/avatar-4.png";
 import avatar5 from "../assets/avatars/avatar-5.png";
 import avatarDefault from "../assets/avatars/avatar-default.jpg";
+import { useTranslation } from "react-i18next";
 
 function SplashPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogin = () => {

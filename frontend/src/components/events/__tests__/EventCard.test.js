@@ -1,7 +1,56 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 import EventCard from '../EventCard';
+
+// 🔹 Mock react-i18next alineado con EventCard
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key, opts) => {
+      switch (key) {
+        // Estado / plazas
+        case 'EventCard.status.full':
+          return 'Completo';
+        case 'EventCard.status.spotsAvailable': {
+          const count = opts?.count ?? 0;
+          return `${count} plazas libres`;
+        }
+
+        // Capacidad
+        case 'EventCard.capacity.label':
+          return 'participantes';
+
+        // Botones
+        case 'EventCard.buttons.join':
+          return 'Apuntarse';
+        case 'EventCard.buttons.joining':
+          return 'Apuntando...';
+        case 'EventCard.buttons.leave':
+          return 'Desapuntarse';
+
+        // Mensaje de inscrito
+        case 'EventCard.enrolled.already':
+          return 'Ya estás apuntado a este evento';
+
+        // Fecha
+        case 'EventModal.dateFallback':
+          return 'Fecha no disponible';
+        case 'EventCard.date':
+          // Solo devolvemos el texto que se nos pasa
+          return opts?.date ?? '';
+
+        // Localización
+        case 'EventCard.location':
+          return opts?.location ?? '';
+
+        default:
+          return key;
+      }
+    },
+    i18n: { language: 'es', changeLanguage: () => Promise.resolve() }
+  })
+}));
 
 describe('EventCard', () => {
   const mockEvent = {
@@ -85,12 +134,12 @@ describe('EventCard', () => {
         />
       );
 
-      // Hay dos elementos con "Completo": el badge y el botón
-      // Verificar que existe el badge de estado usando getAllByText
       const completoElements = screen.getAllByText(/completo/i);
-      expect(completoElements.length).toBe(2); // Badge y botón
-      // Verificar que el badge tiene la clase correcta
-      const badge = completoElements.find(el => el.classList.contains('status-badge'));
+      expect(completoElements.length).toBe(2); // badge + botón
+
+      const badge = completoElements.find(el =>
+        el.classList.contains('status-badge')
+      );
       expect(badge).toBeInTheDocument();
     });
   });
@@ -126,7 +175,9 @@ describe('EventCard', () => {
         />
       );
 
-      expect(screen.getByRole('button', { name: /apuntarse/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /apuntarse/i })
+      ).toBeInTheDocument();
     });
 
     test('debe llamar onJoin cuando se hace click en "Apuntarse"', async () => {
@@ -145,11 +196,11 @@ describe('EventCard', () => {
       await userEvent.click(joinButton);
 
       expect(mockOnJoin).toHaveBeenCalledTimes(1);
-      expect(mockOnClick).not.toHaveBeenCalled(); // No debe propagar el click
+      expect(mockOnClick).not.toHaveBeenCalled();
     });
 
     test('debe mostrar mensaje y botón "Desapuntarse" cuando está inscrito', () => {
-      const { container } = render(
+      render(
         <EventCard
           event={mockEvent}
           isEnrolled={true}
@@ -160,11 +211,16 @@ describe('EventCard', () => {
         />
       );
 
-      expect(screen.getByText(/ya estás apuntado a este evento/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /desapuntarse/i })).toBeInTheDocument();
-      
-      // Verificar que NO hay botón "Apuntarse" - buscar por texto exacto
-      const apuntarseButton = screen.queryByRole('button', { name: /^apuntarse$/i });
+      expect(
+        screen.getByText(/ya estás apuntado a este evento/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /desapuntarse/i })
+      ).toBeInTheDocument();
+
+      const apuntarseButton = screen.queryByRole('button', {
+        name: /^apuntarse$/i
+      });
       expect(apuntarseButton).not.toBeInTheDocument();
     });
 
@@ -184,7 +240,7 @@ describe('EventCard', () => {
       await userEvent.click(leaveButton);
 
       expect(mockOnLeave).toHaveBeenCalledTimes(1);
-      expect(mockOnClick).not.toHaveBeenCalled(); // No debe propagar el click
+      expect(mockOnClick).not.toHaveBeenCalled();
     });
 
     test('debe deshabilitar botón cuando isJoining es true', () => {
@@ -224,7 +280,7 @@ describe('EventCard', () => {
   describe('Manejo de datos faltantes', () => {
     test('debe manejar evento sin fecha', () => {
       const eventWithoutDate = { ...mockEvent, startDate: null };
-      
+
       render(
         <EventCard
           event={eventWithoutDate}
@@ -241,7 +297,7 @@ describe('EventCard', () => {
 
     test('debe manejar evento sin participantes', () => {
       const eventWithoutParticipants = { ...mockEvent, participants: null };
-      
+
       render(
         <EventCard
           event={eventWithoutParticipants}
@@ -257,4 +313,3 @@ describe('EventCard', () => {
     });
   });
 });
-

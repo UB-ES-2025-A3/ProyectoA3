@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterForm from '../components/users/RegisterForm';
+import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [messageType, setMessageType] = useState('');
   const navigate = useNavigate();
 
   const handleRegisterSuccess = (data) => {
-    setMessage(`¡Cuenta creada exitosamente! Bienvenido ${data.username}`);
+    setMessage(
+      t("register.messages.success", { username: data.username })
+    );
     setMessageType('success');
-    
-    // Redirigir al login después de 3 segundos
+
     setTimeout(() => {
       navigate('/login');
     }, 3000);
   };
 
   const handleRegisterError = (error) => {
-    setMessage(error);
+    setMessage(
+      error || t("register.messages.errorFallback")
+    );
     setMessageType('error');
   };
 
@@ -29,7 +34,9 @@ const RegisterPage = () => {
           <div className="container">
             <p>{message}</p>
             {messageType === 'success' && (
-              <p className="redirect-message">Serás redirigido al login en unos segundos...</p>
+              <p className="redirect-message">
+                {t("register.messages.redirecting")}
+              </p>
             )}
           </div>
         </div>
@@ -44,7 +51,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-
-
-
-

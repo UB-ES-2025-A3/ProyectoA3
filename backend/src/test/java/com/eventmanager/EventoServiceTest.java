@@ -42,7 +42,7 @@ class EventoServiceTest {
     evento_create = new EventoDtos.EventoCreate(
         LocalDate.of(LocalDate.now().getYear() + 1, 3, 7),
         LocalTime.of(0, 0),
-        "Sala Principal",
+        "Reus",
         new EventoDtos.RestriccionesCreate(
             List.of("es", "en"),
             18,
@@ -92,7 +92,7 @@ class EventoServiceTest {
 
     assertEquals(10L, v.id());
     assertEquals("Concierto de Navidad", v.titulo());
-    assertEquals("Sala Principal", v.lugar());
+    assertEquals("Reus", v.lugar());
     assertEquals(List.of("es", "en"), v.idiomasPermitidos());
   }
 
@@ -108,8 +108,8 @@ class EventoServiceTest {
             evento_create.titulo(),
             evento_create.descripcion(),
             evento_create.idCreador(),
-            41.3851,
-            2.1734
+            evento_create.latitud(),
+            evento_create.longitud()
     );
 
     var err = assertThrowsExactly(
@@ -133,8 +133,8 @@ class EventoServiceTest {
             evento_create.titulo(),
             evento_create.descripcion(),
             evento_create.idCreador(),
-            41.3851,
-            2.1734
+            evento_create.latitud(),
+            evento_create.longitud()
     );
 
     var err = assertThrowsExactly(
@@ -167,6 +167,22 @@ class EventoServiceTest {
     when(eventoRepo.findAll()).thenReturn(List.of(e1, e2));
 
     var lista = service.listar();
+
+    assertEquals(2, lista.size());
+    assertEquals(10L, lista.get(0).id());
+    assertEquals(20L, lista.get(1).id());
+  }
+
+  @Test
+  void listar_mis_eventos() {
+    Evento e1 = getEvento();
+    Evento e2 = getEvento();
+    e2.setId(20L);
+
+    when(eventoRepo.findEventosByParticipanteId(1L))
+        .thenReturn(List.of(e1, e2));
+
+    var lista = service.listarMisEventos(1L);
 
     assertEquals(2, lista.size());
     assertEquals(10L, lista.get(0).id());

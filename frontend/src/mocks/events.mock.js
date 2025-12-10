@@ -11,6 +11,8 @@ export const mockEvents = [
     capacity: 12,
     participants: [{ id: "u1" }, { id: "u2" }, { id: "u3" }], // 3 participantes, no estás apuntado
     languages: ["es", "en", "pt"], // Idiomas disponibles
+    latitude: 38.7223,
+    longitude: -9.1393,
   },
   {
     id: "e2",
@@ -23,6 +25,8 @@ export const mockEvents = [
     capacity: 8,
     participants: [{ id: "me" }], // Ya estás apuntado a este
     languages: ["es", "pt"], // Solo español y portugués
+    latitude: 38.9626,
+    longitude: -9.4189,
   },
   {
     id: "e3",
@@ -35,5 +39,7 @@ export const mockEvents = [
     capacity: 5,
     participants: [{ id: "u2" }, { id: "u3" }, { id: "u4" }, { id: "u5" }, { id: "u6" }], // lleno
     languages: ["en", "de"], // Inglés y alemán
+    latitude: 38.7809,
+    longitude: -9.4991,
   },
 ];

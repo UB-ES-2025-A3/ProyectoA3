@@ -1,23 +1,23 @@
 // src/pages/HomePage.js
-import React, { useEffect, useState, useCallback } from "react";
-import { getEvents, joinEvent, leaveEvent } from "../services/eventService";
-import userService from '../services/userService';
-import { mockEvents } from "../mocks/events.mock";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { getEvents, joinEvent, leaveEvent, getFavoriteEvents } from "../services/eventService";
 import EventCard from "../components/events/EventCard";
 import EventModal from "../components/events/EventModal";
 import CreateEventForm from "../components/events/CreateEventForm";
 import MessageBanner from "../components/common/MessageBanner";
+import EventMap from "../components/map/EventMap";
 import "../styles/HomePage.css";
 
 // Iconos
-import { FaLanguage, FaUsers, FaSearch, FaMapMarkerAlt, FaFeatherAlt } from "react-icons/fa"; 
+import { FaLanguage, FaUsers, FaSearch, FaFeatherAlt, FaBookmark } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [banner, setBanner] = useState({ type: "success", message: "" });
-  const [me, setMe] = useState(null);
   
   // Estados para los filtros
   const [filters, setFilters] = useState({
@@ -26,29 +26,101 @@ export default function HomePage() {
     language: "",
     minAge: "",
     maxPersons: "",
-    tags: []
+    tags: [],
+    onlyFavorites: false
   });
 
   // Estado para controlar qué filtro está abierto
   const [openFilter, setOpenFilter] = useState(null);
-  const [availableTags, setAvailableTags] = useState([]);
   const [joiningEventId, setJoiningEventId] = useState(null);
+  const [favoriteEventIds, setFavoriteEventIds] = useState([]);
   
   // Estado para el modal
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
+  // Estado para el evento que está siendo hover (para centrar el mapa)
+  const [hoveredEvent, setHoveredEvent] = useState(null);
+  
+  // Estado para el evento fijado en el mapa (se mantiene incluso al cerrar el modal)
+  const [pinnedEvent, setPinnedEvent] = useState(null);
+  
   // Estado para el formulario de crear evento
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [createFormInitialLocation, setCreateFormInitialLocation] = useState(null);
+  const [createFormInitialCoordinates, setCreateFormInitialCoordinates] = useState(null);
+  
+  // Estado para el modal de confirmación de creación desde el mapa
+  const [mapClickConfirmation, setMapClickConfirmation] = useState({
+    isOpen: false,
+    location: null,
+    coordinates: null
+  });
 
-  // Función para aplicar filtros (memoizada para evitar error de dependencias)
-  const applyFilters = useCallback(() => {
-    let filtered = events.filter(event => {
+  // Cargar favoritos desde la API
+  const loadFavoriteIds = useCallback(async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      setFavoriteEventIds([]);
+      return;
+    }
+
+    try {
+      const favoriteEvents = await getFavoriteEvents();
+      const ids = favoriteEvents.map(event => event.id?.toString()).filter(Boolean);
+      setFavoriteEventIds(ids);
+    } catch (error) {
+      console.warn("No se pudieron cargar los favoritos desde la API.", error);
+      setFavoriteEventIds([]);
+    }
+  }, []);
+
+  // Cargar eventos al montar el componente
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        setLoading(true);
+        const eventsData = await getEvents();
+        setEvents(eventsData || []);
+      } catch (error) {
+        console.error("Error cargando eventos:", error);
+        setBanner({ type: "error", message: t("HomePage.banners.loadEventsError") });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, [t]);
+
+  // Calcular tags disponibles según los eventos cargados (memoizado)
+  const availableTags = useMemo(() => {
+    const tagsSet = new Set();
+    events.forEach(event => {
+      if (Array.isArray(event.tags)) {
+        event.tags.forEach(tag => {
+          if (tag && typeof tag === "string") {
+            tagsSet.add(tag);
+          }
+        });
+      }
+    });
+    return Array.from(tagsSet).sort((a, b) => a.localeCompare(b));
+  }, [events]);
+
+  // Calcular eventos filtrados usando useMemo para optimización
+  const filteredEvents = useMemo(() => {
+    const favoritesSet = new Set(favoriteEventIds.map(id => id.toString()));
+
+    return events.filter(event => {
       // Filtro por texto (título o descripción)
       if (filters.searchText) {
         const searchLower = filters.searchText.toLowerCase();
-        if (!event.name.toLowerCase().includes(searchLower) && 
-            !event.description.toLowerCase().includes(searchLower)) {
+        if (
+          !event.name.toLowerCase().includes(searchLower) &&
+          !event.description.toLowerCase().includes(searchLower)
+        ) {
           return false;
         }
       }
@@ -62,8 +134,21 @@ export default function HomePage() {
 
       // Filtro por capacidad máxima
       if (filters.maxPersons) {
-        if (event.capacity > parseInt(filters.maxPersons)) {
+        if (event.capacity > parseInt(filters.maxPersons, 10)) {
           return false;
+        }
+      }
+
+      // Filtro por edad mínima
+      if (filters.minAge) {
+        const filterMinAge = parseInt(filters.minAge, 10);
+        if (!isNaN(filterMinAge)) {
+          if (event.edadMinima !== undefined && event.edadMinima !== null) {
+            const eventMinAge = parseInt(event.edadMinima, 10);
+            if (!isNaN(eventMinAge) && eventMinAge > filterMinAge) {
+              return false;
+            }
+          }
         }
       }
 
@@ -83,79 +168,50 @@ export default function HomePage() {
         }
       }
 
+      // Filtro por favoritos
+      if (filters.onlyFavorites) {
+        if (!favoritesSet.has(event.id?.toString())) {
+          return false;
+        }
+      }
+
       return true;
     });
+  }, [events, filters, favoriteEventIds]);
 
-   setFilteredEvents(filtered);
-}, [events, filters]);
-
-  // Cargar eventos al montar el componente
+  // Cargar favoritos al montar el componente
   useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoading(true);
-        const eventsData = await getEvents();
-        setEvents(eventsData);
-      } catch (error) {
-        console.error('Error cargando eventos:', error);
-        setBanner({ type: "error", message: "Error al cargar los eventos. Inténtalo de nuevo." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
-      } finally {
-        setLoading(false);
-      }
+    loadFavoriteIds();
+  }, [loadFavoriteIds]);
+
+  // Escuchar actualizaciones de favoritos
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const handleFavoritesUpdated = () => {
+      loadFavoriteIds();
     };
 
-    loadEvents();
+    window.addEventListener("favoritesUpdated", handleFavoritesUpdated);
 
-    (async () => {
-      const uid = localStorage.getItem('userId') || localStorage.getItem('id') || null;
-      if (!uid) return;
-      try {
-        const res = await userService.getUserProfile(uid);
-        if (res.success) {
-          const user = res.data?.data ?? res.data;
-          setMe(user);
-        } else {
-          console.warn('No se pudo cargar perfil:', res.error);
-        }
-      } catch (err) {
-        console.warn('Error cargando perfil:', err);
-      }
-    })();
-  }, []);
-
-  // Calcular tags disponibles según los eventos cargados
-  useEffect(() => {
-    const tagsSet = new Set();
-    events.forEach(event => {
-      if (Array.isArray(event.tags)) {
-        event.tags.forEach(tag => {
-          if (tag && typeof tag === "string") {
-            tagsSet.add(tag);
-          }
-        });
-      }
-    });
-    setAvailableTags(Array.from(tagsSet).sort((a, b) => a.localeCompare(b)));
-  }, [events]);
-
-  // Aplicar filtros cuando cambien eventos o filtros
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
-
+    return () => {
+      window.removeEventListener("favoritesUpdated", handleFavoritesUpdated);
+    };
+  }, [loadFavoriteIds]);
 
   // Cerrar filtros al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (openFilter && !event.target.closest('.filter-dropdown')) {
+      if (openFilter && !event.target.closest(".filter-dropdown")) {
         setOpenFilter(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [openFilter]);
 
@@ -187,10 +243,38 @@ export default function HomePage() {
     });
   };
 
-  // Función para abrir el modal
+  // Función para resetear todos los filtros
+  const resetFilters = () => {
+    setFilters({
+      searchText: "",
+      location: "",
+      language: "",
+      minAge: "",
+      maxPersons: "",
+      tags: [],
+      onlyFavorites: false
+    });
+  };
+
+  // Función para abrir el modal (click en la tarjeta)
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setIsModalOpen(true);
+    if (event && event.latitude && event.longitude) {
+      setPinnedEvent(event);
+    }
+  };
+
+  // Función para centrar el mapa cuando se hace hover sobre un evento
+  const handleEventHover = (event) => {
+    if (event && event.latitude && event.longitude) {
+      setHoveredEvent(event);
+    }
+  };
+
+  // Función para quitar el hover del mapa
+  const handleEventHoverLeave = () => {
+    setHoveredEvent(null);
   };
 
   // Función para cerrar el modal
@@ -199,98 +283,114 @@ export default function HomePage() {
     setSelectedEvent(null);
   };
 
-  // Función para abrir el formulario de creación
-  const handleOpenCreateForm = () => {
-    setIsCreateFormOpen(true);
-  };
+  // Función para desfijar el evento del mapa
+  const handleUnpinEvent = useCallback(() => {
+    setPinnedEvent(null);
+  }, []);
 
   // Función para cerrar el formulario de creación
   const handleCloseCreateForm = () => {
     setIsCreateFormOpen(false);
+    setCreateFormInitialLocation(null);
+    setCreateFormInitialCoordinates(null);
   };
 
-  // Función para manejar la creación de evento exitosa
-  const handleEventCreated = () => {
-    setIsCreateFormOpen(false);
-    setBanner({ type: "success", message: "Evento creado correctamente!" });
-    setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-    
-    // Recargar eventos
-    const loadEvents = async () => {
-      try {
-        const eventsData = await getEvents();
-        setEvents(eventsData);
-      } catch (error) {
-        console.error('Error recargando eventos:', error);
+  // Función para manejar clicks en el mapa
+  const handleMapClick = useCallback((locationData) => {
+    setMapClickConfirmation({
+      isOpen: true,
+      location: locationData.location,
+      coordinates: {
+        latitude: locationData.latitude,
+        longitude: locationData.longitude
       }
-    };
-    loadEvents();
+    });
+  }, []);
+
+  // Función para confirmar la creación de evento desde el mapa
+  const handleConfirmMapClick = useCallback(() => {
+    setCreateFormInitialLocation(mapClickConfirmation.location);
+    setCreateFormInitialCoordinates(mapClickConfirmation.coordinates);
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+    setIsCreateFormOpen(true);
+  }, [mapClickConfirmation]);
+
+  // Función para cancelar la creación de evento desde el mapa
+  const handleCancelMapClick = useCallback(() => {
+    setMapClickConfirmation({ isOpen: false, location: null, coordinates: null });
+  }, []);
+
+  // Función para manejar la creación de evento exitosa
+  const handleEventCreated = async () => {
+    setIsCreateFormOpen(false);
+    setBanner({ type: "success", message: t("HomePage.banners.eventCreatedSuccess") });
+    setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+
+    try {
+      const eventsData = await getEvents();
+      setEvents(eventsData || []);
+    } catch (error) {
+      console.error("Error recargando eventos:", error);
+      setBanner({ type: "error", message: t("HomePage.banners.reloadEventsError") });
+      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+    }
   };
 
   // Función para unirse a un evento
   const handleJoinEvent = async (eventId) => {
     try {
       setJoiningEventId(eventId);
-      // Primero recargar eventos para tener el estado más actualizado
-      const currentEvents = await getEvents();
-      const event = currentEvents.find(e => e.id === eventId);
-      
+
+      const event = events.find(e => e.id === eventId);
       if (!event) {
-        setBanner({ type: "error", message: "Evento no encontrado." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-        return;
-      }
-      
-      if (!event) {
-        setBanner({ type: "error", message: "Evento no encontrado." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-        return;
-      }
-      
-      // Verificar si ya está lleno
-      if (event.participants.length >= event.capacity) {
-        setBanner({ type: "error", message: "El evento está completo. No puedes apuntarte." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-        return;
-      }
-      
-      // Verificar si ya está apuntado
-      if (event.isEnrolled) {
-        setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
+        setBanner({ type: "error", message: t("HomePage.banners.eventNotFound") });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Llamar al servicio
+      if (event.participants.length >= event.capacity) {
+        setBanner({ type: "error", message: t("HomePage.banners.eventFull") });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+
+      if (event.isEnrolled) {
+        setBanner({ type: "warning", message: t("HomePage.banners.alreadyEnrolled") });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+
       await joinEvent(eventId);
-      
-      // Recargar los eventos para obtener el estado actualizado
+
       const updatedEvents = await getEvents();
-      setEvents(updatedEvents);
-      
-      // Actualizar el evento seleccionado si está abierto el modal
+      setEvents(updatedEvents || []);
+
       if (selectedEvent && selectedEvent.id === eventId) {
-        const updatedEvent = updatedEvents.find(e => e.id === eventId);
-        if (updatedEvent) {
-          setSelectedEvent(updatedEvent);
+        const updatedSelected = updatedEvents.find(e => e.id === eventId);
+        if (updatedSelected) {
+          setSelectedEvent(updatedSelected);
         }
       }
-      
-      setBanner({ type: "success", message: "¡Te has apuntado al evento correctamente!" });
+
+      setBanner({ type: "success", message: t("HomePage.banners.joinSuccess") });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     } catch (error) {
-      console.error('Error al apuntarse al evento:', error);
-      // Si el error es que ya está apuntado, mostrar mensaje apropiado
-      const errorMessage = error.message || '';
-      if (errorMessage.toLowerCase().includes('ya estás apuntado') || 
-          errorMessage.toLowerCase().includes('apuntado')) {
-        setBanner({ type: "warning", message: "Ya estás apuntado a este evento." });
+      console.error("Error al apuntarse al evento:", error);
+      const errorMessage = error.message || "";
+      if (
+        errorMessage.toLowerCase().includes("ya estás apuntado") ||
+        errorMessage.toLowerCase().includes("apuntado") ||
+        errorMessage.toLowerCase().includes("already")
+      ) {
+        setBanner({ type: "warning", message: t("HomePage.banners.alreadyEnrolled") });
       } else {
-        setBanner({ type: "error", message: errorMessage || "Error al apuntarse al evento." });
+        setBanner({
+          type: "error",
+          message: errorMessage || t("HomePage.banners.joinGenericError")
+        });
       }
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
-    }
-    finally {
+    } finally {
       setJoiningEventId(null);
     }
   };
@@ -299,40 +399,39 @@ export default function HomePage() {
   const handleLeaveEvent = async (eventId) => {
     try {
       const event = events.find(e => e.id === eventId);
-      
+
       if (!event) {
-        setBanner({ type: "error", message: "Evento no encontrado." });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
-        return;
-      }
-      
-      // Verificar si está apuntado
-      if (!event.isEnrolled) {
-        setBanner({ type: "warning", message: "No estás apuntado a este evento." });
+        setBanner({ type: "error", message: t("HomePage.banners.eventNotFound") });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
         return;
       }
 
-      // Llamar al servicio
+      if (!event.isEnrolled) {
+        setBanner({ type: "warning", message: t("HomePage.banners.notEnrolled") });
+        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        return;
+      }
+
       await leaveEvent(eventId);
-      
-      // Recargar los eventos para obtener el estado actualizado
+
       const updatedEvents = await getEvents();
-      setEvents(updatedEvents);
-      
-      // Actualizar el evento seleccionado si está abierto el modal
+      setEvents(updatedEvents || []);
+
       if (selectedEvent && selectedEvent.id === eventId) {
-        const updatedEvent = updatedEvents.find(e => e.id === eventId);
-        if (updatedEvent) {
-          setSelectedEvent(updatedEvent);
+        const updatedSelected = updatedEvents.find(e => e.id === eventId);
+        if (updatedSelected) {
+          setSelectedEvent(updatedSelected);
         }
       }
-      
-      setBanner({ type: "success", message: "Te has desapuntado del evento correctamente." });
+
+      setBanner({ type: "success", message: t("HomePage.banners.leaveSuccess") });
       setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
     } catch (error) {
-      console.error('Error al desapuntarse del evento:', error);
-      setBanner({ type: "error", message: error.message || "Error al desapuntarse del evento." });
+      console.error("Error al desapuntarse del evento:", error);
+      setBanner({
+        type: "error",
+        message: error.message || t("HomePage.banners.leaveGenericError")
+      });
       setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
     }
   };
@@ -340,30 +439,36 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <div className="home-content">
-        
         {/* MITAD IZQUIERDA: Filtros y Lista de Eventos */}
         <div className="home-left">
-          
           <header className="home-main-header">
             <div className="header-top">
               <div>
-                <h1>Encuentra tu próximo evento</h1>
-                <p>Explora intercambios culturales y reuniones cerca de ti.</p>
+<h1 data-testid="home-title">
+  {t("HomePage.header.title")}
+</h1>
+                <p>{t("HomePage.header.subtitle")}</p>
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "#666",
+                    marginTop: "8px"
+                  }}
+                >
+                  {t("HomePage.header.tip")}
+                </p>
               </div>
-              <button className="btn btn-primary btn-create" onClick={handleOpenCreateForm}>
-                + Crear Evento
-              </button>
             </div>
-            
+
             {/* Buscador Principal */}
             <div className="main-search">
               <div className="search-input-container">
                 <FaSearch className="search-icon" />
-              <input 
-                type="text" 
-                  placeholder="Buscar eventos por nombre o descripción..." 
+                <input
+                  type="text"
+                  placeholder={t("HomePage.search.placeholder")}
                   value={filters.searchText}
-                  onChange={(e) => handleFilterChange('searchText', e.target.value)}
+                  onChange={(e) => handleFilterChange("searchText", e.target.value)}
                   className="main-search-input"
                 />
               </div>
@@ -372,236 +477,178 @@ export default function HomePage() {
             {/* Filtros Rápidos con Iconos */}
             <div className="quick-filters">
               <div className="filter-icon-group">
-                
+                {/* Idioma */}
                 <div className="filter-dropdown">
-                  <button 
-                    className={`filter-icon-btn ${filters.language ? 'active' : ''}`}
+                  <button
+                    className={`filter-icon-btn ${filters.language ? "active" : ""}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleFilter('language');
+                      toggleFilter("language");
                     }}
-                    title="Filtrar por idioma"
+                    title={t("HomePage.filters.language.title")}
                   >
                     <FaLanguage />
-                    <span>Idioma</span>
+                    <span>{t("HomePage.filters.language.label")}</span>
                   </button>
-                  
-                  {openFilter === 'language' && (
+
+                  {openFilter === "language" && (
                     <div className="filter-dropdown-content language-dropdown">
                       <div className="filter-options">
                         <div className="language-search">
-              <input 
-                type="text" 
-                            placeholder="Buscar idioma..."
+                          <input
+                            type="text"
+                            placeholder={t("HomePage.filters.language.searchPlaceholder")}
                             className="language-search-input"
-              />
-            </div>
+                          />
+                        </div>
                         <div className="language-list">
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value=""
                               checked={filters.language === ""}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            Cualquier idioma
+                            {t("HomePage.filters.language.any")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="es" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="es"
                               checked={filters.language === "es"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇪🇸 Español
+                            🇪🇸 {t("HomePage.filters.language.spanish")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="en" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="en"
                               checked={filters.language === "en"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇬🇧 Inglés
+                            🇬🇧 {t("HomePage.filters.language.english")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="fr" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="fr"
                               checked={filters.language === "fr"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇫🇷 Francés
+                            🇫🇷 {t("HomePage.filters.language.french")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="de" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="de"
                               checked={filters.language === "de"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇩🇪 Alemán
+                            🇩🇪 {t("HomePage.filters.language.german")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="it" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="it"
                               checked={filters.language === "it"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇮🇹 Italiano
+                            🇮🇹 {t("HomePage.filters.language.italian")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="pt" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="pt"
                               checked={filters.language === "pt"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇵🇹 Portugués
+                            🇵🇹 {t("HomePage.filters.language.portuguese")}
                           </label>
                           <label>
-                            <input 
-                              type="radio" 
-                              name="language" 
-                              value="ru" 
+                            <input
+                              type="radio"
+                              name="language"
+                              value="ru"
                               checked={filters.language === "ru"}
-                              onChange={(e) => handleFilterChange('language', e.target.value)}
+                              onChange={(e) => handleFilterChange("language", e.target.value)}
                             />
-                            🇷🇺 Ruso
-              </label>
+                            🇷🇺 {t("HomePage.filters.language.russian")}
+                          </label>
                         </div>
                       </div>
                     </div>
                   )}
-            </div>
+                </div>
 
+                {/* Edad */}
                 <div className="filter-dropdown">
-                  <button 
-                    className={`filter-icon-btn ${filters.minAge ? 'active' : ''}`}
+                  <button
+                    className={`filter-icon-btn ${filters.minAge ? "active" : ""}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleFilter('age');
+                      toggleFilter("age");
                     }}
-                    title="Filtrar por edad mínima"
+                    title={t("HomePage.filters.age.title")}
                   >
                     <FaUsers />
-                    <span>Edad</span>
+                    <span>{t("HomePage.filters.age.label")}</span>
                   </button>
-                  
-                  {openFilter === 'age' && (
+
+                  {openFilter === "age" && (
                     <div className="filter-dropdown-content">
                       <div className="filter-options">
                         <div className="age-input-section">
-                          <label htmlFor="age-input">Edad mínima:</label>
+                          <label htmlFor="age-input">
+                            {t("HomePage.filters.age.minAgeLabel")}
+                          </label>
                           <div className="age-input-container">
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               id="age-input"
-                              min="0" 
+                              min="0"
                               max="100"
-                              placeholder="Ej: 18"
+                              placeholder={t("HomePage.filters.age.placeholder")}
                               value={filters.minAge}
-                              onChange={(e) => handleFilterChange('minAge', e.target.value)}
+                              onChange={(e) => handleFilterChange("minAge", e.target.value)}
                               className="age-input"
                             />
-                            <span className="age-unit">años</span>
+                            <span className="age-unit">
+                              {t("HomePage.filters.age.unit")}
+                            </span>
                           </div>
                           <div className="age-presets">
-                            <button 
+                            <button
                               type="button"
-                              className={`age-preset ${filters.minAge === "" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('minAge', '')}
+                              className={`age-preset ${filters.minAge === "" ? "active" : ""}`}
+                              onClick={() => handleFilterChange("minAge", "")}
                             >
-                              Sin límite
+                              {t("HomePage.filters.age.noLimit")}
                             </button>
-                            <button 
+                            <button
                               type="button"
-                              className={`age-preset ${filters.minAge === "18" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('minAge', '18')}
+                              className={`age-preset ${
+                                filters.minAge === "18" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("minAge", "18")}
                             >
-                              18+
+                              {t("HomePage.filters.age.eighteenPlus")}
                             </button>
-                            <button 
+                            <button
                               type="button"
-                              className={`age-preset ${filters.minAge === "21" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('minAge', '21')}
+                              className={`age-preset ${
+                                filters.minAge === "21" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("minAge", "21")}
                             >
-                              21+
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-            </div>
-
-                <div className="filter-dropdown">
-                  <button 
-                    className={`filter-icon-btn ${filters.maxPersons ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFilter('capacity');
-                    }}
-                    title="Filtrar por capacidad máxima"
-                  >
-                    <FaUsers />
-                    <span>Capacidad</span>
-                  </button>
-                  
-                  {openFilter === 'capacity' && (
-                    <div className="filter-dropdown-content">
-                      <div className="filter-options">
-                        <div className="capacity-input-section">
-                          <label htmlFor="capacity-input">Capacidad máxima:</label>
-                          <div className="capacity-input-container">
-              <input 
-                type="number" 
-                              id="capacity-input"
-                min="1" 
-                              max="100"
-                              placeholder="Ej: 10"
-                              value={filters.maxPersons}
-                              onChange={(e) => handleFilterChange('maxPersons', e.target.value)}
-                              className="capacity-input"
-                            />
-                            <span className="capacity-unit">personas</span>
-                          </div>
-                          <div className="capacity-presets">
-                            <button 
-                              type="button"
-                              className={`capacity-preset ${filters.maxPersons === "" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('maxPersons', '')}
-                            >
-                              Sin límite
-                            </button>
-                            <button 
-                              type="button"
-                              className={`capacity-preset ${filters.maxPersons === "5" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('maxPersons', '5')}
-                            >
-                              ≤ 5
-                            </button>
-                            <button 
-                              type="button"
-                              className={`capacity-preset ${filters.maxPersons === "10" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('maxPersons', '10')}
-                            >
-                              ≤ 10
-                            </button>
-                            <button 
-                              type="button"
-                              className={`capacity-preset ${filters.maxPersons === "20" ? 'active' : ''}`}
-                              onClick={() => handleFilterChange('maxPersons', '20')}
-                            >
-                              ≤ 20
+                              {t("HomePage.filters.age.twentyOnePlus")}
                             </button>
                           </div>
                         </div>
@@ -610,24 +657,111 @@ export default function HomePage() {
                   )}
                 </div>
 
+                {/* Capacidad */}
                 <div className="filter-dropdown">
-                  <button 
-                    className={`filter-icon-btn ${filters.tags && filters.tags.length ? 'active' : ''}`}
+                  <button
+                    className={`filter-icon-btn ${filters.maxPersons ? "active" : ""}`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleFilter('tags');
+                      toggleFilter("capacity");
                     }}
-                    title="Filtrar por etiquetas"
+                    title={t("HomePage.filters.capacity.title")}
                   >
-                    <FaFeatherAlt />
-                    <span>Tags</span>
+                    <FaUsers />
+                    <span>{t("HomePage.filters.capacity.label")}</span>
                   </button>
 
-                  {openFilter === 'tags' && (
+                  {openFilter === "capacity" && (
+                    <div className="filter-dropdown-content">
+                      <div className="filter-options">
+                        <div className="capacity-input-section">
+                          <label htmlFor="capacity-input">
+                            {t("HomePage.filters.capacity.maxLabel")}
+                          </label>
+                          <div className="capacity-input-container">
+                            <input
+                              type="number"
+                              id="capacity-input"
+                              min="1"
+                              max="100"
+                              placeholder={t("HomePage.filters.capacity.placeholder")}
+                              value={filters.maxPersons}
+                              onChange={(e) =>
+                                handleFilterChange("maxPersons", e.target.value)
+                              }
+                              className="capacity-input"
+                            />
+                            <span className="capacity-unit">
+                              {t("HomePage.filters.capacity.unit")}
+                            </span>
+                          </div>
+                          <div className="capacity-presets">
+                            <button
+                              type="button"
+                              className={`capacity-preset ${
+                                filters.maxPersons === "" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("maxPersons", "")}
+                            >
+                              {t("HomePage.filters.capacity.noLimit")}
+                            </button>
+                            <button
+                              type="button"
+                              className={`capacity-preset ${
+                                filters.maxPersons === "5" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("maxPersons", "5")}
+                            >
+                              {t("HomePage.filters.capacity.max5")}
+                            </button>
+                            <button
+                              type="button"
+                              className={`capacity-preset ${
+                                filters.maxPersons === "10" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("maxPersons", "10")}
+                            >
+                              {t("HomePage.filters.capacity.max10")}
+                            </button>
+                            <button
+                              type="button"
+                              className={`capacity-preset ${
+                                filters.maxPersons === "20" ? "active" : ""
+                              }`}
+                              onClick={() => handleFilterChange("maxPersons", "20")}
+                            >
+                              {t("HomePage.filters.capacity.max20")}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tags */}
+                <div className="filter-dropdown">
+                  <button
+                    className={`filter-icon-btn ${
+                      filters.tags && filters.tags.length ? "active" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFilter("tags");
+                    }}
+                    title={t("HomePage.filters.tags.title")}
+                  >
+                    <FaFeatherAlt />
+                    <span>{t("HomePage.filters.tags.label")}</span>
+                  </button>
+
+                  {openFilter === "tags" && (
                     <div className="filter-dropdown-content tags-dropdown">
                       <div className="filter-options">
                         {availableTags.length === 0 ? (
-                          <p className="filter-empty">No hay etiquetas disponibles todavía.</p>
+                          <p className="filter-empty">
+                            {t("HomePage.filters.tags.empty")}
+                          </p>
                         ) : (
                           <div className="tags-list">
                             {availableTags.map(tag => (
@@ -647,31 +781,42 @@ export default function HomePage() {
                           <button
                             type="button"
                             className="tags-clear-btn"
-                            onClick={() => handleFilterChange('tags', [])}
+                            onClick={() => handleFilterChange("tags", [])}
                           >
-                            Limpiar tags
+                            {t("HomePage.filters.tags.clear")}
                           </button>
                         )}
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
-              
-              {/* Botón para limpiar filtros */}
-              {(filters.searchText || filters.language || filters.minAge || filters.maxPersons || (filters.tags && filters.tags.length > 0)) && (
-                <button 
-                  className="clear-filters-btn"
-                  onClick={() => setFilters({
-                    searchText: "",
-                    location: "",
-                    language: "",
-                    minAge: "",
-                    maxPersons: "",
-                    tags: []
-                  })}
+
+                {/* Solo favoritos */}
+                <button
+                  type="button"
+                  className={`filter-icon-btn favorite-filter-btn ${
+                    filters.onlyFavorites ? "active" : ""
+                  }`}
+                  onClick={() =>
+                    handleFilterChange("onlyFavorites", !filters.onlyFavorites)
+                  }
+                  title={t("HomePage.filters.favorites.title")}
                 >
-                  Limpiar filtros
+                  <FaBookmark />
+                  <span>{t("HomePage.filters.favorites.label")}</span>
+                  <span className="favorite-count">{favoriteEventIds.length}</span>
+                </button>
+              </div>
+
+              {/* Botón para limpiar filtros */}
+              {(filters.searchText ||
+                filters.language ||
+                filters.minAge ||
+                filters.maxPersons ||
+                filters.onlyFavorites ||
+                (filters.tags && filters.tags.length > 0)) && (
+                <button className="clear-filters-btn" onClick={resetFilters}>
+                  {t("HomePage.filters.clearButton")}
                 </button>
               )}
             </div>
@@ -679,15 +824,17 @@ export default function HomePage() {
 
           {/* Lista de Eventos */}
           <div className="events-list">
-            <h2>Eventos Disponibles ({filteredEvents.length})</h2>
+            <h2>
+              {t("HomePage.eventsList.title")} ({filteredEvents.length})
+            </h2>
             {loading ? (
-              <p>Cargando eventos...</p>
+              <p>{t("HomePage.eventsList.loading")}</p>
             ) : filteredEvents.length > 0 ? (
               <div className="events-grid">
                 {filteredEvents.map(event => {
                   const isEnrolled = event.isEnrolled || false;
                   const isFull = event.participants.length >= event.capacity;
-                  
+
                   return (
                     <EventCard
                       key={event.id}
@@ -698,48 +845,37 @@ export default function HomePage() {
                       onJoin={() => handleJoinEvent(event.id)}
                       onLeave={() => handleLeaveEvent(event.id)}
                       onClick={() => handleEventClick(event)}
+                      onMouseEnter={() => handleEventHover(event)}
+                      onMouseLeave={handleEventHoverLeave}
                     />
                   );
                 })}
               </div>
             ) : (
               <div className="no-events">
-                <p>No se encontraron eventos con los filtros aplicados.</p>
-                <button 
-                  className="btn btn-outline"
-                  onClick={() => setFilters({
-                    searchText: "",
-                    location: "",
-                    language: "",
-                    minAge: "",
-                    maxPersons: "",
-                    tags: []
-                  })}
-                >
-                  Limpiar filtros
+                <p>{t("HomePage.eventsList.empty")}</p>
+                <button className="btn btn-outline" onClick={resetFilters}>
+                  {t("HomePage.eventsList.clearFilters")}
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* MITAD DERECHA: Mapa (placeholder por ahora) */}
+        {/* MITAD DERECHA: Mapa */}
         <div className="home-right">
-          <div className="map-placeholder">
-            <h3>🗺️ Mapa de Eventos</h3>
-            <p>Aquí se mostrará un mapa interactivo con la ubicación de los eventos.</p>
-            <p><strong>Próximas implementaciones:</strong></p>
-            <ul>
-              <li>Integración con Google Maps API</li>
-              <li>Marcadores de eventos en el mapa</li>
-              <li>Filtrado en tiempo real</li>
-              <li>Información de eventos al hacer clic en marcadores</li>
-            </ul>
-          </div>
+          <EventMap
+            selectedEvent={hoveredEvent || pinnedEvent || selectedEvent}
+            events={filteredEvents}
+            onUnpin={handleUnpinEvent}
+            isPinned={!!pinnedEvent}
+            onMapClick={handleMapClick}
+          />
         </div>
       </div>
+
       {banner.message && <MessageBanner type={banner.type} message={banner.message} />}
-      
+
       {/* Modal de Evento */}
       {selectedEvent && (
         <EventModal
@@ -750,13 +886,6 @@ export default function HomePage() {
           isFull={selectedEvent.participants.length >= selectedEvent.capacity}
           onJoin={async () => {
             await handleJoinEvent(selectedEvent.id);
-            // Recargar eventos y actualizar el evento seleccionado
-            const updatedEvents = await getEvents();
-            setEvents(updatedEvents);
-            const updatedEvent = updatedEvents.find(e => e.id === selectedEvent.id);
-            if (updatedEvent) {
-              setSelectedEvent(updatedEvent);
-            }
           }}
           onLeave={async () => {
             await handleLeaveEvent(selectedEvent.id);
@@ -764,14 +893,43 @@ export default function HomePage() {
         />
       )}
 
+      {/* Modal de Confirmación para crear evento desde el mapa */}
+      {mapClickConfirmation.isOpen && (
+        <div className="modal-overlay" onClick={handleCancelMapClick}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{t("HomePage.mapModal.title")}</h2>
+              <button className="modal-close" onClick={handleCancelMapClick}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>{t("HomePage.mapModal.question")}</p>
+              <p className="modal-location-info">
+                <strong>{t("HomePage.mapModal.locationLabel")}</strong>{" "}
+                {mapClickConfirmation.location}
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-outline" onClick={handleCancelMapClick}>
+                {t("HomePage.mapModal.cancel")}
+              </button>
+              <button className="btn btn-primary" onClick={handleConfirmMapClick}>
+                {t("HomePage.mapModal.confirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Crear Evento */}
       <CreateEventForm
         isOpen={isCreateFormOpen}
         onClose={handleCloseCreateForm}
         onSuccess={handleEventCreated}
+        initialLocation={createFormInitialLocation}
+        initialCoordinates={createFormInitialCoordinates}
       />
     </div>
   );
 }
-
-

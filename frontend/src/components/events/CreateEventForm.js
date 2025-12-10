@@ -2,8 +2,11 @@
 import React, { useState } from 'react';
 import './CreateEventForm.css';
 import { createEvent } from '../../services/eventService';
+import { useTranslation } from 'react-i18next';
 
-export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
+export default function CreateEventForm({ isOpen, onClose, onSuccess, initialLocation, initialCoordinates}) {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     titulo: '',
     etiquetas: '',
@@ -18,89 +21,185 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     longitud: ''
   });
 
+  // Resetear el formulario cuando se cierre
+  React.useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        titulo: '',
+        etiquetas: '',
+        fecha: '',
+        hora: '',
+        idioma: '',
+        plazasDisponibles: '',
+        edadMinima: '',
+        lugar: '',
+        descripcion: '',
+        latitud: '',
+        longitud: ''
+      });
+      setErrors({});
+      setSubmitError('');
+    }
+  }, [isOpen]);
+
+  // Actualizar el formulario cuando se abra con coordenadas iniciales
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialLocation) {
+        setFormData(prev => ({
+          ...prev,
+          lugar: initialLocation
+        }));
+      }
+      if (initialCoordinates) {
+        // Convertir a string y reemplazar comas por puntos (formato europeo -> internacional)
+        const lat = initialCoordinates.latitude != null 
+          ? String(initialCoordinates.latitude).replace(',', '.') 
+          : '';
+        const lng = initialCoordinates.longitude != null 
+          ? String(initialCoordinates.longitude).replace(',', '.') 
+          : '';
+        
+        setFormData(prev => ({
+          ...prev,
+          latitud: lat,
+          longitud: lng
+        }));
+      }
+    }
+  }, [isOpen, initialLocation, initialCoordinates]);
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  // Limitar el año del date a 4 dígitos
+  if (name === "fecha") {
+    // value en un input type="date" es siempre "YYYY-MM-DD" o parcial ("2025-", "2025-01", etc.)
+    const [year] = value.split("-");
+
+    // Si el usuario intenta meter más de 4 dígitos en el año, ignoramos el cambio
+    if (year && year.length > 4) {
+      return;
+    }
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  if (errors[name]) {
+    setErrors((prev) => ({
       ...prev,
-      [name]: value
+      [name]: "",
     }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    // Clear submit error
-    if (submitError) {
-      setSubmitError('');
-    }
-  };
+  }
+  if (submitError) {
+    setSubmitError("");
+  }
+};
+
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.titulo.trim()) {
-      newErrors.titulo = 'El título del evento es requerido';
+      newErrors.titulo = t("createEvent.validation.titleRequired");
     }
 
-
     if (!formData.fecha) {
-      newErrors.fecha = 'La fecha es requerida';
+      newErrors.fecha = t("createEvent.validation.dateRequired");
     } else {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const selectedDate = new Date(formData.fecha);
       if (selectedDate < today) {
-        newErrors.fecha = 'La fecha no puede ser anterior a hoy';
+        newErrors.fecha = t("createEvent.validation.dateInPast");
       }
     }
 
     if (!formData.hora) {
-      newErrors.hora = 'La hora es requerida';
+      newErrors.hora = t("createEvent.validation.timeRequired");
     }
 
-    if (!formData.idioma || (typeof formData.idioma === 'string' && formData.idioma.trim() === '') || (Array.isArray(formData.idioma) && formData.idioma.length === 0)) {
-      newErrors.idioma = 'Debes seleccionar un idioma';
+    if (
+      !formData.idioma ||
+      (typeof formData.idioma === 'string' && formData.idioma.trim() === '') ||
+      (Array.isArray(formData.idioma) && formData.idioma.length === 0)
+    ) {
+      newErrors.idioma = t("createEvent.validation.languageRequired");
     }
 
     if (!formData.plazasDisponibles) {
-      newErrors.plazasDisponibles = 'Las plazas disponibles son requeridas';
+      newErrors.plazasDisponibles = t("createEvent.validation.capacityRequired");
     } else if (parseInt(formData.plazasDisponibles) < 1) {
-      newErrors.plazasDisponibles = 'Debe haber al menos 1 plaza disponible';
+      newErrors.plazasDisponibles = t("createEvent.validation.capacityMin");
     }
 
     if (formData.edadMinima && parseInt(formData.edadMinima) < 0) {
-      newErrors.edadMinima = 'La edad mínima debe ser 0 o mayor';
+      newErrors.edadMinima = t("createEvent.validation.minAgeMin");
     } else if (formData.edadMinima && parseInt(formData.edadMinima) > 120) {
-      newErrors.edadMinima = 'La edad mínima debe ser menor a 120';
+      newErrors.edadMinima = t("createEvent.validation.minAgeMax");
     }
 
     if (!formData.lugar.trim()) {
-      newErrors.lugar = 'El lugar es requerido';
+      newErrors.lugar = t("createEvent.validation.placeRequired");
     }
 
+    // Validación de latitud y longitud
+    // Si vienen del mapa (initialCoordinates), son requeridas
+    // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+    const hasInitialCoordinates = initialCoordinates?.latitude != null && initialCoordinates?.longitude != null;
+    
     // Validación de latitud
-    if (!formData.latitud && formData.latitud !== 0) {
-      newErrors.latitud = 'La latitud es requerida';
+    if (hasInitialCoordinates) {
+      // Si vienen del mapa, deben estar rellenas
+      if (!formData.latitud || formData.latitud.trim() === '') {
+        newErrors.latitud = 'La latitud es requerida';
+      } else {
+        // Convertir coma a punto para parseFloat
+        const latStr = String(formData.latitud).replace(',', '.');
+        const lat = parseFloat(latStr);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          newErrors.latitud = 'Latitud inválida';
+        }
+      }
     } else {
-      const lat = parseFloat(formData.latitud);
-      if (isNaN(lat) || lat < -90 || lat > 90) {
-        newErrors.latitud = 'Latitud inválida';
+      // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+      if (formData.latitud && formData.latitud.trim() !== '') {
+        const latStr = String(formData.latitud).replace(',', '.');
+        const lat = parseFloat(latStr);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+          newErrors.latitud = 'Latitud inválida';
+        }
       }
     }
 
     // Validación de longitud
-    if (!formData.longitud && formData.longitud !== 0) {
-      newErrors.longitud = 'La longitud es requerida';
+    if (hasInitialCoordinates) {
+      // Si vienen del mapa, deben estar rellenas
+      if (!formData.longitud || formData.longitud.trim() === '') {
+        newErrors.longitud = 'La longitud es requerida';
+      } else {
+        // Convertir coma a punto para parseFloat
+        const lngStr = String(formData.longitud).replace(',', '.');
+        const lng = parseFloat(lngStr);
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          newErrors.longitud = 'Longitud inválida';
+        }
+      }
     } else {
-      const lng = parseFloat(formData.longitud);
-      if (isNaN(lng) || lng < -180 || lng > 180) {
-        newErrors.longitud = 'Longitud inválida';
+      // Si no vienen del mapa, son opcionales pero si se rellenan deben ser válidas
+      if (formData.longitud && formData.longitud.trim() !== '') {
+        const lngStr = String(formData.longitud).replace(',', '.');
+        const lng = parseFloat(lngStr);
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+          newErrors.longitud = 'Longitud inválida';
+        }
       }
     }
 
@@ -119,16 +218,22 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     setSubmitError('');
 
     try {
-      // Llamar al backend para crear el evento
+      // Convertir coordenadas, reemplazando coma por punto si es necesario
+      const latStr = formData.latitud ? String(formData.latitud).replace(',', '.') : '';
+      const lngStr = formData.longitud ? String(formData.longitud).replace(',', '.') : '';
+      
+      const lat = latStr ? parseFloat(latStr) : null;
+      const lng = lngStr ? parseFloat(lngStr) : null;
+
       const response = await createEvent({
         titulo: formData.titulo,
         descripcion: formData.descripcion,
-        etiquetas: formData.etiquetas || 'otros',        
+        etiquetas: formData.etiquetas || 'otros',
         fecha: formData.fecha,
         hora: formData.hora,
         lugar: formData.lugar,
-        latitud: parseFloat(formData.latitud),
-        longitud: parseFloat(formData.longitud),
+        latitud: lat,
+        longitud: lng,
         restricciones: {
           idiomasRequerido: formData.idioma ? [formData.idioma] : [],
           plazasDisponibles: parseInt(formData.plazasDisponibles),
@@ -138,7 +243,6 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
 
       console.log('Evento creado exitosamente:', response);
 
-      // Resetear formulario
       setFormData({
         titulo: '',
         etiquetas: '',
@@ -153,13 +257,12 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         longitud: ''
       });
 
-      // Llamar al callback de éxito
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
       console.error('Error al crear el evento:', error);
-      setSubmitError(error.message || 'Error al crear el evento. Inténtalo de nuevo.');
+      setSubmitError(error.message || t("createEvent.messages.submitErrorFallback"));
     } finally {
       setLoading(false);
     }
@@ -183,34 +286,42 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
         </button>
         
         <div className="modal-header">
-          <h2>Crear Nuevo Evento</h2>
-          <p>Completa el formulario para crear un nuevo evento</p>
+          <h2 data-testid="create-event-title">
+            {t("createEvent.modal.title")}
+          </h2>
+          <p>{t("createEvent.modal.subtitle")}</p>
         </div>
 
+
         {submitError && (
-          <div className="form-error-banner" style={{
-            padding: '12px 16px',
-            backgroundColor: '#fee',
-            border: '1px solid #fcc',
-            borderRadius: '6px',
-            marginBottom: '16px',
-            color: '#c33',
-            fontSize: '14px'
-          }}>
+          <div
+            className="form-error-banner"
+            style={{
+              padding: '12px 16px',
+              backgroundColor: '#fee',
+              border: '1px solid #fcc',
+              borderRadius: '6px',
+              marginBottom: '16px',
+              color: '#c33',
+              fontSize: '14px'
+            }}
+          >
             {submitError}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="create-event-form">
           <div className="form-group">
-            <label htmlFor="titulo">Título del Evento *</label>
+            <label htmlFor="titulo">
+              {t("createEvent.form.labels.title")} *
+            </label>
             <input
               type="text"
               id="titulo"
               name="titulo"
               value={formData.titulo}
               onChange={handleChange}
-              placeholder="ej: Paseo por el centro histórico"
+              placeholder={t("createEvent.form.placeholders.title")}
               className={errors.titulo ? 'error' : ''}
               disabled={loading}
             />
@@ -218,13 +329,15 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="descripcion">Descripción</label>
+            <label htmlFor="descripcion">
+              {t("createEvent.form.labels.description")}
+            </label>
             <textarea
               id="descripcion"
               name="descripcion"
               value={formData.descripcion}
               onChange={handleChange}
-              placeholder="Describe tu evento (opcional)"
+              placeholder={t("createEvent.form.placeholders.description")}
               disabled={loading}
               rows="3"
               style={{
@@ -239,9 +352,10 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="etiquetas">Etiquetas</label>  
+            <label htmlFor="etiquetas">
+              {t("createEvent.form.labels.tags")}
+            </label>
             <select
-              // Antes habia Etiquetas * pero no es obligatorio
               id="etiquetas"
               name="etiquetas"
               value={formData.etiquetas}
@@ -249,28 +363,60 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               className={errors.etiquetas ? 'error' : ''}
               disabled={loading}
             >
-              <option value="">Selecciona una etiqueta</option>
-              <option value="turismo">Turismo</option>
-              <option value="comida">Comida</option>
-              <option value="excursion">Excursión</option>
-              <option value="cultural">Cultural</option>
-              <option value="social">Social</option>
-              <option value="deporte">Deporte</option>
-              <option value="aventura">Aventura</option>
-              <option value="familiar">Familiar</option>
-              <option value="juegos">Juegos</option>
-              <option value="cine">Cine</option>
-              <option value="relax">Relax</option>
-              <option value="tardeo">Tardeo</option>
-              <option value="noche">Noche</option>
-              <option value="otros">Otros</option>
+              <option value="">
+                {t("createEvent.form.tags.placeholder")}
+              </option>
+              <option value="turismo">
+                {t("createEvent.form.tags.options.turismo")}
+              </option>
+              <option value="comida">
+                {t("createEvent.form.tags.options.comida")}
+              </option>
+              <option value="excursion">
+                {t("createEvent.form.tags.options.excursion")}
+              </option>
+              <option value="cultural">
+                {t("createEvent.form.tags.options.cultural")}
+              </option>
+              <option value="social">
+                {t("createEvent.form.tags.options.social")}
+              </option>
+              <option value="deporte">
+                {t("createEvent.form.tags.options.deporte")}
+              </option>
+              <option value="aventura">
+                {t("createEvent.form.tags.options.aventura")}
+              </option>
+              <option value="familiar">
+                {t("createEvent.form.tags.options.familiar")}
+              </option>
+              <option value="juegos">
+                {t("createEvent.form.tags.options.juegos")}
+              </option>
+              <option value="cine">
+                {t("createEvent.form.tags.options.cine")}
+              </option>
+              <option value="relax">
+                {t("createEvent.form.tags.options.relax")}
+              </option>
+              <option value="tardeo">
+                {t("createEvent.form.tags.options.tardeo")}
+              </option>
+              <option value="noche">
+                {t("createEvent.form.tags.options.noche")}
+              </option>
+              <option value="otros">
+                {t("createEvent.form.tags.options.otros")}
+              </option>
             </select>
             {errors.etiquetas && <span className="error-message">{errors.etiquetas}</span>}
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="fecha">Fecha *</label>
+              <label htmlFor="fecha">
+                {t("createEvent.form.labels.date")} *
+              </label>
               <input
                 type="date"
                 id="fecha"
@@ -285,7 +431,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
             </div>
 
             <div className="form-group">
-              <label htmlFor="hora">Hora *</label>
+              <label htmlFor="hora">
+                {t("createEvent.form.labels.time")} *
+              </label>
               <input
                 type="time"
                 id="hora"
@@ -298,9 +446,10 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               {errors.hora && <span className="error-message">{errors.hora}</span>}
             </div>
 
-
             <div className="form-group">
-              <label htmlFor="idioma">Idioma *</label>
+              <label htmlFor="idioma">
+                {t("createEvent.form.labels.language")} *
+              </label>
               <select
                 id="idioma"
                 name="idioma"
@@ -309,14 +458,16 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 className={errors.idioma ? 'error' : ''}
                 disabled={loading}
               >
-                <option value="">Selecciona un idioma</option>
-                <option value="es">🇪🇸 Español</option>
-                <option value="en">🇬🇧 Inglés</option>
-                <option value="fr">🇫🇷 Francés</option>
-                <option value="de">🇩🇪 Alemán</option>
-                <option value="it">🇮🇹 Italiano</option>
-                <option value="pt">🇵🇹 Portugués</option>
-                <option value="ru">🇷🇺 Ruso</option>
+                <option value="">
+                  {t("createEvent.form.language.placeholder")}
+                </option>
+                <option value="es">🇪🇸 {t("createEvent.form.language.options.es")}</option>
+                <option value="en">🇬🇧 {t("createEvent.form.language.options.en")}</option>
+                <option value="fr">🇫🇷 {t("createEvent.form.language.options.fr")}</option>
+                <option value="de">🇩🇪 {t("createEvent.form.language.options.de")}</option>
+                <option value="it">🇮🇹 {t("createEvent.form.language.options.it")}</option>
+                <option value="pt">🇵🇹 {t("createEvent.form.language.options.pt")}</option>
+                <option value="ru">🇷🇺 {t("createEvent.form.language.options.ru")}</option>
               </select>
               {errors.idioma && <span className="error-message">{errors.idioma}</span>}
             </div>
@@ -324,7 +475,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="plazasDisponibles">Plazas Disponibles *</label>
+              <label htmlFor="plazasDisponibles">
+                {t("createEvent.form.labels.capacity")} *
+              </label>
               <input
                 type="number"
                 id="plazasDisponibles"
@@ -332,15 +485,19 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 value={formData.plazasDisponibles}
                 onChange={handleChange}
                 min="1"
-                placeholder="Número de plazas"
+                placeholder={t("createEvent.form.placeholders.capacity")}
                 className={errors.plazasDisponibles ? 'error' : ''}
                 disabled={loading}
               />
-              {errors.plazasDisponibles && <span className="error-message">{errors.plazasDisponibles}</span>}
+              {errors.plazasDisponibles && (
+                <span className="error-message">{errors.plazasDisponibles}</span>
+              )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="edadMinima">Edad Mínima (opcional)</label>
+              <label htmlFor="edadMinima">
+                {t("createEvent.form.labels.minAge")}
+              </label>
               <input
                 type="number"
                 id="edadMinima"
@@ -349,11 +506,13 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 onChange={handleChange}
                 min="0"
                 max="120"
-                placeholder="Ej: 18"
+                placeholder={t("createEvent.form.placeholders.minAge")}
                 className={errors.edadMinima ? 'error' : ''}
                 disabled={loading}
               />
-              {errors.edadMinima && <span className="error-message">{errors.edadMinima}</span>}
+              {errors.edadMinima && (
+                <span className="error-message">{errors.edadMinima}</span>
+              )}
             </div>
           </div>
 
@@ -376,7 +535,9 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="latitud">Latitud *</label>
+              <label htmlFor="latitud">
+                Latitud {initialCoordinates?.latitude != null ? '*' : '(opcional)'}
+              </label>
               <input
                 type="number"
                 id="latitud"
@@ -389,12 +550,21 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 placeholder="Ej: 41.3851"
                 className={errors.latitud ? 'error' : ''}
                 disabled={loading}
+                readOnly={!!initialCoordinates?.latitude}
+                style={initialCoordinates?.latitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
+              {initialCoordinates?.latitude && (
+                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
+                  Rellenado automáticamente desde el mapa
+                </span>
+              )}
               {errors.latitud && <span className="error-message">{errors.latitud}</span>}
             </div>
 
             <div className="form-group">
-              <label htmlFor="longitud">Longitud *</label>
+              <label htmlFor="longitud">
+                Longitud {initialCoordinates?.longitude != null ? '*' : '(opcional)'}
+              </label>
               <input
                 type="number"
                 id="longitud"
@@ -407,7 +577,14 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
                 placeholder="Ej: 2.1734"
                 className={errors.longitud ? 'error' : ''}
                 disabled={loading}
+                readOnly={!!initialCoordinates?.longitude}
+                style={initialCoordinates?.longitude ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
               />
+              {initialCoordinates?.longitude && (
+                <span style={{ fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
+                  Rellenado automáticamente desde el mapa
+                </span>
+              )}
               {errors.longitud && <span className="error-message">{errors.longitud}</span>}
             </div>
           </div>
@@ -419,14 +596,16 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
               onClick={onClose}
               disabled={loading}
             >
-              Cancelar
+              {t("createEvent.buttons.cancel")}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Creando...' : 'Crear Evento'}
+              {loading
+                ? t("createEvent.buttons.submitting")
+                : t("createEvent.buttons.submit")}
             </button>
           </div>
         </form>
@@ -434,4 +613,3 @@ export default function CreateEventForm({ isOpen, onClose, onSuccess }) {
     </div>
   );
 }
-

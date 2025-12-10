@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import authService from '../../services/authService';
 import './LoginForm.css';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const LoginForm = ({ onSuccess, onError }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     usernameOrEmail: '',
     password: ''
@@ -36,11 +39,11 @@ const LoginForm = ({ onSuccess, onError }) => {
     const newErrors = {};
 
     if (!formData.usernameOrEmail.trim()) {
-      newErrors.usernameOrEmail = 'El nombre de usuario o correo es requerido';
+      newErrors.usernameOrEmail = t("Login.errors.usernameOrEmailRequired");
     }
 
     if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
+      newErrors.password = t("Login.errors.passwordRequired");
     }
 
     setErrors(newErrors);
@@ -52,9 +55,7 @@ const LoginForm = ({ onSuccess, onError }) => {
     
     setLoginError('');
     
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
     
@@ -64,12 +65,11 @@ const LoginForm = ({ onSuccess, onError }) => {
       if (result.success) {
         onSuccess && onSuccess(result.data);
       } else {
-        // Usar el mensaje de error específico del servidor
         setLoginError(result.error);
         onError && onError(result.error);
       }
     } catch (error) {
-      const errorMsg = 'Error inesperado al iniciar sesión. Por favor, intenta de nuevo.';
+      const errorMsg = t("Login.errors.unexpected");
       setLoginError(errorMsg);
       onError && onError(errorMsg);
     } finally {
@@ -80,8 +80,8 @@ const LoginForm = ({ onSuccess, onError }) => {
   return (
     <div className="login-form-container">
       <div className="login-form">
-        <h2>Iniciar Sesión</h2>
-        <p className="form-subtitle">Accede a tu cuenta de eventos</p>
+        <h2>{t("Login.title")}</h2>
+        <p className="form-subtitle">{t("Login.subtitle")}</p>
         
         {loginError && (
           <div className="login-error-banner">
@@ -93,7 +93,7 @@ const LoginForm = ({ onSuccess, onError }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="usernameOrEmail" className="form-label">
-              Nombre de Usuario o Correo
+              {t("Login.fields.usernameOrEmail")}
             </label>
             <input
               type="text"
@@ -103,7 +103,7 @@ const LoginForm = ({ onSuccess, onError }) => {
               value={formData.usernameOrEmail}
               onChange={handleChange}
               disabled={isLoading}
-              placeholder="Ingresa tu usuario o correo electrónico"
+              placeholder={t("Login.fields.placeholderUsernameOrEmail")}
             />
             {errors.usernameOrEmail && (
               <span className="error-message">{errors.usernameOrEmail}</span>
@@ -112,7 +112,7 @@ const LoginForm = ({ onSuccess, onError }) => {
 
           <div className="form-group">
             <label htmlFor="password" className="form-label">
-              Contraseña
+              {t("Login.fields.password")}
             </label>
             <input
               type="password"
@@ -122,7 +122,7 @@ const LoginForm = ({ onSuccess, onError }) => {
               value={formData.password}
               onChange={handleChange}
               disabled={isLoading}
-              placeholder="Ingresa tu contraseña"
+              placeholder={t("Login.fields.placeholderPassword")}
             />
             {errors.password && (
               <span className="error-message">{errors.password}</span>
@@ -134,12 +134,15 @@ const LoginForm = ({ onSuccess, onError }) => {
             className="login-submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {isLoading ? t("Login.button.loading") : t("Login.button.login")}
           </button>
         </form>
 
         <div className="form-footer">
-          <p>¿No tienes una cuenta? <Link to="/register">Registrate aqui</Link></p>
+          <p>
+            {t("Login.register.question")}{" "}
+            <Link to="/register">{t("Login.register.link")}</Link>
+          </p>
         </div>
       </div>
     </div>

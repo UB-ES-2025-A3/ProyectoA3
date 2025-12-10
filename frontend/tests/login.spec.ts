@@ -12,7 +12,7 @@ test('Login correcto', async ({ page }) => {
   await page.getByRole('button', { name: /iniciar sesión/i }).click();
 
   // Esperar redirección / comprobar login correcto
-  await expect(page.getByText('Descubre y guarda tus próximos planes.')).toBeVisible();
+  await expect(page.getByText('Encuentra tu próximo evento')).toBeVisible();
 });
 
 test('Login incorrecto - contraseña incorrecta', async ({ page }) => {
@@ -30,7 +30,7 @@ test('Login incorrecto - contraseña incorrecta', async ({ page }) => {
   const banner = page.locator('.message-banner.error');
 
   await expect(banner).toBeVisible();
-  await expect(banner).toContainText('Contraseña incorrecta. Inténtalo de nuevo.');
+  await expect(banner).toContainText(/Contraseña incorrecta|Incorrect password/i);
 });
 
 test('Login incorrecto - usuario inexistente', async ({ page }) => {

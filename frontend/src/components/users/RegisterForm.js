@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import authService from '../../services/authService';
 import './RegisterForm.css';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const RegisterForm = ({ onSuccess, onError }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
@@ -25,8 +28,21 @@ const RegisterForm = ({ onSuccess, onError }) => {
     specialChar: false
   });
 
+  const [idiomaOpen, setIdiomaOpen] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    
+    if (name === 'fechaNacimiento') {
+    const [year] = value.split('-'); // "YYYY-MM-DD" → ["YYYY", "MM", "DD"]
+
+    // Si el usuario intenta meter más de 4 dígitos en el año, no actualizamos el estado
+    if (year && year.length > 4) {
+      return;
+    }
+  }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -51,49 +67,68 @@ const RegisterForm = ({ onSuccess, onError }) => {
     }
   };
 
-  const [idiomaOpen, setIdiomaOpen] = useState(false);
   const handleCheckboxChange = (e) => {
-    const{value, checked} = e.target;
-      setFormData(prev => {
-        if(checked){
-          return { ...prev, idioma: [...prev.idioma, value]};
-        }else{
-          return { ...prev, idioma: prev.idioma.filter(i => i !== value)};
-        }
-      });
+    const { value, checked } = e.target;
+    setFormData(prev => {
+      if (checked) {
+        return { ...prev, idioma: [...prev.idioma, value] };
+      } else {
+        return { ...prev, idioma: prev.idioma.filter(i => i !== value) };
+      }
+    });
   };
 
   const validateForm = () => {
     const newErrors = {};
 
     if (!formData.nombre.trim()) {
-      newErrors.nombre = 'El nombre es requerido';
+      newErrors.nombre = t("Register.errors.nombreRequired");
     }
 
     if (!formData.apellidos.trim()) {
-      newErrors.apellidos = 'Los apellidos son requeridos';
+      newErrors.apellidos = t("Register.errors.apellidosRequired");
     }
 
     if (!formData.username.trim()) {
-      newErrors.username = 'El nombre de usuario es requerido';
+      newErrors.username = t("Register.errors.usernameRequired");
     }
 
     if (!formData.correo.trim()) {
-      newErrors.correo = 'El correo es requerido';
+      newErrors.correo = t("Register.errors.correoRequired");
     } else if (!/\S+@\S+\.\S+/.test(formData.correo)) {
-      newErrors.correo = 'El correo no es válido';
+      newErrors.correo = t("Register.errors.correoInvalid");
     }
 
-    if (!formData.fechaNacimiento) {
-      newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
+if (!formData.fechaNacimiento) {
+  newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoRequired");
+} else {
+  // Esperamos formato "YYYY-MM-DD"
+  const match = formData.fechaNacimiento.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    // Formato inválido (año con más o menos de 4 dígitos, etc.)
+    newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
+  } else {
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10);
+    const day = parseInt(match[3], 10);
+
+    // Aquí puedes ajustar los rangos según lo que tenga sentido para vuestra app
+    if (year < 1900 || year > 2100) {
+      newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
+    } else if (month < 1 || month > 12 || day < 1 || day > 31) {
+      newErrors.fechaNacimiento = t("Register.errors.fechaNacimientoInvalid");
     }
+  }
+}
+
 
     if (!formData.password) {
-      newErrors.password = 'La contraseña es requerida';
+      newErrors.password = t("Register.errors.passwordRequired");
     } else {
       const { length, uppercase, lowercase, number, specialChar } = pwdRequirements;
       if (!length || !uppercase || !lowercase || !number || !specialChar) {
-        newErrors.password = 'La contraseña no cumple con los requisitos mínimos';
+        newErrors.password = t("Register.errors.passwordRequirements");
       }
     }
 
@@ -112,7 +147,6 @@ const RegisterForm = ({ onSuccess, onError }) => {
     
     try {
       // El backend espera List<String> idioma (array), no string
-      // Mantener como array, enviar array vacío si no hay selección
       const payload = {
         ...formData,
         idioma: Array.isArray(formData.idioma) ? formData.idioma : []
@@ -125,7 +159,8 @@ const RegisterForm = ({ onSuccess, onError }) => {
         onError && onError(result.error);
       }
     } catch (error) {
-      onError && onError('Error inesperado al registrar usuario');
+      const errorMsg = t("Register.errors.unexpected");
+      onError && onError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -134,14 +169,14 @@ const RegisterForm = ({ onSuccess, onError }) => {
   return (
     <div className="register-form-container">
       <div className="register-form">
-        <h2>Crear Cuenta</h2>
-        <p className="form-subtitle">Únete a nuestra plataforma de eventos</p>
+        <h2>{t("Register.title")}</h2>
+        <p className="form-subtitle">{t("Register.subtitle")}</p>
         
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="nombre">
-                Nombre *
+                {t("Register.fields.nombre")} *
               </label>
               <input
                 type="text"
@@ -150,14 +185,14 @@ const RegisterForm = ({ onSuccess, onError }) => {
                 className={`form-input ${errors.nombre ? 'error' : ''}`}
                 value={formData.nombre}
                 onChange={handleChange}
-                placeholder="Ingresa tu nombre"
+                placeholder={t("Register.fields.placeholderNombre")}
               />
               {errors.nombre && <div className="error-message">{errors.nombre}</div>}
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="apellidos">
-                Apellidos *
+                {t("Register.fields.apellidos")} *
               </label>
               <input
                 type="text"
@@ -166,7 +201,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                 className={`form-input ${errors.apellidos ? 'error' : ''}`}
                 value={formData.apellidos}
                 onChange={handleChange}
-                placeholder="Ingresa tus apellidos"
+                placeholder={t("Register.fields.placeholderApellidos")}
               />
               {errors.apellidos && <div className="error-message">{errors.apellidos}</div>}
             </div>
@@ -174,7 +209,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="username">
-              Nombre de Usuario *
+              {t("Register.fields.username")} *
             </label>
             <input
               type="text"
@@ -183,14 +218,14 @@ const RegisterForm = ({ onSuccess, onError }) => {
               className={`form-input ${errors.username ? 'error' : ''}`}
               value={formData.username}
               onChange={handleChange}
-              placeholder="Elige un nombre de usuario"
+              placeholder={t("Register.fields.placeholderUsername")}
             />
             {errors.username && <div className="error-message">{errors.username}</div>}
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="correo">
-              Correo Electrónico *
+              {t("Register.fields.correo")} *
             </label>
             <input
               type="email"
@@ -199,14 +234,14 @@ const RegisterForm = ({ onSuccess, onError }) => {
               className={`form-input ${errors.correo ? 'error' : ''}`}
               value={formData.correo}
               onChange={handleChange}
-              placeholder="tu@email.com"
+              placeholder={t("Register.fields.placeholderCorreo")}
             />
             {errors.correo && <div className="error-message">{errors.correo}</div>}
           </div>
 
           <div className="form-group">
             <label className="form-label" htmlFor="fechaNacimiento">
-              Fecha de Nacimiento *
+              {t("Register.fields.fechaNacimiento")} *
             </label>
             <input
               type="date"
@@ -222,7 +257,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="ciudad">
-                Ciudad
+                {t("Register.fields.ciudad")}
               </label>
               <input
                 type="text"
@@ -231,20 +266,22 @@ const RegisterForm = ({ onSuccess, onError }) => {
                 className="form-input"
                 value={formData.ciudad}
                 onChange={handleChange}
-                placeholder="Tu ciudad"
+                placeholder={t("Register.fields.placeholderCiudad")}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Idioma(s) Hablado(s)</label>
+              <label className="form-label">
+                {t("Register.fields.idioma")}
+              </label>
               <div className="multi-dropdown">
                 <div
                   className="multi-dropdown-header"
                   onClick={() => setIdiomaOpen(!idiomaOpen)}
                 >
                   {formData.idioma.length > 0 
-                  ? formData.idioma.join(', ') 
-                  : 'Selecciona idioma(s)'}
+                    ? formData.idioma.join(', ') 
+                    : t("Register.fields.idiomaPlaceholder")}
                   <span className="dropdown-arrow">{idiomaOpen ? '▲' : '▼'}</span>
                 </div>
                 {idiomaOpen && (
@@ -256,7 +293,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('es')}
                         onChange={handleCheckboxChange}
                       />
-                      Español
+                      {t("Register.languages.es")}
                     </label>
                     <label>
                       <input
@@ -265,17 +302,16 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('en')}
                         onChange={handleCheckboxChange}
                       />
-                      Inglés
+                      {t("Register.languages.en")}
                     </label>
                     <label>
                       <input
-
                         type="checkbox"
                         value="fr"
                         checked={formData.idioma.includes('fr')}
                         onChange={handleCheckboxChange}
                       />
-                      Francés
+                      {t("Register.languages.fr")}
                     </label>
                     <label>
                       <input
@@ -284,7 +320,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('de')}
                         onChange={handleCheckboxChange}
                       />
-                      Alemán
+                      {t("Register.languages.de")}
                     </label>
                     <label>
                       <input
@@ -293,7 +329,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('it')}
                         onChange={handleCheckboxChange}
                       />
-                      Italiano
+                      {t("Register.languages.it")}
                     </label>
                     <label>
                       <input
@@ -302,7 +338,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('pt')}
                         onChange={handleCheckboxChange}
                       />
-                      Portugués
+                      {t("Register.languages.pt")}
                     </label>
                     <label>
                       <input
@@ -311,7 +347,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
                         checked={formData.idioma.includes('ru')}
                         onChange={handleCheckboxChange}
                       />
-                      Ruso
+                      {t("Register.languages.ru")}
                     </label>
                   </div>
                 )}
@@ -321,7 +357,7 @@ const RegisterForm = ({ onSuccess, onError }) => {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">
-              Contraseña *
+              {t("Register.password.label")} *
             </label>
             <input
               type="password"
@@ -330,16 +366,26 @@ const RegisterForm = ({ onSuccess, onError }) => {
               className={`form-input ${errors.password ? 'error' : ''}`}
               value={formData.password}
               onChange={handleChange}
-              placeholder="Mínimo 6 caracteres"
+              placeholder={t("Register.password.placeholder")}
             />
             <div className="password-requirements">
-              <p>La contraseña debe incluir:</p>
+              <p>{t("Register.password.requirementsTitle")}</p>
               <ul>
-                <li className={pwdRequirements.length ? 'valid' : 'unmet'}>Al menos 6 caracteres</li>
-                <li className={pwdRequirements.uppercase ? 'valid' : 'unmet'}>Una letra mayúscula</li>
-                <li className={pwdRequirements.lowercase ? 'valid' : 'unmet'}>Una letra minúscula</li>
-                <li className={pwdRequirements.number ? 'valid' : 'unmet'}>Un número</li>
-                <li className={pwdRequirements.specialChar ? 'valid' : 'unmet'}>Un carácter especial</li>
+                <li className={pwdRequirements.length ? 'valid' : 'unmet'}>
+                  {t("Register.password.requirements.length")}
+                </li>
+                <li className={pwdRequirements.uppercase ? 'valid' : 'unmet'}>
+                  {t("Register.password.requirements.uppercase")}
+                </li>
+                <li className={pwdRequirements.lowercase ? 'valid' : 'unmet'}>
+                  {t("Register.password.requirements.lowercase")}
+                </li>
+                <li className={pwdRequirements.number ? 'valid' : 'unmet'}>
+                  {t("Register.password.requirements.number")}
+                </li>
+                <li className={pwdRequirements.specialChar ? 'valid' : 'unmet'}>
+                  {t("Register.password.requirements.specialChar")}
+                </li>
               </ul>
             </div>
             {errors.password && <div className="error-message">{errors.password}</div>}
@@ -350,12 +396,15 @@ const RegisterForm = ({ onSuccess, onError }) => {
             className="register-submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            {isLoading ? t("Register.button.loading") : t("Register.button.submit")}
           </button>
         </form>
 
         <div className="form-footer">
-          <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
+          <p>
+            {t("Register.footer.question")}{" "}
+            <Link to="/login">{t("Register.footer.link")}</Link>
+          </p>
         </div>
       </div>
     </div>
@@ -363,4 +412,3 @@ const RegisterForm = ({ onSuccess, onError }) => {
 };
 
 export default RegisterForm;
-

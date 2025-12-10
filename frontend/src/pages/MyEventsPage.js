@@ -1,9 +1,11 @@
+// src/pages/MyEventsPage.js
 import React, { useEffect, useState } from "react";
 import { getUserEvents, leaveEvent } from "../services/eventService";
 import EnrolledEventCard from "../components/events/EnrolledEventCard";
 import EventModal from "../components/events/EventModal";
 import MessageBanner from "../components/common/MessageBanner";
 import "../styles/MyEventsPage.css";
+import { useTranslation } from "react-i18next";
 
 export default function MyEventsPage() {
   const [events, setEvents] = useState([]);
@@ -11,6 +13,7 @@ export default function MyEventsPage() {
   const [banner, setBanner] = useState({ type: "success", message: "" });
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadUserEvents = async () => {
@@ -19,18 +22,22 @@ export default function MyEventsPage() {
         const eventsData = await getUserEvents();
         setEvents(eventsData);
       } catch (error) {
-        console.error('Error cargando tus eventos:', error);
-        setBanner({ 
-          type: "error", 
-          message: "Error al cargar tus eventos. Inténtalo de nuevo." 
+        console.error("Error cargando tus eventos:", error);
+        setBanner({
+          type: "error",
+          message: t("myEvents.messages.loadError")
         });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+        setTimeout(
+          () => setBanner({ type: "success", message: "" }),
+          5000
+        );
       } finally {
         setLoading(false);
       }
     };
 
     loadUserEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEventClick = (event) => {
@@ -46,50 +53,64 @@ export default function MyEventsPage() {
   const handleLeaveEvent = async (eventId) => {
     try {
       await leaveEvent(eventId);
-      
-      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
-      
-      setBanner({ 
-        type: "success", 
-        message: "Te has desapuntado del evento correctamente." 
+
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== eventId)
+      );
+
+      setBanner({
+        type: "success",
+        message: t("myEvents.messages.leaveSuccess")
       });
-      setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+      setTimeout(
+        () => setBanner({ type: "success", message: "" }),
+        3000
+      );
     } catch (error) {
-      console.error('Error al desapuntarse del evento:', error);
-      setBanner({ 
-        type: "error", 
-        message: error.message || "Error al desapuntarse del evento." 
+      console.error("Error al desapuntarse del evento:", error);
+      setBanner({
+        type: "error",
+        message: error.message || t("myEvents.messages.leaveErrorFallback")
       });
-      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      setTimeout(
+        () => setBanner({ type: "success", message: "" }),
+        5000
+      );
     }
   };
 
   const now = new Date();
-  const activeEvents = events.filter(event => new Date(event.startDate) >= now);
-  const finishedEvents = events.filter(event => new Date(event.startDate) < now);
+  const activeEvents = events.filter(
+    (event) => new Date(event.startDate) >= now
+  );
+  const finishedEvents = events.filter(
+    (event) => new Date(event.startDate) < now
+  );
 
   return (
     <div className="my-events-page">
       <div className="my-events-content">
         <header className="my-events-header">
           <h1>
-            <span className="header-icon" aria-hidden="true">📅</span>
-            Mi Agenda de Eventos
+            <span className="header-icon" aria-hidden="true">
+              📅
+            </span>
+            {t("myEvents.title")}
           </h1>
-          <p>Aquí puedes ver todos los eventos en los que estás inscrito</p>
+          <p>{t("myEvents.subtitle")}</p>
         </header>
 
         {loading ? (
           <div className="loading-state">
-            <p>Cargando tus eventos...</p>
+            <p>{t("myEvents.loading")}</p>
           </div>
         ) : events.length === 0 ? (
           <div className="empty-state">
             <div className="empty-state-icon">📭</div>
-            <h2>Todavía no tienes eventos guardados</h2>
-            <p>Explora los eventos disponibles y apúntate a los que más te interesen</p>
+            <h2>{t("myEvents.empty.title")}</h2>
+            <p>{t("myEvents.empty.description")}</p>
             <a href="/events" className="btn btn-primary">
-              Ver eventos disponibles
+              {t("myEvents.empty.button")}
             </a>
           </div>
         ) : (
@@ -98,10 +119,12 @@ export default function MyEventsPage() {
             {activeEvents.length > 0 && (
               <section className="events-section">
                 <h2 className="section-title">
-                  Próximos Eventos ({activeEvents.length})
+                  {t("myEvents.sections.upcoming", {
+                    count: activeEvents.length
+                  })}
                 </h2>
                 <div className="events-grid">
-                  {activeEvents.map(event => (
+                  {activeEvents.map((event) => (
                     <EnrolledEventCard
                       key={event.id}
                       event={event}
@@ -117,10 +140,12 @@ export default function MyEventsPage() {
             {finishedEvents.length > 0 && (
               <section className="events-section">
                 <h2 className="section-title">
-                  Eventos Pasados ({finishedEvents.length})
+                  {t("myEvents.sections.past", {
+                    count: finishedEvents.length
+                  })}
                 </h2>
                 <div className="events-grid">
-                  {finishedEvents.map(event => (
+                  {finishedEvents.map((event) => (
                     <EnrolledEventCard
                       key={event.id}
                       event={event}
@@ -135,8 +160,10 @@ export default function MyEventsPage() {
         )}
       </div>
 
-      {banner.message && <MessageBanner type={banner.type} message={banner.message} />}
-      
+      {banner.message && (
+        <MessageBanner type={banner.type} message={banner.message} />
+      )}
+
       {/* Modal de Evento */}
       {selectedEvent && (
         <EventModal

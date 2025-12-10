@@ -182,3 +182,4 @@ spring-shell.log
 # Documentación generada
 /docs/generated/
 /javadoc/
+test-results/

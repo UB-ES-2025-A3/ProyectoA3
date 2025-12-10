@@ -2,8 +2,18 @@ import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
+
+// 🔹 Mock simple de i18n (no necesitamos textos)
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    i18n: { language: 'es', changeLanguage: () => Promise.resolve() },
+  }),
+}));
+
 import App from './App';
 import userService from './services/userService';
+
 
 // Mocks
 jest.mock('./services/userService');

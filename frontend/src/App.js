@@ -5,6 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import MyEventsPage from './pages/MyEventsPage';
 import EventPage from './pages/EventPage';
+import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import SplashPage from './pages/SplashPage';
 import NavBar from './components/layout/NavBar';
@@ -64,9 +65,14 @@ function App() {
         applyTheme(DEFAULT_THEME);
       } catch (error) {
         console.error('Error cargando tema:', error);
-        // Usar tema por defecto si hay error
-        setCurrentTheme(DEFAULT_THEME);
-        applyTheme(DEFAULT_THEME);
+        const cachedTheme = localStorage.getItem('profileTheme');
+        if (cachedTheme) {
+          setCurrentTheme(cachedTheme);
+          applyTheme(cachedTheme);
+        } else {
+          setCurrentTheme(DEFAULT_THEME);
+          applyTheme(DEFAULT_THEME);
+        }
       }
     };
 
@@ -96,7 +102,7 @@ function App() {
 
         {/* Rutas CON NavBar */}
         <Route element={<WithNavLayout />}>
-          <Route path="/home" element={<Navigate to="/events" replace />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/events" element={<EventPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-events" element={<MyEventsPage />} />

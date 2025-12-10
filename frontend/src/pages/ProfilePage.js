@@ -1,12 +1,21 @@
+// src/pages/ProfilePage.js
 import React, { useState, useEffect } from 'react';
 import '../styles/ProfilePage.css';
-import { FaUser, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaEdit, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import {
+  FaUser,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaBirthdayCake,
+  FaEdit,
+  FaCheck,
+  FaTimes,
+  FaInfoCircle
+} from 'react-icons/fa';
 import userService from '../services/userService';
 import { getMyCreatedEvents } from '../services/eventService';
 import MessageBanner from '../components/common/MessageBanner';
+import { useTranslation } from 'react-i18next';
 
-// 👇 IMPORTA AQUÍ TUS IMÁGENES DE AVATAR
-// Asegúrate de crear estos archivos o adaptar las rutas a las que tú tengas
 import avatarDefault from '../assets/avatars/avatar-default.jpg';
 import avatar1 from '../assets/avatars/avatar-1.png';
 import avatar2 from '../assets/avatars/avatar-2.png';
@@ -22,7 +31,7 @@ import bgOrange from '../assets/avatars/bgOrange.png';
 import bgPink from '../assets/avatars/bgPink.png';
 import bgDark from '../assets/avatars/bgdefault.jpg';
 
-// 👇 Opciones de avatar disponibles
+// Opciones de avatar disponibles
 const AVATAR_OPTIONS = [avatarDefault, avatar1, avatar2, avatar3, avatar4, avatar5];
 
 // Mapeo de nombres de tema a colores
@@ -56,17 +65,19 @@ const getBackgroundForTheme = (theme) =>
   BACKGROUND_MAP[theme] || BACKGROUND_MAP.default;
 
 export default function ProfilePage() {
+  const { t, i18n } = useTranslation();
+
   const [userData, setUserData] = useState(null);
   const [stats, setStats] = useState(null);
   const [userEvents, setUserEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
-  const [banner, setBanner] = useState({ type: "success", message: "" });
+  const [banner, setBanner] = useState({ type: 'success', message: '' });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // 👇 Estado para el avatar seleccionado
+  // Estado para el avatar seleccionado
   const [avatar, setAvatar] = useState(avatarDefault);
 
   // *** TEMA: Estado para previsualización y guardado ***
@@ -75,16 +86,22 @@ export default function ProfilePage() {
   const [savingTema, setSavingTema] = useState(false);
   const [themeChanged, setThemeChanged] = useState(false); // Indica si hay cambios pendientes
 
-  // Cargar datos del usuario + avatar desde localStorage
+  // Helper para locale de fechas según idioma
+  const getLocale = () => {
+    if (i18n.language === 'en') return 'en-GB';
+    if (i18n.language === 'ca' || i18n.language === 'cat') return 'ca-ES';
+    return 'es-ES';
+  };
+
+  // Cargar datos del usuario + tema + avatar
   useEffect(() => {
     const loadUserData = async () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem('userId');
 
-        
         if (!userId) {
-          setBanner({ type: "error", message: "No hay usuario logueado" });
+          setBanner({ type: 'error', message: t('profile.noUserLogged') });
           return;
         }
 
@@ -102,7 +119,7 @@ export default function ProfilePage() {
           setUserData(user);
           setEditData(user);
         } else {
-          setBanner({ type: "error", message: profileResult.error });
+          setBanner({ type: 'error', message: profileResult.error });
         }
 
         // 2. Estadísticas
@@ -137,20 +154,24 @@ export default function ProfilePage() {
         if (storedAvatar) {
           setAvatar(storedAvatar);
         } else {
-          // si no había nada guardado, dejamos el avatar por defecto y lo guardamos
           setAvatar(avatarDefault);
           localStorage.setItem('profileAvatar', avatarDefault);
         }
-
       } catch (error) {
         console.error('Error cargando datos del usuario:', error);
-        setBanner({ type: "error", message: `Error al cargar los datos: ${error.message || 'Error desconocido'}` });
+        setBanner({
+          type: 'error',
+          message: t('profile.loadErrorWithMessage', {
+            error: error.message || t('profile.unknownError')
+          })
+        });
       } finally {
         setLoading(false);
       }
     };
 
     loadUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEdit = () => {
@@ -164,29 +185,29 @@ export default function ProfilePage() {
 
     // Validar nombre
     if (!editData.nombre?.trim()) {
-      newErrors.nombre = 'El nombre es requerido';
+      newErrors.nombre = t('profile.validation.firstNameRequired');
     } else if (editData.nombre.length < 2) {
-      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+      newErrors.nombre = t('profile.validation.firstNameMin');
     } else if (editData.nombre.length > 50) {
-      newErrors.nombre = 'El nombre no puede tener más de 50 caracteres';
+      newErrors.nombre = t('profile.validation.firstNameMax');
     }
 
     // Validar apellidos
     if (!editData.apellidos?.trim()) {
-      newErrors.apellidos = 'Los apellidos son requeridos';
+      newErrors.apellidos = t('profile.validation.lastNameRequired');
     } else if (editData.apellidos.length < 2) {
-      newErrors.apellidos = 'Los apellidos deben tener al menos 2 caracteres';
+      newErrors.apellidos = t('profile.validation.lastNameMin');
     } else if (editData.apellidos.length > 100) {
-      newErrors.apellidos = 'Los apellidos no pueden tener más de 100 caracteres';
+      newErrors.apellidos = t('profile.validation.lastNameMax');
     }
 
     // Validar correo
     if (!editData.correo?.trim()) {
-      newErrors.correo = 'El correo electrónico es requerido';
+      newErrors.correo = t('profile.validation.emailRequired');
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(editData.correo)) {
-        newErrors.correo = 'El correo electrónico no es válido';
+        newErrors.correo = t('profile.validation.emailInvalid');
       }
     }
 
@@ -194,40 +215,36 @@ export default function ProfilePage() {
     if (editData.fechaNacimiento) {
       const birthDate = new Date(editData.fechaNacimiento);
       const today = new Date();
-      
-      // Verificar que la fecha es válida
+
       if (isNaN(birthDate.getTime())) {
-        newErrors.fechaNacimiento = 'La fecha de nacimiento no es válida';
+        newErrors.fechaNacimiento = t('profile.validation.birthDateInvalid');
       } else {
-        // Calcular edad
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
           age--;
         }
 
-        // Validar edad mínima (13 años) y máxima (120 años)
         if (age < 13) {
-          newErrors.fechaNacimiento = 'Debes tener al menos 13 años para usar esta plataforma';
+          newErrors.fechaNacimiento = t('profile.validation.tooYoung');
         } else if (age > 120) {
-          newErrors.fechaNacimiento = 'La fecha de nacimiento no parece válida';
+          newErrors.fechaNacimiento = t('profile.validation.tooOld');
         }
 
-        // Validar que no sea una fecha futura
         if (birthDate > today) {
-          newErrors.fechaNacimiento = 'La fecha de nacimiento no puede ser en el futuro';
+          newErrors.fechaNacimiento = t('profile.validation.birthDateFuture');
         }
       }
     }
 
-    // Validar ciudad (opcional pero con límite)
+    // Validar ciudad
     if (editData.ciudad && editData.ciudad.length > 100) {
-      newErrors.ciudad = 'El nombre de la ciudad no puede tener más de 100 caracteres';
+      newErrors.ciudad = t('profile.validation.cityMax');
     }
 
-    // Validar descripción (opcional pero con límite)
+    // Validar descripción
     if (editData.descripcion && editData.descripcion.length > 500) {
-      newErrors.descripcion = 'La descripción no puede tener más de 500 caracteres';
+      newErrors.descripcion = t('profile.validation.descriptionMax');
     }
 
     setErrors(newErrors);
@@ -235,10 +252,12 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
-    // Validar formulario antes de guardar
     if (!validateForm()) {
-      setBanner({ type: "error", message: "Por favor, corrige los errores en el formulario" });
-      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      setBanner({
+        type: 'error',
+        message: t('profile.validation.fixErrors')
+      });
+      setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
       return;
     }
 
@@ -258,16 +277,16 @@ export default function ProfilePage() {
           localStorage.setItem('username', updated.username);
         }
 
-        setBanner({ type: "success", message: "Perfil actualizado correctamente" });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        setBanner({ type: 'success', message: t('profile.updateSuccess') });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
       } else {
-        setBanner({ type: "error", message: result.error });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+        setBanner({ type: 'error', message: result.error });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
       }
     } catch (error) {
       console.error('Error actualizando perfil:', error);
-      setBanner({ type: "error", message: "Error al actualizar el perfil" });
-      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      setBanner({ type: 'error', message: t('profile.updateError') });
+      setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
     } finally {
       setSaving(false);
     }
@@ -284,7 +303,6 @@ export default function ProfilePage() {
       ...prev,
       [field]: value
     }));
-    // Limpiar error del campo cuando el usuario empieza a escribir
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -293,20 +311,20 @@ export default function ProfilePage() {
     }
   };
 
-  // 👇 Cambio de avatar (sólo entre opciones predefinidas)
-  const handleAvatarChange = (newAvatar) => {
+  // Cambio de avatar (sólo entre opciones predefinidas)
+  const handleAvatarChange = newAvatar => {
     setAvatar(newAvatar);
     localStorage.setItem('profileAvatar', newAvatar);
   };
-  
+
   // *** PREVISUALIZACIÓN DE TEMA (sin guardar) ***
   const handleThemePreview = (themeName) => {
-    // Actualizar UI inmediatamente (solo previsualización)
     setPreviewTheme(themeName);
     setThemeChanged(themeName !== savedTheme);
-    
-    // Disparar evento para que App.js actualice el tema visualmente
-    window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: themeName } }));
+
+    window.dispatchEvent(
+      new CustomEvent('themeChange', { detail: { theme: themeName } })
+    );
   };
 
   // *** GUARDAR TEMA EN BACKEND ***
@@ -317,7 +335,7 @@ export default function ProfilePage() {
     setSavingTema(true);
     try {
       const result = await userService.updateTema(userId, previewTheme);
-      
+
       if (result.success) {
         const savedThemeName =
           (typeof result.data === 'string' && result.data) ||
@@ -330,13 +348,16 @@ export default function ProfilePage() {
         setBanner({ type: "success", message: "Tema guardado correctamente" });
         setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
       } else {
-        setBanner({ type: "error", message: result.error || "Error al guardar el tema" });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+        setBanner({
+          type: 'error',
+          message: result.error || 'Error al guardar el tema'
+        });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
       }
     } catch (error) {
       console.error('Error guardando tema:', error);
-      setBanner({ type: "error", message: "Error al guardar el tema" });
-      setTimeout(() => setBanner({ type: "success", message: "" }), 5000);
+      setBanner({ type: 'error', message: 'Error al guardar el tema' });
+      setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
     } finally {
       setSavingTema(false);
     }
@@ -346,17 +367,16 @@ export default function ProfilePage() {
   const handleCancelTheme = () => {
     setPreviewTheme(savedTheme);
     setThemeChanged(false);
-    // Restaurar el tema guardado en la UI
-    window.dispatchEvent(new CustomEvent('themeChange', { detail: { theme: savedTheme } }));
+    window.dispatchEvent(
+      new CustomEvent('themeChange', { detail: { theme: savedTheme } })
+    );
   };
-
-
 
   if (loading) {
     return (
       <div className="profile-page">
         <div className="profile-container" style={{ textAlign: 'center', padding: '50px' }}>
-          <p>Cargando perfil...</p>
+          <p>{t('profile.loading')}</p>
         </div>
       </div>
     );
@@ -366,7 +386,7 @@ export default function ProfilePage() {
     return (
       <div className="profile-page">
         <div className="profile-container" style={{ textAlign: 'center', padding: '50px' }}>
-          <p>No se pudo cargar el perfil del usuario</p>
+          <p>{t('profile.loadError')}</p>
         </div>
       </div>
     );
@@ -393,33 +413,33 @@ export default function ProfilePage() {
               className="profile-avatar"
               style={{
                 backgroundColor: getThemeColor(previewTheme),
-                backgroundImage: "none"
+                backgroundImage: 'none'
               }}
             >
               <img
                 src={avatar}
-                alt={`Avatar de ${fullName}`}
+                alt={t('profile.header.avatarAlt', { fullName })}
                 className="profile-avatar-img"
               />
             </div>
-
-
           </div>
-          <div className="profile-header-info" >
+          <div className="profile-header-info">
             <h1>{fullName}</h1>
-            <p className="profile-role">Usuario: {userData.username}</p>
+            <p className="profile-role">
+              {t('profile.header.usernameLabel')}: {userData.username}
+            </p>
             {!isEditing && (
               <button className="edit-profile-btn" onClick={handleEdit}>
-                <FaEdit /> Editar Perfil
+                <FaEdit /> {t('profile.header.edit')}
               </button>
             )}
             {isEditing && (
               <div className="edit-actions">
                 <button className="save-btn" onClick={handleSave} disabled={saving}>
-                  <FaCheck /> {saving ? 'Guardando...' : 'Guardar'}
+                  <FaCheck /> {saving ? t('profile.header.saving') : t('profile.header.save')}
                 </button>
                 <button className="cancel-btn" onClick={handleCancel} disabled={saving}>
-                  <FaTimes /> Cancelar
+                  <FaTimes /> {t('profile.header.cancel')}
                 </button>
               </div>
             )}
@@ -438,7 +458,7 @@ export default function ProfilePage() {
                 className="color-option-btn"
                 style={{
                   backgroundColor: getThemeColor(theme),
-                  border: previewTheme === theme ? "3px solid #007bff" : "2px solid #ccc",
+                  border: previewTheme === theme ? '3px solid #007bff' : '2px solid #ccc',
                   color: theme === 'dark' ? '#fff' : '#333'
                 }}
                 onClick={() => handleThemePreview(theme)}
@@ -448,36 +468,48 @@ export default function ProfilePage() {
               />
             ))}
           </div>
-          
-          {/* Botones de guardar/cancelar solo si hay cambios */}
+
           {themeChanged && (
-            <div className="theme-actions" style={{ marginTop: '16px', display: 'flex', gap: '12px' }}>
-              <button 
-                className="save-btn" 
-                onClick={handleSaveTheme} 
+            <div
+              className="theme-actions"
+              style={{ marginTop: '16px', display: 'flex', gap: '12px' }}
+            >
+              <button
+                className="save-btn"
+                onClick={handleSaveTheme}
                 disabled={savingTema}
                 style={{ padding: '8px 20px', borderRadius: '8px' }}
               >
                 <FaCheck /> {savingTema ? 'Guardando...' : 'Guardar tema'}
               </button>
-              <button 
-                className="cancel-btn" 
-                onClick={handleCancelTheme} 
+              <button
+                className="cancel-btn"
+                onClick={handleCancelTheme}
                 disabled={savingTema}
-                style={{ padding: '8px 20px', borderRadius: '8px', background: '#6c757d', color: '#fff', border: 'none' }}
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: '8px',
+                  background: '#6c757d',
+                  color: '#fff',
+                  border: 'none'
+                }}
               >
                 <FaTimes /> Cancelar
               </button>
             </div>
           )}
-          
-          {savingTema && <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>Guardando tema...</p>}
+
+          {savingTema && (
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+              Guardando tema...
+            </p>
+          )}
         </div>
 
-        {/* 👇 Selector de avatar sólo cuando está en modo edición */}
+        {/* Selector de avatar sólo en edición */}
         {isEditing && (
           <div className="profile-section">
-            <h2 className="section-title">Cambiar avatar</h2>
+            <h2 className="section-title">{t('profile.header.changeAvatarTitle')}</h2>
             <div className="avatar-options">
               {AVATAR_OPTIONS.map((option, index) => (
                 <button
@@ -497,24 +529,24 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Main Profile Content */}
+        {/* Contenido principal */}
         <div className="profile-content">
           {/* Información Personal */}
           <div className="profile-section">
-            <h2 className="section-title">Información Personal</h2>
+            <h2 className="section-title">{t('profile.sections.personalInfo')}</h2>
             <div className="info-grid">
               <div className="info-item">
                 <div className="info-icon">
                   <FaUser />
                 </div>
                 <div className="info-content">
-                  <label>Nombre</label>
+                  <label>{t('profile.fields.firstName')}</label>
                   {isEditing ? (
                     <>
                       <input
                         type="text"
                         value={editData.nombre || ''}
-                        onChange={(e) => handleChange('nombre', e.target.value)}
+                        onChange={e => handleChange('nombre', e.target.value)}
                         className={`input-field ${errors.nombre ? 'error' : ''}`}
                       />
                       {errors.nombre && <span className="error-message">{errors.nombre}</span>}
@@ -530,16 +562,18 @@ export default function ProfilePage() {
                   <FaUser />
                 </div>
                 <div className="info-content">
-                  <label>Apellidos</label>
+                  <label>{t('profile.fields.lastName')}</label>
                   {isEditing ? (
                     <>
                       <input
                         type="text"
                         value={editData.apellidos || ''}
-                        onChange={(e) => handleChange('apellidos', e.target.value)}
+                        onChange={e => handleChange('apellidos', e.target.value)}
                         className={`input-field ${errors.apellidos ? 'error' : ''}`}
                       />
-                      {errors.apellidos && <span className="error-message">{errors.apellidos}</span>}
+                      {errors.apellidos && (
+                        <span className="error-message">{errors.apellidos}</span>
+                      )}
                     </>
                   ) : (
                     <p>{userData.apellidos}</p>
@@ -552,13 +586,13 @@ export default function ProfilePage() {
                   <FaEnvelope />
                 </div>
                 <div className="info-content">
-                  <label>Correo Electrónico</label>
+                  <label>{t('profile.fields.email')}</label>
                   {isEditing ? (
                     <>
                       <input
                         type="email"
                         value={editData.correo || ''}
-                        onChange={(e) => handleChange('correo', e.target.value)}
+                        onChange={e => handleChange('correo', e.target.value)}
                         className={`input-field ${errors.correo ? 'error' : ''}`}
                       />
                       {errors.correo && <span className="error-message">{errors.correo}</span>}
@@ -574,19 +608,19 @@ export default function ProfilePage() {
                   <FaMapMarkerAlt />
                 </div>
                 <div className="info-content">
-                  <label>Ciudad</label>
+                  <label>{t('profile.fields.city')}</label>
                   {isEditing ? (
                     <>
                       <input
                         type="text"
                         value={editData.ciudad || ''}
-                        onChange={(e) => handleChange('ciudad', e.target.value)}
+                        onChange={e => handleChange('ciudad', e.target.value)}
                         className={`input-field ${errors.ciudad ? 'error' : ''}`}
                       />
                       {errors.ciudad && <span className="error-message">{errors.ciudad}</span>}
                     </>
                   ) : (
-                    <p>{userData.ciudad || 'No especificada'}</p>
+                    <p>{userData.ciudad || t('profile.fields.cityNotSpecified')}</p>
                   )}
                 </div>
               </div>
@@ -596,25 +630,33 @@ export default function ProfilePage() {
                   <FaBirthdayCake />
                 </div>
                 <div className="info-content">
-                  <label>Fecha de Nacimiento</label>
+                  <label>{t('profile.fields.birthDate')}</label>
                   {isEditing ? (
                     <>
                       <input
                         type="date"
                         value={editData.fechaNacimiento || ''}
-                        onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
+                        onChange={e => handleChange('fechaNacimiento', e.target.value)}
                         className={`input-field ${errors.fechaNacimiento ? 'error' : ''}`}
                         max={new Date().toISOString().split('T')[0]}
-                        min={new Date(new Date().getFullYear() - 120, 0, 1).toISOString().split('T')[0]}
+                        min={new Date(new Date().getFullYear() - 120, 0, 1)
+                          .toISOString()
+                          .split('T')[0]}
                       />
-                      {errors.fechaNacimiento && <span className="error-message">{errors.fechaNacimiento}</span>}
+                      {errors.fechaNacimiento && (
+                        <span className="error-message">{errors.fechaNacimiento}</span>
+                      )}
                     </>
                   ) : (
-                    <p>{userData.fechaNacimiento ? new Date(userData.fechaNacimiento).toLocaleDateString('es-ES', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    }) : 'No especificada'}</p>
+                    <p>
+                      {userData.fechaNacimiento
+                        ? new Date(userData.fechaNacimiento).toLocaleDateString(getLocale(), {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })
+                        : t('profile.fields.birthDateNotSpecified')}
+                    </p>
                   )}
                 </div>
               </div>
@@ -625,28 +667,44 @@ export default function ProfilePage() {
           <div className="profile-section">
             <h2 className="section-title">
               <FaInfoCircle style={{ marginRight: '8px' }} />
-              Descripción
+              {t('profile.sections.description')}
             </h2>
             <div className="bio-section">
               {isEditing ? (
                 <>
                   <textarea
                     value={editData.descripcion || ''}
-                    onChange={(e) => handleChange('descripcion', e.target.value)}
+                    onChange={e => handleChange('descripcion', e.target.value)}
                     className={`bio-textarea ${errors.descripcion ? 'error' : ''}`}
                     rows="6"
-                    placeholder="Cuéntanos un poco sobre ti..."
+                    placeholder={t('profile.fields.descriptionPlaceholder')}
                     maxLength="500"
                   />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                    {errors.descripcion && <span className="error-message">{errors.descripcion}</span>}
-                    <span style={{ fontSize: '12px', color: '#666', marginLeft: 'auto' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginTop: '8px'
+                    }}
+                  >
+                    {errors.descripcion && (
+                      <span className="error-message">{errors.descripcion}</span>
+                    )}
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        color: '#666',
+                        marginLeft: 'auto'
+                      }}
+                    >
                       {(editData.descripcion || '').length} / 500
                     </span>
                   </div>
                 </>
               ) : (
-                <p className="bio-text">{userData.descripcion || 'No hay descripción disponible'}</p>
+                <p className="bio-text">
+                  {userData.descripcion || t('profile.fields.noDescription')}
+                </p>
               )}
             </div>
           </div>
@@ -654,7 +712,7 @@ export default function ProfilePage() {
           {/* Idiomas */}
           {userData.languages && userData.languages.length > 0 && (
             <div className="profile-section">
-              <h2 className="section-title">Idiomas</h2>
+              <h2 className="section-title">{t('profile.sections.languages')}</h2>
               <div className="tags-section">
                 {userData.languages.map((language, index) => (
                   <span key={index} className="tag tag-language">
@@ -662,8 +720,11 @@ export default function ProfilePage() {
                   </span>
                 ))}
                 {isEditing && (
-                  <button className="add-tag-btn" title="Agregar idioma">
-                    + Agregar
+                  <button
+                    className="add-tag-btn"
+                    title={t('profile.languages.addLanguage')}
+                  >
+                    + {t('profile.languages.add')}
                   </button>
                 )}
               </div>
@@ -673,7 +734,11 @@ export default function ProfilePage() {
           {/* Eventos Creados */}
           {userEvents && userEvents.length > 0 && (
             <div className="profile-section">
-              <h2 className="section-title">Mis Eventos Creados ({userEvents.length})</h2>
+              <h2 className="section-title">
+                {t('profile.sections.createdEvents', {
+                  count: userEvents.length
+                })}
+              </h2>
               <div className="user-events-grid">
                 {userEvents.map(event => (
                   <div key={event.id} className="user-event-card">
@@ -688,12 +753,14 @@ export default function ProfilePage() {
                       <div className="event-info">
                         <span className="event-date">
                           {(() => {
-                            if (!event.startDate) return "Fecha no disponible";
+                            if (!event.startDate)
+                              return t('profile.events.dateNotAvailable');
                             const date = new Date(event.startDate);
-                            if (isNaN(date.getTime())) return "Fecha no disponible";
-                            return date.toLocaleDateString('es-ES', { 
-                              day: 'numeric', 
-                              month: 'short', 
+                            if (isNaN(date.getTime()))
+                              return t('profile.events.dateNotAvailable');
+                            return date.toLocaleDateString(getLocale(), {
+                              day: 'numeric',
+                              month: 'short',
                               year: 'numeric',
                               hour: '2-digit',
                               minute: '2-digit'
@@ -701,14 +768,19 @@ export default function ProfilePage() {
                           })()}
                         </span>
                         <span className="event-participants">
-                          {event.participants.length} / {event.capacity} participantes
+                          {t('profile.events.participants', {
+                            current: event.participants.length,
+                            capacity: event.capacity
+                          })}
                         </span>
                       </div>
                       <p className="event-description">{event.description}</p>
                       {event.languages && event.languages.length > 0 && (
                         <div className="event-languages">
                           {event.languages.map(lang => (
-                            <span key={lang} className="language-tag">{lang.toUpperCase()}</span>
+                            <span key={lang} className="language-tag">
+                              {lang.toUpperCase()}
+                            </span>
                           ))}
                         </div>
                       )}
@@ -724,21 +796,29 @@ export default function ProfilePage() {
             <div className="profile-stats">
               <div className="stat-item">
                 <div className="stat-number">{stats.enrolledEvents}</div>
-                <div className="stat-label">Eventos Apuntados</div>
+                <div className="stat-label">
+                  {t('profile.stats.enrolledEvents')}
+                </div>
               </div>
               <div className="stat-item">
                 <div className="stat-number">{stats.organizedEvents}</div>
-                <div className="stat-label">Eventos Organizados</div>
+                <div className="stat-label">
+                  {t('profile.stats.organizedEvents')}
+                </div>
               </div>
               <div className="stat-item">
                 <div className="stat-number">{stats.ratings}</div>
-                <div className="stat-label">Valoraciones</div>
+                <div className="stat-label">
+                  {t('profile.stats.ratings')}
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
-      {banner.message && <MessageBanner type={banner.type} message={banner.message} />}
+      {banner.message && (
+        <MessageBanner type={banner.type} message={banner.message} />
+      )}
     </div>
   );
 }
