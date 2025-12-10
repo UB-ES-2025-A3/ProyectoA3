@@ -1,5 +1,47 @@
 {
 
+
+  "SplashPage": {
+  "tagline": "Organiza, comparte y vive experiencias",
+  "title": "EventManager",
+  "subtitle": "Gestiona tus eventos desde un solo lugar. Colabora con tu equipo e inspira a nuevos usuarios.",
+  "loginButton": "Iniciar Sesión",
+  "registerButton": "Registrarse",
+  "scrollButton": "Quiénes somos ↓",
+
+  "about": {
+    "title": "Quiénes Somos",
+    "subtitle": "Un equipo de desarrolladores apasionados por crear soluciones innovadoras"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Desarrolladora Full Stack",
+      "description": "Especializada en arquitectura de aplicaciones web y experiencia de usuario."
+    },
+    "Adrià": {
+      "role": "Desarrollador Backend",
+      "description": "Experto en APIs REST y gestión de bases de datos relacionales."
+    },
+    "Sergi": {
+      "role": "Desarrollador Full Stack",
+      "description": "Enfocado en integración de sistemas y optimización de rendimiento."
+    },
+    "Arnau": {
+      "role": "Desarrollador Frontend",
+      "description": "Especialista en interfaces modernas y experiencia de usuario interactiva."
+    },
+    "Chaofan": {
+      "role": "Desarrollador Full Stack",
+      "description": "Experto en desarrollo de aplicaciones escalables y arquitectura de software."
+    },
+    "Andrés": {
+      "role": "Desarrollador Backend",
+      "description": "Especializado en servicios web y lógica de negocio robusta."
+    }
+  }
+},
+
   "HomePage": {
   "header": {
     "title": "Encuentra tu próximo evento",
