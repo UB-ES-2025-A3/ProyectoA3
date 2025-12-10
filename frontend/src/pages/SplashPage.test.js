@@ -60,13 +60,12 @@ describe('SplashPage', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('EventManager')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'EventManager' })).toBeInTheDocument();
     expect(
       screen.getByText('Organitza, comparteix i viu experiències')
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Gestiona els teus esdeveniments des d'un sol lloc/i)
-    ).toBeInTheDocument();
+        screen.getAllByText(/Gestiona els teus esdeveniments/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /registrarse/i })).toBeInTheDocument();
   });
@@ -143,7 +142,8 @@ describe('SplashPage', () => {
       </BrowserRouter>
     );
 
-    const title = screen.getByText('EventManager');
+    const titles = screen.getAllByText('EventManager');
+    const title = titles[0]; // el del splash
     expect(title).toHaveClass('splash__title');
     expect(title.tagName).toBe('H1');
   });
@@ -167,7 +167,9 @@ describe('SplashPage', () => {
       </BrowserRouter>
     );
 
-    const subtitle = screen.getByText(/Gestiona els teus esdeveniments/i);
+    const subtitles = screen.getAllByText(/Gestiona els teus esdeveniments/i);
+    const subtitle = subtitles[0]; // el del splash
+
     expect(subtitle).toHaveClass('splash__subtitle');
     expect(subtitle.tagName).toBe('P');
   });
@@ -227,8 +229,9 @@ describe('SplashPage', () => {
     expect(screen.getByText(/comparteix/i)).toBeInTheDocument();
     expect(screen.getByText(/viu experiències/i)).toBeInTheDocument();
 
-    expect(screen.getByText(/Gestiona els teus esdeveniments/i)).toBeInTheDocument();
-    expect(screen.getByText(/Col·labora amb el teu equip/i)).toBeInTheDocument();
+    // Verificar texto en catalán en subtitle
+    expect(screen.getAllByText(/Gestiona els teus esdeveniments/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Col·labora amb el teu equip/i).length).toBeGreaterThan(0);
   });
 
 
