@@ -1,10 +1,10 @@
 package com.eventmanager.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,13 +16,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "clientes_new")
 public class Cliente {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -34,11 +34,6 @@ public class Cliente {
   @NotNull private LocalDate fechaNacimiento;
   private String ciudad;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(
-          name = "cliente_idiomas",
-          joinColumns = @JoinColumn(name = "cliente_id")
-  )
   @Column(name = "idioma")
   private List<String> idioma = new ArrayList<>();
 
@@ -46,10 +41,13 @@ public class Cliente {
   private String descripcion;
   @NotBlank private String passwordHash;
 
+  // Tema de color de la interfaz (default, blue, green, purple, orange, pink)
+  private String tema = "default";
+
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
   @JoinTable(
-          name = "evento_fav",
+          name = "eventos_favoritos",
           joinColumns = @JoinColumn(name = "cliente_id"),
           inverseJoinColumns = @JoinColumn(name = "evento_id")
   )
@@ -93,4 +91,7 @@ public class Cliente {
   public void setFavoritos(Set<Evento> favoritos) { this.favoritos = favoritos; }
   public void addEventoFavorito(Evento evento) { this.favoritos.add(evento); }
   public void removeEventoFavorito(Evento evento) { this.favoritos.remove(evento);}
+
+  public String getTema() { return tema; }
+  public void setTema(String tema) { this.tema = tema; }
 }

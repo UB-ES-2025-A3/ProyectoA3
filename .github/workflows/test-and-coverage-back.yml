@@ -1,0 +1,90 @@
+name: Backend Test & Coverage
+
+on:
+  push:
+    branches: [ main, pre_prod, dev ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-test-coverage.yml'
+  pull_request:
+    branches: [ main, pre_prod, dev ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-test-coverage.yml'
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create Maven settings with mirrors
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <mirrors>
+              <mirror>
+                <id>central-repo</id>
+                <mirrorOf>central</mirrorOf>
+                <url>https://repo1.maven.org/maven2/</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Ejecutar tests con perfil "test" y generar reporte de cobertura JaCoCo
+      - name: Run backend tests with coverage (perfil test)
+        run: mvn --batch-mode -Dspring.profiles.active=test -Dsurefire.printSummary=true test jacoco:report
+
+      # --- Artifacts de coverage (HTML de JaCoCo) ---
+      - name: Upload backend coverage HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: backend/target/site/jacoco
+          if-no-files-found: warn
+
+      # --- Fichero XML de JaCoCo (para resumen / otras integraciones) ---
+      - name: Upload backend coverage XML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-xml
+          path: backend/target/site/jacoco/jacoco.xml
+          if-no-files-found: warn
+
+      # --- Generar resumen de coverage en markdown ---
+      - name: Generate backend coverage summary
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: backend/target/site/jacoco/jacoco.xml
+          format: markdown
+          output: file
+          badge: false
+          fail_below_min: false
+
+      # --- Comentar en la PR con el resumen de coverage (backend) ---
+      - name: Comment backend coverage summary on PR
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: code-coverage-results.md
+          header: backend-coverage

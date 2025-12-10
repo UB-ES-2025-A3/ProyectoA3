@@ -1,0 +1,626 @@
+{
+
+"EventMap": {
+  "search": {
+    "placeholder": "Buscar ubicación (ej: Barcelona, Madrid...)",
+    "buttonTitle": "Buscar ubicación",
+    "clearTitle": "Limpiar búsqueda",
+    "noResults": "No se encontró la ubicación. Intenta con otro término de búsqueda.",
+    "error": "Error al buscar la ubicación. Por favor, intenta de nuevo."
+  },
+  "mapStyle": {
+    "selectorTitle": "Cambiar estilo del mapa",
+    "names": {
+      "googlelike": "Estilo Google Maps",
+      "light": "Claro (Positron)",
+      "dark": "Oscuro (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topográfico",
+      "satellite": "Satelital"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Desfijar evento del mapa",
+    "unpinLabel": "Desfijar"
+  },
+  "mapClick": {
+    "waterError": "Por favor, selecciona un lugar en tierra firme."
+  }
+},
+
+
+
+  "SplashPage": {
+  "tagline": "Organiza, comparte y vive experiencias",
+  "title": "EventManager",
+  "subtitle": "Gestiona tus eventos desde un solo lugar. Colabora con tu equipo e inspira a nuevos usuarios.",
+  "loginButton": "Iniciar Sesión",
+  "registerButton": "Registrarse",
+  "scrollButton": "Quiénes somos ↓",
+
+  "about": {
+    "title": "Quiénes Somos",
+    "subtitle": "Un equipo de desarrolladores apasionados por crear soluciones innovadoras"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Desarrolladora Full Stack",
+      "description": "Especializada en arquitectura de aplicaciones web y experiencia de usuario."
+    },
+    "Adrià": {
+      "role": "Desarrollador Backend",
+      "description": "Experto en APIs REST y gestión de bases de datos relacionales."
+    },
+    "Sergi": {
+      "role": "Desarrollador Full Stack",
+      "description": "Enfocado en integración de sistemas y optimización de rendimiento."
+    },
+    "Arnau": {
+      "role": "Desarrollador Frontend",
+      "description": "Especialista en interfaces modernas y experiencia de usuario interactiva."
+    },
+    "Chaofan": {
+      "role": "Desarrollador Full Stack",
+      "description": "Experto en desarrollo de aplicaciones escalables y arquitectura de software."
+    },
+    "Andrés": {
+      "role": "Desarrollador Backend",
+      "description": "Especializado en servicios web y lógica de negocio robusta."
+    }
+  }
+},
+
+  "HomePage": {
+  "header": {
+    "title": "Encuentra tu próximo evento",
+    "subtitle": "Explora intercambios culturales y reuniones cerca de ti.",
+    "tip": "💡 Haz clic en el mapa para crear un nuevo evento"
+  },
+  "search": {
+    "placeholder": "Buscar eventos por nombre o descripción..."
+  },
+  "filters": {
+    "clearButton": "Limpiar filtros",
+    "language": {
+      "title": "Filtrar por idioma",
+      "label": "Idioma",
+      "searchPlaceholder": "Buscar idioma...",
+      "any": "Cualquier idioma",
+      "spanish": "Español",
+      "english": "Inglés",
+      "french": "Francés",
+      "german": "Alemán",
+      "italian": "Italiano",
+      "portuguese": "Portugués",
+      "russian": "Ruso"
+    },
+    "age": {
+      "title": "Filtrar por edad mínima",
+      "label": "Edad",
+      "minAgeLabel": "Edad mínima:",
+      "placeholder": "Ej: 18",
+      "unit": "años",
+      "noLimit": "Sin límite",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filtrar por capacidad máxima",
+      "label": "Capacidad",
+      "maxLabel": "Capacidad máxima:",
+      "placeholder": "Ej: 10",
+      "unit": "personas",
+      "noLimit": "Sin límite",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filtrar por etiquetas",
+      "label": "Tags",
+      "empty": "No hay etiquetas disponibles todavía.",
+      "clear": "Limpiar tags"
+    },
+    "favorites": {
+      "title": "Mostrar solo eventos guardados",
+      "label": "Solo favoritos"
+    }
+  },
+  "eventsList": {
+    "title": "Eventos disponibles",
+    "loading": "Cargando eventos...",
+    "empty": "No se encontraron eventos con los filtros aplicados.",
+    "clearFilters": "Limpiar filtros"
+  },
+  "mapModal": {
+    "title": "¿Crear evento aquí?",
+    "question": "¿Quieres añadir un evento en esta ubicación?",
+    "locationLabel": "Ubicación:",
+    "cancel": "Cancelar",
+    "confirm": "Sí, crear evento"
+  },
+  "banners": {
+    "loadEventsError": "Error al cargar los eventos. Inténtalo de nuevo.",
+    "eventCreatedSuccess": "Evento creado correctamente!",
+    "reloadEventsError": "Error al recargar los eventos.",
+    "eventNotFound": "Evento no encontrado.",
+    "eventFull": "El evento está completo. No puedes apuntarte.",
+    "alreadyEnrolled": "Ya estás apuntado a este evento.",
+    "joinSuccess": "¡Te has apuntado al evento correctamente!",
+    "joinGenericError": "Error al apuntarse al evento.",
+    "notEnrolled": "No estás apuntado a este evento.",
+    "leaveSuccess": "Te has desapuntado del evento correctamente.",
+    "leaveGenericError": "Error al desapuntarse del evento."
+  }
+},
+
+  "UserProfile": {
+  "loading": "Cargando perfil...",
+  "loadError": "Error al cargar el perfil del usuario",
+  "closeButton": "Cerrar",
+  "sections": {
+    "personalInfo": "Información Personal",
+    "languages": "Idiomas",
+    "description": "Descripción"
+  },
+  "fields": {
+    "city": "Ciudad",
+    "age": "Edad"
+  },
+  "ageSuffix": "años"
+},
+
+
+    "Register": {
+  "title": "Crear Cuenta",
+  "subtitle": "Únete a nuestra plataforma de eventos",
+  "fields": {
+    "nombre": "Nombre",
+    "apellidos": "Apellidos",
+    "username": "Nombre de Usuario",
+    "correo": "Correo Electrónico",
+    "fechaNacimiento": "Fecha de Nacimiento",
+    "ciudad": "Ciudad",
+    "idioma": "Idioma(s) Hablado(s)",
+    "idiomaPlaceholder": "Selecciona idioma(s)",
+    "placeholderNombre": "Ingresa tu nombre",
+    "placeholderApellidos": "Ingresa tus apellidos",
+    "placeholderUsername": "Elige un nombre de usuario",
+    "placeholderCorreo": "tu@email.com",
+    "placeholderCiudad": "Tu ciudad"
+  },
+  "languages": {
+    "es": "Español",
+    "en": "Inglés",
+    "fr": "Francés",
+    "de": "Alemán",
+    "it": "Italiano",
+    "pt": "Portugués",
+    "ru": "Ruso"
+  },
+  "password": {
+    "label": "Contraseña",
+    "placeholder": "Mínimo 6 caracteres",
+    "requirementsTitle": "La contraseña debe incluir:",
+    "requirements": {
+      "length": "Al menos 6 caracteres",
+      "uppercase": "Una letra mayúscula",
+      "lowercase": "Una letra minúscula",
+      "number": "Un número",
+      "specialChar": "Un carácter especial"
+    }
+  },
+  "errors": {
+    "nombreRequired": "El nombre es requerido",
+    "apellidosRequired": "Los apellidos son requeridos",
+    "usernameRequired": "El nombre de usuario es requerido",
+    "correoRequired": "El correo es requerido",
+    "correoInvalid": "El correo no es válido",
+    "fechaNacimientoRequired": "La fecha de nacimiento es requerida",
+    "fechaNacimientoInvalid": "La fecha de nacimiento no es válida",
+    "passwordRequired": "La contraseña es requerida",
+    "passwordRequirements": "La contraseña no cumple con los requisitos mínimos",
+    "unexpected": "Error inesperado al registrar usuario"
+  },
+  "button": {
+    "submit": "Crear Cuenta",
+    "loading": "Creando cuenta..."
+  },
+  "footer": {
+    "question": "¿Ya tienes una cuenta?",
+    "link": "Inicia sesión aquí"
+  }
+},
+    
+"Login": {
+  "title": "Iniciar Sesión",
+  "subtitle": "Accede a tu cuenta de eventos",
+  "fields": {
+    "usernameOrEmail": "Nombre de Usuario o Correo",
+    "password": "Contraseña",
+    "placeholderUsernameOrEmail": "Ingresa tu usuario o correo electrónico",
+    "placeholderPassword": "Ingresa tu contraseña"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "El nombre de usuario o correo es requerido",
+    "passwordRequired": "La contraseña es requerida",
+    "unexpected": "Error inesperado al iniciar sesión. Por favor, intenta de nuevo."
+  },
+  "button": {
+    "login": "Iniciar Sesión",
+    "loading": "Iniciando sesión..."
+  },
+  "register": {
+    "question": "¿No tienes una cuenta?",
+    "link": "Regístrate aquí"
+  } 
+    },
+    
+"EventModal": {
+  "dateFallback": "Fecha no disponible",
+  "status": {
+    "full": "Completo",
+    "availableSpots": "Quedan {{count}} plazas"
+  },
+  "meta": {
+    "participantsCount": "{{current}} de {{capacity}} participantes",
+    "languages": "Idiomas"
+  },
+  "sections": {
+    "description": "Descripción",
+    "restrictions": "Restricciones",
+    "info": "Información del evento",
+    "registeredParticipants": "Participantes inscritos ({{count}})",
+    "loadingParticipants": "Cargando participantes...",
+    "participantsError": "No se han podido cargar los participantes"
+  },
+  "details": {
+    "capacity": "Capacidad total:",
+    "currentParticipants": "Participantes actuales:",
+    "availableSpots": "Plazas disponibles:"
+  },
+  "eventFull": "Evento completo",
+  "join": "Unirme al evento",
+  "alreadyEnrolled": "Ya estás inscrito en este evento",
+  "leave": "Desapuntarme",
+  "clickToViewProfile": "Haz clic para ver el perfil",
+  "creatorBadge": "Creador del evento",
+  "creatorStar": "Creador",
+  "aria": {
+    "addFavorite": "Añadir a favoritos",
+    "removeFavorite": "Eliminar de favoritos",
+    "loginToFavorite": "Inicia sesión para guardar eventos en favoritos"
+  },
+  "favorite": {
+    "mustLogin": "Debes iniciar sesión para guardar eventos en favoritos"
+  }
+},
+
+  "EventCard": {
+    "status": {
+      "full": "Completo",
+      "spotsAvailable": "{{count}} plazas libres"
+    },
+    "location": "📍 {{location}}",
+    "date": "📅 {{date}}",
+    "capacity": {
+      "label": "participantes"
+    },
+    "buttons": {
+      "join": "Apuntarse",
+      "joining": "Apuntando...",
+      "leave": "Desapuntarse"
+    },
+    "enrolled": {
+      "already": "✓ Ya estás apuntado a este evento"
+    },
+    "fallback": {
+      "noDate": "Fecha no disponible"
+    }
+  },
+    
+  "EnrolledEvents": {
+    "card": {
+      "status": {
+        "finished": "Finalizado",
+        "active": "Activo"
+      },
+      "leaveButton": "Desapuntarse",
+      "finishedButton": "Evento finalizado"
+    }
+  },
+    
+  "createEvent": {
+    "modal": {
+      "title": "Crear nuevo evento",
+      "subtitle": "Completa el formulario para crear un nuevo evento"
+    },
+    "messages": {
+      "submitErrorFallback": "Error al crear el evento. Inténtalo de nuevo."
+    },
+    "form": {
+      "labels": {
+        "title": "Título del evento",
+        "description": "Descripción",
+        "tags": "Etiquetas",
+        "date": "Fecha",
+        "time": "Hora",
+        "language": "Idioma",
+        "capacity": "Plazas disponibles",
+        "minAge": "Edad mínima (opcional)",
+        "place": "Lugar"
+      },
+      "placeholders": {
+        "title": "Ej: Paseo por el centro histórico",
+        "description": "Describe tu evento (opcional)",
+        "capacity": "Número de plazas",
+        "minAge": "Ej: 18",
+        "place": "Ej: Café Central"
+      },
+      "tags": {
+        "placeholder": "Selecciona una etiqueta",
+        "options": {
+          "turismo": "Turismo",
+          "comida": "Comida",
+          "excursion": "Excursión",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Deporte",
+          "aventura": "Aventura",
+          "familiar": "Familiar",
+          "juegos": "Juegos",
+          "cine": "Cine",
+          "relax": "Relax",
+          "tardeo": "Tardeo",
+          "noche": "Noche",
+          "otros": "Otros"
+        }
+      },
+      "language": {
+        "placeholder": "Selecciona un idioma",
+        "options": {
+          "es": "Español",
+          "en": "Inglés",
+          "fr": "Francés",
+          "de": "Alemán",
+          "it": "Italiano",
+          "pt": "Portugués",
+          "ru": "Ruso"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancelar",
+      "submit": "Crear evento",
+      "submitting": "Creando..."
+    },
+    "validation": {
+      "titleRequired": "El título del evento es requerido",
+      "dateRequired": "La fecha es requerida",
+      "dateInPast": "La fecha no puede ser anterior a hoy",
+      "timeRequired": "La hora es requerida",
+      "languageRequired": "Debes seleccionar un idioma",
+      "capacityRequired": "Las plazas disponibles son requeridas",
+      "capacityMin": "Debe haber al menos 1 plaza disponible",
+      "minAgeMin": "La edad mínima debe ser 0 o mayor",
+      "minAgeMax": "La edad mínima debe ser menor a 120",
+      "placeRequired": "El lugar es requerido"
+    }
+    },
+
+  "splash": {
+    "tagline": "Organiza, comparte y vive experiencias",
+    "title": "EventManager",
+    "subtitle": "Gestiona tus eventos desde un solo lugar. Colabora con tu equipo e inspira a nuevos participantes.",
+    "loginButton": "Iniciar sesión",
+    "registerButton": "Registrarse"
+  },
+
+  "register": {
+    "messages": {
+      "success": "¡Cuenta creada exitosamente! Bienvenido {{username}}",
+      "redirecting": "Serás redirigido al login en unos segundos...",
+      "errorFallback": "Error al crear la cuenta."
+    }
+  },
+
+  "login": {
+    "messages": {
+      "welcome": "¡Bienvenido de nuevo, {{username}}!",
+      "redirecting": "Redirigiendo...",
+      "errorFallback": "Error al iniciar sesión."
+    }
+  },
+
+
+  "eventsPage": {
+    "filters": {
+      "title": "Filtra tus eventos",
+      "subtitle": "Encuentra el plan perfecto ajustando idioma, plazas disponibles o etiquetas temáticas.",
+      "searchPlaceholder": "Buscar eventos por nombre o descripción...",
+      "language": {
+        "buttonLabel": "Idioma",
+        "buttonTitle": "Filtrar por idioma",
+        "searchPlaceholder": "Buscar idioma...",
+        "any": "Cualquier idioma",
+        "es": "Español",
+        "en": "Inglés",
+        "fr": "Francés",
+        "de": "Alemán",
+        "it": "Italiano",
+        "pt": "Portugués",
+        "ru": "Ruso"
+      },
+      "capacity": {
+        "buttonLabel": "Capacidad",
+        "buttonTitle": "Filtrar por capacidad máxima",
+        "label": "Capacidad máxima:",
+        "placeholder": "Ej: 10",
+        "unit": "personas",
+        "presets": {
+          "noLimit": "Sin límite",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Tags",
+        "buttonTitle": "Filtrar por etiquetas",
+        "empty": "Todavía no hay etiquetas disponibles.",
+        "clear": "Limpiar tags"
+      },
+      "favorites": {
+        "buttonTitle": "Mostrar solo eventos guardados",
+        "buttonLabel": "Solo favoritos"
+      },
+      "clearFilters": "Limpiar filtros"
+    },
+    "header": {
+      "title": "Eventos",
+      "subtitle": "Descubre y guarda tus próximos planes.",
+      "createButton": "Crear evento"
+    },
+    "list": {
+      "loading": "Cargando eventos...",
+      "empty": "No hay eventos disponibles con los filtros aplicados."
+    },
+    "messages": {
+      "loadError": "Error al cargar los eventos. Inténtalo de nuevo.",
+      "eventNotFound": "Evento no encontrado.",
+      "eventFull": "El evento está completo. No puedes apuntarte.",
+      "alreadyEnrolled": "Ya estás apuntado a este evento.",
+      "joinSuccess": "¡Te has apuntado al evento correctamente!",
+      "joinErrorFallback": "Error al apuntarse al evento.",
+      "notEnrolled": "No estás apuntado a este evento.",
+      "leaveSuccess": "Te has desapuntado del evento correctamente.",
+      "leaveErrorFallback": "Error al desapuntarse del evento.",
+      "createSuccess": "¡Evento creado correctamente!"
+    }
+  },
+
+  "myEvents": {
+    "title": "Mi agenda de eventos",
+    "subtitle": "Aquí puedes ver todos los eventos en los que estás inscrito",
+
+    "loading": "Cargando tus eventos...",
+
+    "empty": {
+      "title": "Todavía no tienes eventos guardados",
+      "description": "Explora los eventos disponibles y apúntate a los que más te interesen",
+      "button": "Ver eventos disponibles"
+    },
+
+    "sections": {
+      "upcoming": "Próximos eventos ({{count}})",
+      "past": "Eventos pasados ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "Te has desapuntado del evento correctamente.",
+      "loadError": "Error al cargar tus eventos. Inténtalo de nuevo.",
+      "leaveErrorFallback": "Error al desapuntarse del evento."
+    }
+  },
+
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Eventos",
+    "profile": "Perfil",
+    "myEvents": "Mis eventos",
+    "logout": "Cerrar sesión"
+  },
+
+  "profile": {
+      "theme": {
+    "sectionTitle": "Tema",
+    "save": "Guardar tema",
+    "savingShort": "Guardando...",
+    "saving": "Guardando tema...",
+    "cancel": "Cancelar",
+    "saveSuccess": "Tema guardado correctamente",
+    "saveError": "Error al guardar el tema",
+    "ariaLabel": "Seleccionar tema {{theme}}"
+  },
+
+    "loading": "Cargando perfil...",
+    "loadError": "No se pudo cargar el perfil del usuario",
+    "loadErrorWithMessage": "Error al cargar los datos: {{error}}",
+    "noUserLogged": "No hay usuario logueado",
+    "unknownError": "Error desconocido",
+
+    "header": {
+      "usernameLabel": "Usuario",
+      "edit": "Editar perfil",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "bgColorTitle": "Color de fondo",
+      "changeAvatarTitle": "Cambiar avatar",
+      "avatarAlt": "Avatar de {{fullName}}"
+    },
+
+    "sections": {
+      "personalInfo": "Información personal",
+      "description": "Descripción",
+      "languages": "Idiomas",
+      "createdEvents": "Mis eventos creados ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico",
+      "city": "Ciudad",
+      "birthDate": "Fecha de nacimiento",
+      "cityNotSpecified": "No especificada",
+      "birthDateNotSpecified": "No especificada",
+      "descriptionPlaceholder": "Cuéntanos un poco sobre ti...",
+      "noDescription": "No hay descripción disponible"
+    },
+
+    "languages": {
+      "addLanguage": "Agregar idioma",
+      "add": "Agregar"
+    },
+
+    "events": {
+      "dateNotAvailable": "Fecha no disponible",
+      "participants": "{{current}} / {{capacity}} participantes"
+    },
+
+    "stats": {
+      "enrolledEvents": "Eventos apuntados",
+      "organizedEvents": "Eventos organizados",
+      "ratings": "Valoraciones"
+    },
+
+    "validation": {
+      "firstNameRequired": "El nombre es requerido",
+      "firstNameMin": "El nombre debe tener al menos 2 caracteres",
+      "firstNameMax": "El nombre no puede tener más de 50 caracteres",
+
+      "lastNameRequired": "Los apellidos son requeridos",
+      "lastNameMin": "Los apellidos deben tener al menos 2 caracteres",
+      "lastNameMax": "Los apellidos no pueden tener más de 100 caracteres",
+
+      "emailRequired": "El correo electrónico es requerido",
+      "emailInvalid": "El correo electrónico no es válido",
+
+      "birthDateInvalid": "La fecha de nacimiento no es válida",
+      "tooYoung": "Debes tener al menos 13 años para usar esta plataforma",
+      "tooOld": "La fecha de nacimiento no parece válida",
+      "birthDateFuture": "La fecha de nacimiento no puede ser en el futuro",
+
+      "cityMax": "El nombre de la ciudad no puede tener más de 100 caracteres",
+      "descriptionMax": "La descripción no puede tener más de 500 caracteres",
+
+      "fixErrors": "Por favor, corrige los errores en el formulario"
+    },
+
+    "updateSuccess": "Perfil actualizado correctamente",
+    "updateError": "Error al actualizar el perfil"
+  }
+}

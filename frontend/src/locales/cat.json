@@ -1,0 +1,624 @@
+{
+ 
+
+  "EventMap": {
+  "search": {
+    "placeholder": "Cerca ubicació (ex: Barcelona, Madrid...)",
+    "buttonTitle": "Cerca ubicació",
+    "clearTitle": "Neteja la cerca",
+    "noResults": "No s'ha trobat la ubicació. Intenta amb un altre terme de cerca.",
+    "error": "Error en cercar la ubicació. Si us plau, torna-ho a provar."
+  },
+  "mapStyle": {
+    "selectorTitle": "Canvia l'estil del mapa",
+    "names": {
+      "googlelike": "Estil Google Maps",
+      "light": "Clar (Positron)",
+      "dark": "Fosc (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topogràfic",
+      "satellite": "Satèl·lit"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Desfixa l'esdeveniment del mapa",
+    "unpinLabel": "Desfixa"
+  },
+  "mapClick": {
+    "waterError": "Si us plau, selecciona un lloc en terra ferma."
+  }
+},
+
+"SplashPage": {
+  "tagline": "Organitza, comparteix i viu experiències",
+  "title": "EventManager",
+  "subtitle": "Gestiona els teus esdeveniments des d’un sol lloc. Col·labora amb el teu equip i inspira nous usuaris.",
+  "loginButton": "Iniciar Sessió",
+  "registerButton": "Registrar-se",
+  "scrollButton": "Qui som ↓",
+
+  "about": {
+    "title": "Qui Som",
+    "subtitle": "Un equip de desenvolupadors apassionats per crear solucions innovadores"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Desenvolupadora Full Stack",
+      "description": "Especialitzada en arquitectura d'aplicacions web i experiència d'usuari."
+    },
+    "Adrià": {
+      "role": "Desenvolupador Backend",
+      "description": "Expert en APIs REST i gestió de bases de dades relacionals."
+    },
+    "Sergi": {
+      "role": "Desenvolupador Full Stack",
+      "description": "Enfocat en integració de sistemes i optimització del rendiment."
+    },
+    "Arnau": {
+      "role": "Desenvolupador Frontend",
+      "description": "Especialista en interfícies modernes i experiència d'usuari interactiva."
+    },
+    "Chaofan": {
+      "role": "Desenvolupador Full Stack",
+      "description": "Expert en aplicacions escalables i arquitectura de programari."
+    },
+    "Andrés": {
+      "role": "Desenvolupador Backend",
+      "description": "Especialitzat en serveis web i lògica de negoci robusta."
+    }
+  }
+},
+
+  "HomePage": {
+  "header": {
+    "title": "Troba el teu proper esdeveniment",
+    "subtitle": "Explora intercanvis culturals i trobades a prop teu.",
+    "tip": "💡 Fes clic al mapa per crear un nou esdeveniment"
+  },
+  "search": {
+    "placeholder": "Cerca esdeveniments per nom o descripció..."
+  },
+  "filters": {
+    "clearButton": "Neteja filtres",
+    "language": {
+      "title": "Filtra per idioma",
+      "label": "Idioma",
+      "searchPlaceholder": "Cerca idioma...",
+      "any": "Qualsevol idioma",
+      "spanish": "Espanyol",
+      "english": "Anglès",
+      "french": "Francès",
+      "german": "Alemany",
+      "italian": "Italià",
+      "portuguese": "Portuguès",
+      "russian": "Rus"
+    },
+    "age": {
+      "title": "Filtra per edat mínima",
+      "label": "Edat",
+      "minAgeLabel": "Edat mínima:",
+      "placeholder": "Ex: 18",
+      "unit": "anys",
+      "noLimit": "Sense límit",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filtra per aforament màxim",
+      "label": "Capacitat",
+      "maxLabel": "Capacitat màxima:",
+      "placeholder": "Ex: 10",
+      "unit": "persones",
+      "noLimit": "Sense límit",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filtra per etiquetes",
+      "label": "Tags",
+      "empty": "Encara no hi ha etiquetes disponibles.",
+      "clear": "Neteja tags"
+    },
+    "favorites": {
+      "title": "Mostra només esdeveniments desats",
+      "label": "Només favorits"
+    }
+  },
+  "eventsList": {
+    "title": "Esdeveniments disponibles",
+    "loading": "Carregant esdeveniments...",
+    "empty": "No s'han trobat esdeveniments amb els filtres aplicats.",
+    "clearFilters": "Neteja filtres"
+  },
+  "mapModal": {
+    "title": "Crear un esdeveniment aquí?",
+    "question": "Vols afegir un esdeveniment en aquesta ubicació?",
+    "locationLabel": "Ubicació:",
+    "cancel": "Cancel·la",
+    "confirm": "Sí, crea l'esdeveniment"
+  },
+  "banners": {
+    "loadEventsError": "Error en carregar els esdeveniments. Torna-ho a provar.",
+    "eventCreatedSuccess": "Esdeveniment creat correctament!",
+    "reloadEventsError": "Error en tornar a carregar els esdeveniments.",
+    "eventNotFound": "Esdeveniment no trobat.",
+    "eventFull": "L'esdeveniment és complet. No t'hi pots apuntar.",
+    "alreadyEnrolled": "Ja estàs apuntat a aquest esdeveniment.",
+    "joinSuccess": "T'has apuntat a l'esdeveniment correctament!",
+    "joinGenericError": "Error en apuntar-te a l'esdeveniment.",
+    "notEnrolled": "No estàs apuntat a aquest esdeveniment.",
+    "leaveSuccess": "T'has desapuntat de l'esdeveniment correctament.",
+    "leaveGenericError": "Error en desapuntar-te de l'esdeveniment."
+  }
+},
+
+
+  "UserProfile": {
+  "loading": "Carregant perfil...",
+  "loadError": "Error en carregar el perfil de l'usuari",
+  "closeButton": "Tancar",
+  "sections": {
+    "personalInfo": "Informació personal",
+    "languages": "Idiomes",
+    "description": "Descripció"
+  },
+  "fields": {
+    "city": "Ciutat",
+    "age": "Edat"
+  },
+  "ageSuffix": "anys"
+},
+
+  "Register": {
+  "title": "Crear Compte",
+  "subtitle": "Uneix-te a la nostra plataforma d'esdeveniments",
+  "fields": {
+    "nombre": "Nom",
+    "apellidos": "Cognoms",
+    "username": "Nom d'usuari",
+    "correo": "Correu electrònic",
+    "fechaNacimiento": "Data de naixement",
+    "ciudad": "Ciutat",
+    "idioma": "Idioma(es) parlat(s)",
+    "idiomaPlaceholder": "Selecciona idioma(es)",
+    "placeholderNombre": "Introdueix el teu nom",
+    "placeholderApellidos": "Introdueix els teus cognoms",
+    "placeholderUsername": "Tria un nom d'usuari",
+    "placeholderCorreo": "elteu@email.com",
+    "placeholderCiudad": "La teva ciutat"
+  },
+  "languages": {
+    "es": "Espanyol",
+    "en": "Anglès",
+    "fr": "Francès",
+    "de": "Alemany",
+    "it": "Italià",
+    "pt": "Portuguès",
+    "ru": "Rus"
+  },
+  "password": {
+    "label": "Contrasenya",
+    "placeholder": "Mínim 6 caràcters",
+    "requirementsTitle": "La contrasenya ha d'incloure:",
+    "requirements": {
+      "length": "Almenys 6 caràcters",
+      "uppercase": "Una lletra majúscula",
+      "lowercase": "Una lletra minúscula",
+      "number": "Un número",
+      "specialChar": "Un caràcter especial"
+    }
+  },
+  "errors": {
+    "nombreRequired": "El nom és obligatori",
+    "apellidosRequired": "Els cognoms són obligatoris",
+    "usernameRequired": "El nom d'usuari és obligatori",
+    "correoRequired": "El correu és obligatori",
+    "correoInvalid": "El correu no és vàlid",
+    "fechaNacimientoRequired": "La data de naixement és obligatòria",
+    "fechaNacimientoInvalid": "La data de naixement no es válida",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "passwordRequirements": "La contrasenya no compleix els requisits mínims",
+    "unexpected": "Error inesperat en registrar l'usuari"
+  },
+  "button": {
+    "submit": "Crear Compte",
+    "loading": "Creant compte..."
+  },
+  "footer": {
+    "question": "Ja tens un compte?",
+    "link": "Inicia sessió aquí"
+  }
+},
+
+  "Login": {
+  "title": "Inicia Sessió",
+  "subtitle": "Accedeix al teu compte d'esdeveniments",
+  "fields": {
+    "usernameOrEmail": "Nom d'usuari o correu",
+    "password": "Contrasenya",
+    "placeholderUsernameOrEmail": "Introdueix el teu usuari o correu electrònic",
+    "placeholderPassword": "Introdueix la teva contrasenya"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "El nom d'usuari o correu és obligatori",
+    "passwordRequired": "La contrasenya és obligatòria",
+    "unexpected": "Error inesperat en iniciar sessió. Si us plau, intenta-ho de nou."
+  },
+  "button": {
+    "login": "Inicia Sessió",
+    "loading": "Iniciant sessió..."
+  },
+  "register": {
+    "question": "No tens un compte?",
+    "link": "Registra't aquí"
+  }
+  },
+
+  "EventModal": {
+  "dateFallback": "Data no disponible",
+  "status": {
+    "full": "Complet",
+    "availableSpots": "Queden {{count}} places"
+  },
+  "meta": {
+    "participantsCount": "{{current}} de {{capacity}} participants",
+    "languages": "Idiomes"
+  },
+  "sections": {
+    "description": "Descripció",
+    "restrictions": "Restriccions",
+    "info": "Informació de l'esdeveniment",
+    "registeredParticipants": "Participants inscrits ({{count}})",
+    "loadingParticipants": "Carregant participants...",
+    "participantsError": "No s'han pogut carregar els participants"
+  },
+  "details": {
+    "capacity": "Capacitat total:",
+    "currentParticipants": "Participants actuals:",
+    "availableSpots": "Places disponibles:"
+  },
+  "eventFull": "Esdeveniment complet",
+  "join": "Unir-me a l'esdeveniment",
+  "alreadyEnrolled": "Ja estàs inscrit en aquest esdeveniment",
+  "leave": "Donar-me de baixa",
+  "clickToViewProfile": "Fes clic per veure el perfil",
+  "creatorBadge": "Creador de l'esdeveniment",
+  "creatorStar": "Creador",
+  "aria": {
+    "addFavorite": "Afegir a favorits",
+    "removeFavorite": "Treure de favorits",
+    "loginToFavorite": "Inicia sessió per desar esdeveniments com a favorits"
+  },
+  "favorite": {
+    "mustLogin": "Has d'iniciar sessió per desar esdeveniments com a favorits"
+  }
+},
+  
+  "EventCard": {
+    "status": {
+      "full": "Complet",
+      "spotsAvailable": "{{count}} places lliures"
+    },
+    "location": "📍 {{location}}",
+    "date": "📅 {{date}}",
+    "capacity": {
+      "label": "participants"
+    },
+    "buttons": {
+      "join": "Apuntar-se",
+      "joining": "Apuntant...",
+      "leave": "Desapuntar-se"
+    },
+    "enrolled": {
+      "already": "✓ Ja estàs apuntat a aquest esdeveniment"
+    },
+    "fallback": {
+      "noDate": "Data no disponible"
+    }
+  },
+  
+  "EnrolledEvents": {
+    "card": {
+      "status": {
+        "finished": "Finalitzat",
+        "active": "Actiu"
+      },
+      "leaveButton": "Donar-se de baixa",
+      "finishedButton": "Esdeveniment finalitzat"
+    }
+  },
+  
+  "createEvent": {
+    "modal": {
+      "title": "Crear nou esdeveniment",
+      "subtitle": "Completa el formulari per crear un nou esdeveniment"
+    },
+    "messages": {
+      "submitErrorFallback": "S'ha produït un error en crear l'esdeveniment. Torna-ho a intentar."
+    },
+    "form": {
+      "labels": {
+        "title": "Títol de l'esdeveniment",
+        "description": "Descripció",
+        "tags": "Etiquetes",
+        "date": "Data",
+        "time": "Hora",
+        "language": "Idioma",
+        "capacity": "Places disponibles",
+        "minAge": "Edat mínima (opcional)",
+        "place": "Lloc"
+      },
+      "placeholders": {
+        "title": "Ex: Passeig pel centre històric",
+        "description": "Descriu el teu esdeveniment (opcional)",
+        "capacity": "Nombre de places",
+        "minAge": "Ex: 18",
+        "place": "Ex: Cafè Central"
+      },
+      "tags": {
+        "placeholder": "Selecciona una etiqueta",
+        "options": {
+          "turismo": "Turisme",
+          "comida": "Menjar",
+          "excursion": "Excursió",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Esport",
+          "aventura": "Aventura",
+          "familiar": "Familiar",
+          "juegos": "Jocs",
+          "cine": "Cinema",
+          "relax": "Relax",
+          "tardeo": "Tardeo",
+          "noche": "Nit",
+          "otros": "Altres"
+        }
+      },
+      "language": {
+        "placeholder": "Selecciona un idioma",
+        "options": {
+          "es": "Espanyol",
+          "en": "Anglès",
+          "fr": "Francès",
+          "de": "Alemany",
+          "it": "Italià",
+          "pt": "Portuguès",
+          "ru": "Rus"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel·lar",
+      "submit": "Crear esdeveniment",
+      "submitting": "Creant..."
+    },
+    "validation": {
+      "titleRequired": "El títol de l'esdeveniment és obligatori",
+      "dateRequired": "La data és obligatòria",
+      "dateInPast": "La data no pot ser anterior a avui",
+      "timeRequired": "L'hora és obligatòria",
+      "languageRequired": "Has de seleccionar un idioma",
+      "capacityRequired": "Les places disponibles són obligatòries",
+      "capacityMin": "Hi ha d'haver almenys 1 plaça disponible",
+      "minAgeMin": "L'edat mínima ha de ser 0 o superior",
+      "minAgeMax": "L'edat mínima ha de ser inferior a 120",
+      "placeRequired": "El lloc és obligatori"
+    }
+  },
+
+  "splash": {
+    "tagline": "Organitza, comparteix i viu experiències",
+    "title": "EventManager",
+    "subtitle": "Gestiona els teus esdeveniments des d'un sol lloc. Col·labora amb el teu equip i inspira nous participants.",
+    "loginButton": "Iniciar sessió",
+    "registerButton": "Registrar-se"
+  },
+
+  "register": {
+    "messages": {
+      "success": "Compte creat amb èxit! Benvingut/da {{username}}",
+      "redirecting": "Seràs redirigit al login en uns segons...",
+      "errorFallback": "Error en crear el compte."
+    }
+  },
+
+
+  "login": {
+    "messages": {
+      "welcome": "Benvingut de nou, {{username}}!",
+      "redirecting": "Redirigint...",
+      "errorFallback": "Error en iniciar sessió."
+    }
+  },
+
+  "eventsPage": {
+    "filters": {
+      "title": "Filtra els teus esdeveniments",
+      "subtitle": "Troba el pla perfecte ajustant l'idioma, les places disponibles o etiquetes temàtiques.",
+      "searchPlaceholder": "Cerca esdeveniments per nom o descripció...",
+      "language": {
+        "buttonLabel": "Idioma",
+        "buttonTitle": "Filtrar per idioma",
+        "searchPlaceholder": "Cercar idioma...",
+        "any": "Qualsevol idioma",
+        "es": "Espanyol",
+        "en": "Anglès",
+        "fr": "Francès",
+        "de": "Alemany",
+        "it": "Italià",
+        "pt": "Portuguès",
+        "ru": "Rus"
+      },
+      "capacity": {
+        "buttonLabel": "Capacitat",
+        "buttonTitle": "Filtrar per capacitat màxima",
+        "label": "Capacitat màxima:",
+        "placeholder": "Ex: 10",
+        "unit": "persones",
+        "presets": {
+          "noLimit": "Sense límit",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Etiquetes",
+        "buttonTitle": "Filtrar per etiquetes",
+        "empty": "Encara no hi ha etiquetes disponibles.",
+        "clear": "Netejar etiquetes"
+      },
+      "favorites": {
+        "buttonTitle": "Mostrar només esdeveniments desats",
+        "buttonLabel": "Només favorits"
+      },
+      "clearFilters": "Netejar filtres"
+    },
+    "header": {
+      "title": "Esdeveniments",
+      "subtitle": "Descobreix i desa els teus propers plans.",
+      "createButton": "Crear esdeveniment"
+    },
+    "list": {
+      "loading": "Carregant esdeveniments...",
+      "empty": "No hi ha esdeveniments disponibles amb els filtres aplicats."
+    },
+    "messages": {
+      "loadError": "Error en carregar els esdeveniments. Torna-ho a intentar.",
+      "eventNotFound": "No s'ha trobat l'esdeveniment.",
+      "eventFull": "L'esdeveniment està complet. No t'hi pots apuntar.",
+      "alreadyEnrolled": "Ja estàs apuntat a aquest esdeveniment.",
+      "joinSuccess": "T'has apuntat a l'esdeveniment correctament!",
+      "joinErrorFallback": "Error en apuntar-te a l'esdeveniment.",
+      "notEnrolled": "No estàs apuntat a aquest esdeveniment.",
+      "leaveSuccess": "T'has donat de baixa de l'esdeveniment correctament.",
+      "leaveErrorFallback": "Error en donar-te de baixa de l'esdeveniment.",
+      "createSuccess": "Esdeveniment creat correctament!"
+    }
+  },
+
+  "myEvents": {
+    "title": "La meva agenda d'esdeveniments",
+    "subtitle": "Aquí pots veure tots els esdeveniments als quals estàs inscrit",
+
+    "loading": "Carregant els teus esdeveniments...",
+
+    "empty": {
+      "title": "Encara no tens esdeveniments guardats",
+      "description": "Explora els esdeveniments disponibles i apunta't als que més t'interessin",
+      "button": "Veure esdeveniments disponibles"
+    },
+
+    "sections": {
+      "upcoming": "Propers esdeveniments ({{count}})",
+      "past": "Esdeveniments passats ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "T'has donat de baixa de l'esdeveniment correctament.",
+      "loadError": "Error en carregar els teus esdeveniments. Torna-ho a intentar.",
+      "leaveErrorFallback": "Error en donar-te de baixa de l'esdeveniment."
+    }
+  },
+
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Esdeveniments",
+    "profile": "Perfil",
+    "myEvents": "Els meus esdeveniments",
+    "logout": "Tancar sessió"
+  },
+
+  "profile": {
+      "theme": {
+    "sectionTitle": "Tema",
+    "save": "Desa el tema",
+    "savingShort": "Desant...",
+    "saving": "S'està desant el tema...",
+    "cancel": "Cancel·la",
+    "saveSuccess": "Tema desat correctament",
+    "saveError": "Error en desar el tema",
+    "ariaLabel": "Selecciona el tema {{theme}}"
+  },
+    "loading": "Carregant perfil...",
+    "loadError": "No s'ha pogut carregar el perfil de l'usuari",
+    "loadErrorWithMessage": "Error en carregar les dades: {{error}}",
+    "noUserLogged": "No hi ha cap usuari connectat",
+    "unknownError": "Error desconegut",
+
+    "header": {
+      "usernameLabel": "Usuari",
+      "edit": "Editar perfil",
+      "save": "Desar",
+      "saving": "Desant...",
+      "cancel": "Cancel·lar",
+      "bgColorTitle": "Color de fons",
+      "changeAvatarTitle": "Canviar avatar",
+      "avatarAlt": "Avatar de {{fullName}}"
+    },
+
+    "sections": {
+      "personalInfo": "Informació personal",
+      "description": "Descripció",
+      "languages": "Idiomes",
+      "createdEvents": "Els meus esdeveniments creats ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "Nom",
+      "lastName": "Cognoms",
+      "email": "Correu electrònic",
+      "city": "Ciutat",
+      "birthDate": "Data de naixement",
+      "cityNotSpecified": "No especificada",
+      "birthDateNotSpecified": "No especificada",
+      "descriptionPlaceholder": "Explica'ns una mica sobre tu...",
+      "noDescription": "No hi ha cap descripció disponible"
+    },
+
+    "languages": {
+      "addLanguage": "Afegir idioma",
+      "add": "Afegir"
+    },
+
+    "events": {
+      "dateNotAvailable": "Data no disponible",
+      "participants": "{{current}} / {{capacity}} participants"
+    },
+
+    "stats": {
+      "enrolledEvents": "Esdeveniments apuntats",
+      "organizedEvents": "Esdeveniments organitzats",
+      "ratings": "Valoracions"
+    },
+
+    "validation": {
+      "firstNameRequired": "El nom és obligatori",
+      "firstNameMin": "El nom ha de tenir almenys 2 caràcters",
+      "firstNameMax": "El nom no pot tenir més de 50 caràcters",
+
+      "lastNameRequired": "Els cognoms són obligatoris",
+      "lastNameMin": "Els cognoms han de tenir almenys 2 caràcters",
+      "lastNameMax": "Els cognoms no poden tenir més de 100 caràcters",
+
+      "emailRequired": "El correu electrònic és obligatori",
+      "emailInvalid": "El correu electrònic no és vàlid",
+
+      "birthDateInvalid": "La data de naixement no és vàlida",
+      "tooYoung": "Has de tenir almenys 13 anys per utilitzar aquesta plataforma",
+      "tooOld": "La data de naixement no sembla vàlida",
+      "birthDateFuture": "La data de naixement no pot ser en el futur",
+
+      "cityMax": "El nom de la ciutat no pot tenir més de 100 caràcters",
+      "descriptionMax": "La descripció no pot tenir més de 500 caràcters",
+
+      "fixErrors": "Si us plau, corregeix els errors del formulari"
+    },
+
+    "updateSuccess": "Perfil actualitzat correctament",
+    "updateError": "Error en actualitzar el perfil"
+  }
+}

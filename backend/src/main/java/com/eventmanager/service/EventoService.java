@@ -2,8 +2,8 @@ package com.eventmanager.service;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.dao.DataAccessException;
@@ -119,6 +119,18 @@ public class EventoService {
       if (req.fecha().isBefore(LocalDate.now())) {
         throw new ValidationException("La fecha del evento no puede ser anterior a hoy");
       }
+      // Validación de latitud (opcional, pero si se proporciona debe ser válida)
+      if (req.latitud() != null) {
+        if (req.latitud() < -90 || req.latitud() > 90) {
+          throw new ValidationException("Latitud inválida");
+        }
+      }
+      // Validación de longitud (opcional, pero si se proporciona debe ser válida)
+      if (req.longitud() != null) {
+        if (req.longitud() < -180 || req.longitud() > 180) {
+          throw new ValidationException("Longitud inválida");
+        }
+      }
       var e = new Evento();
       e.setFecha(req.fecha());
       e.setHora(req.hora());          
@@ -126,7 +138,9 @@ public class EventoService {
       e.setTitulo(req.titulo());
       e.setDescripcion(req.descripcion());
       e.setIdCreador(req.idCreador());
-      e.setTags(req.tags()); 
+      e.setTags(req.tags());
+      e.setLatitud(req.latitud());
+      e.setLongitud(req.longitud());
 
       if (req.restricciones() != null) {
         e.setRestricciones(new Restricciones(
@@ -143,7 +157,7 @@ public class EventoService {
       return toView(saved);
     } catch (DataAccessException ex) {
       var det = SqlErrorDetails.from(ex);
-      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
+      throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex); 
     } catch (PersistenceException ex) {
       var det = SqlErrorDetails.from(ex);
       throw new DatabaseSchemaMismatchException(buildUserMessage(det), ex);
@@ -170,8 +184,10 @@ public class EventoService {
       r != null ? r.getMax_personas() : null,
       e.getTitulo(), e.getDescripcion(),
       e.getIdCreador(),
-      e.getTags() == null ? List.of() : e.getTags(),   // <- AQUI
-      e.getParticipantes().stream().map(p -> p.getId()).toList()
+      e.getTags() == null ? List.of() : e.getTags(),
+      e.getParticipantes().stream().map(p -> p.getId()).toList(),
+      e.getLatitud(),
+      e.getLongitud()
     );
   }
 
@@ -239,5 +255,22 @@ public class EventoService {
     clienteRepo.save(user);
 
     return toView(evento);
+  }
+
+  public List<EventoView> listarFavoritos(Long userId) {
+    var user = clienteRepo.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    
+    return user.getFavoritos().stream()
+            .map(this::toView)
+            .toList();
+  }
+
+  public boolean isEventoFavorito(Long userId, Long eventoId) {
+    var user = clienteRepo.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    
+    return user.getFavoritos().stream()
+            .anyMatch(e -> e.getId().equals(eventoId));
   }
 }

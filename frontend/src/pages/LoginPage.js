@@ -1,32 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/users/LoginForm';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const [messageType, setMessageType] = useState('');
   const navigate = useNavigate();
 
   const handleLoginSuccess = (data) => {
-    setMessage(`¡Bienvenido de nuevo, ${data.username}!`);
+    setMessage(
+      t("login.messages.welcome", { username: data.username })
+    );
     setMessageType('success');
-    
-    // Guardar el token de autenticación y el userId
+
     if (data.token) {
       localStorage.setItem('authToken', data.token);
     }
     if (data.userId) {
       localStorage.setItem('userId', data.userId);
     }
-    
-    // Redirigir al dashboard después de 2 segundos
+
     setTimeout(() => {
-      navigate('/events');
+      navigate('/home');
     }, 2000);
   };
 
   const handleLoginError = (error) => {
-    setMessage(error);
+    setMessage(
+      error || t("login.messages.errorFallback")
+    );
     setMessageType('error');
   };
 
@@ -37,7 +41,9 @@ const LoginPage = () => {
           <div className="container">
             <p>{message}</p>
             {messageType === 'success' && (
-              <p className="redirect-message">Redirigiendo...</p>
+              <p className="redirect-message">
+                {t("login.messages.redirecting")}
+              </p>
             )}
           </div>
         </div>

@@ -1,0 +1,627 @@
+{
+
+  "EventMap": {
+  "search": {
+    "placeholder": "Search location (e.g. Barcelona, Madrid...)",
+    "buttonTitle": "Search location",
+    "clearTitle": "Clear search",
+    "noResults": "Location not found. Try another search term.",
+    "error": "Error searching location. Please try again."
+  },
+  "mapStyle": {
+    "selectorTitle": "Change map style",
+    "names": {
+      "googlelike": "Google Maps style",
+      "light": "Light (Positron)",
+      "dark": "Dark (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topographic",
+      "satellite": "Satellite"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Unpin event from map",
+    "unpinLabel": "Unpin"
+  },
+  "mapClick": {
+    "waterError": "Please select a place on land."
+  }
+},
+
+  "SplashPage": {
+  "tagline": "Organize, share and live experiences",
+  "title": "EventManager",
+  "subtitle": "Manage your events from a single place. Collaborate with your team and inspire new users.",
+  "loginButton": "Log In",
+  "registerButton": "Sign Up",
+  "scrollButton": "About Us ↓",
+
+  "about": {
+    "title": "About Us",
+    "subtitle": "A team of developers passionate about creating innovative solutions"
+  },
+
+  "team": {
+    "Anna": {
+      "role": "Full Stack Developer",
+      "description": "Specialized in web application architecture and user experience."
+    },
+    "Adrià": {
+      "role": "Backend Developer",
+      "description": "Expert in REST APIs and relational database management."
+    },
+    "Sergi": {
+      "role": "Full Stack Developer",
+      "description": "Focused on systems integration and performance optimization."
+    },
+    "Arnau": {
+      "role": "Frontend Developer",
+      "description": "Specialist in modern interfaces and interactive user experiences."
+    },
+    "Chaofan": {
+      "role": "Full Stack Developer",
+      "description": "Expert in scalable applications and software architecture."
+    },
+    "Andrés": {
+      "role": "Backend Developer",
+      "description": "Specialized in web services and robust business logic."
+    }
+  }
+},
+
+  "HomePage": {
+  "header": {
+    "title": "Find your next event",
+    "subtitle": "Discover cultural exchanges and meetups near you.",
+    "tip": "💡 Click on the map to create a new event"
+  },
+  "search": {
+    "placeholder": "Search events by name or description..."
+  },
+  "filters": {
+    "clearButton": "Clear filters",
+    "language": {
+      "title": "Filter by language",
+      "label": "Language",
+      "searchPlaceholder": "Search language...",
+      "any": "Any language",
+      "spanish": "Spanish",
+      "english": "English",
+      "french": "French",
+      "german": "German",
+      "italian": "Italian",
+      "portuguese": "Portuguese",
+      "russian": "Russian"
+    },
+    "age": {
+      "title": "Filter by minimum age",
+      "label": "Age",
+      "minAgeLabel": "Minimum age:",
+      "placeholder": "E.g. 18",
+      "unit": "years",
+      "noLimit": "No limit",
+      "eighteenPlus": "18+",
+      "twentyOnePlus": "21+"
+    },
+    "capacity": {
+      "title": "Filter by maximum capacity",
+      "label": "Capacity",
+      "maxLabel": "Maximum capacity:",
+      "placeholder": "E.g. 10",
+      "unit": "people",
+      "noLimit": "No limit",
+      "max5": "≤ 5",
+      "max10": "≤ 10",
+      "max20": "≤ 20"
+    },
+    "tags": {
+      "title": "Filter by tags",
+      "label": "Tags",
+      "empty": "There are no tags available yet.",
+      "clear": "Clear tags"
+    },
+    "favorites": {
+      "title": "Show only saved events",
+      "label": "Only favorites"
+    }
+  },
+  "eventsList": {
+    "title": "Available events",
+    "loading": "Loading events...",
+    "empty": "No events found with the applied filters.",
+    "clearFilters": "Clear filters"
+  },
+  "mapModal": {
+    "title": "Create an event here?",
+    "question": "Do you want to add an event at this location?",
+    "locationLabel": "Location:",
+    "cancel": "Cancel",
+    "confirm": "Yes, create event"
+  },
+  "banners": {
+    "loadEventsError": "Error loading events. Please try again.",
+    "eventCreatedSuccess": "Event created successfully!",
+    "reloadEventsError": "Error reloading events.",
+    "eventNotFound": "Event not found.",
+    "eventFull": "The event is full. You can’t join.",
+    "alreadyEnrolled": "You are already enrolled in this event.",
+    "joinSuccess": "You have successfully joined the event!",
+    "joinGenericError": "Error joining the event.",
+    "notEnrolled": "You are not enrolled in this event.",
+    "leaveSuccess": "You have successfully left the event.",
+    "leaveGenericError": "Error leaving the event."
+  }
+},
+
+
+  "UserProfile": {
+  "loading": "Loading profile...",
+  "loadError": "Error loading user profile",
+  "closeButton": "Close",
+  "sections": {
+    "personalInfo": "Personal Information",
+    "languages": "Languages",
+    "description": "Description"
+  },
+  "fields": {
+    "city": "City",
+    "age": "Age"
+  },
+  "ageSuffix": "years old"
+},
+
+    "Register": {
+  "title": "Create Account",
+  "subtitle": "Join our event platform",
+  "fields": {
+    "nombre": "First Name",
+    "apellidos": "Last Name",
+    "username": "Username",
+    "correo": "Email",
+    "fechaNacimiento": "Date of Birth",
+    "ciudad": "City",
+    "idioma": "Spoken Language(s)",
+    "idiomaPlaceholder": "Select language(s)",
+    "placeholderNombre": "Enter your first name",
+    "placeholderApellidos": "Enter your last name",
+    "placeholderUsername": "Choose a username",
+    "placeholderCorreo": "your@email.com",
+    "placeholderCiudad": "Your city"
+  },
+  "languages": {
+    "es": "Spanish",
+    "en": "English",
+    "fr": "French",
+    "de": "German",
+    "it": "Italian",
+    "pt": "Portuguese",
+    "ru": "Russian"
+  },
+  "password": {
+    "label": "Password",
+    "placeholder": "Minimum 6 characters",
+    "requirementsTitle": "Your password must include:",
+    "requirements": {
+      "length": "At least 6 characters",
+      "uppercase": "One uppercase letter",
+      "lowercase": "One lowercase letter",
+      "number": "One number",
+      "specialChar": "One special character"
+    }
+  },
+  "errors": {
+    "nombreRequired": "First name is required",
+    "apellidosRequired": "Last name is required",
+    "usernameRequired": "Username is required",
+    "correoRequired": "Email is required",
+    "correoInvalid": "Email is not valid",
+    "fechaNacimientoRequired": "Date of birth is required",
+    "fechaNacimientoInvalid": "Date of birth is not valid",
+
+    "passwordRequired": "Password is required",
+    "passwordRequirements": "Password does not meet the minimum requirements",
+    "unexpected": "Unexpected error while registering user"
+  },
+  "button": {
+    "submit": "Create Account",
+    "loading": "Creating account..."
+  },
+  "footer": {
+    "question": "Already have an account?",
+    "link": "Log in here"
+  }
+},
+    
+    "Login": {
+  "title": "Log In",
+  "subtitle": "Access your event account",
+  "fields": {
+    "usernameOrEmail": "Username or Email",
+    "password": "Password",
+    "placeholderUsernameOrEmail": "Enter your username or email",
+    "placeholderPassword": "Enter your password"
+  },
+  "errors": {
+    "usernameOrEmailRequired": "Username or email is required",
+    "passwordRequired": "Password is required",
+    "unexpected": "Unexpected error while logging in. Please try again."
+  },
+  "button": {
+    "login": "Log In",
+    "loading": "Logging in..."
+  },
+  "register": {
+    "question": "Don't have an account?",
+    "link": "Register here"
+  }
+},
+
+  "EventModal": {
+  "dateFallback": "Date not available",
+  "status": {
+    "full": "Full",
+    "availableSpots": "{{count}} spots left"
+  },
+  "meta": {
+    "participantsCount": "{{current}} of {{capacity}} participants",
+    "languages": "Languages"
+  },
+  "sections": {
+    "description": "Description",
+    "restrictions": "Restrictions",
+    "info": "Event information",
+    "registeredParticipants": "Registered participants ({{count}})",
+    "loadingParticipants": "Loading participants...",
+    "participantsError": "Could not load participants"
+  },
+  "details": {
+    "capacity": "Total capacity:",
+    "currentParticipants": "Current participants:",
+    "availableSpots": "Available spots:"
+  },
+  "eventFull": "Event full",
+  "join": "Join event",
+  "alreadyEnrolled": "You are already enrolled in this event",
+  "leave": "Leave event",
+  "clickToViewProfile": "Click to view profile",
+  "creatorBadge": "Event creator",
+  "creatorStar": "Creator",
+  "aria": {
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "loginToFavorite": "Log in to save events as favorites"
+  },
+  "favorite": {
+    "mustLogin": "You must log in to save events as favorites"
+  }
+},
+    
+    
+  "EventCard": {
+    "status": {
+      "full": "Full",
+      "spotsAvailable": "{{count}} spots available"
+    },
+    "location": "📍 {{location}}",
+    "date": "📅 {{date}}",
+    "capacity": {
+      "label": "participants"
+    },
+    "buttons": {
+      "join": "Join",
+      "joining": "Joining...",
+      "leave": "Leave event"
+    },
+    "enrolled": {
+      "already": "✓ You are already enrolled in this event"
+    },
+    "fallback": {
+      "noDate": "Date not available"
+    }
+  },
+
+  "EnrolledEvents": {
+    "card": {
+      "status": {
+        "finished": "Finished",
+        "active": "Active"
+      },
+      "leaveButton": "Leave event",
+      "finishedButton": "Event finished"
+    }
+  },
+
+  "createEvent": {
+    "modal": {
+      "title": "Create new event",
+      "subtitle": "Fill in the form to create a new event"
+    },
+    "messages": {
+      "submitErrorFallback": "Error creating the event. Please try again."
+    },
+    "form": {
+      "labels": {
+        "title": "Event title",
+        "description": "Description",
+        "tags": "Tags",
+        "date": "Date",
+        "time": "Time",
+        "language": "Language",
+        "capacity": "Available spots",
+        "minAge": "Minimum age (optional)",
+        "place": "Location"
+      },
+      "placeholders": {
+        "title": "E.g.: Walk through the historic center",
+        "description": "Describe your event (optional)",
+        "capacity": "Number of spots",
+        "minAge": "E.g.: 18",
+        "place": "E.g.: Central Café"
+      },
+      "tags": {
+        "placeholder": "Select a tag",
+        "options": {
+          "turismo": "Tourism",
+          "comida": "Food",
+          "excursion": "Excursion",
+          "cultural": "Cultural",
+          "social": "Social",
+          "deporte": "Sports",
+          "aventura": "Adventure",
+          "familiar": "Family",
+          "juegos": "Games",
+          "cine": "Cinema",
+          "relax": "Relax",
+          "tardeo": "Afternoon plans",
+          "noche": "Night out",
+          "otros": "Others"
+        }
+      },
+      "language": {
+        "placeholder": "Select a language",
+        "options": {
+          "es": "Spanish",
+          "en": "English",
+          "fr": "French",
+          "de": "German",
+          "it": "Italian",
+          "pt": "Portuguese",
+          "ru": "Russian"
+        }
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "submit": "Create event",
+      "submitting": "Creating..."
+    },
+    "validation": {
+      "titleRequired": "Event title is required",
+      "dateRequired": "Date is required",
+      "dateInPast": "The date cannot be earlier than today",
+      "timeRequired": "Time is required",
+      "languageRequired": "You must select a language",
+      "capacityRequired": "Available spots are required",
+      "capacityMin": "There must be at least 1 available spot",
+      "minAgeMin": "Minimum age must be 0 or higher",
+      "minAgeMax": "Minimum age must be less than 120",
+      "placeRequired": "Location is required"
+    }
+  },
+
+  "splash": {
+    "tagline": "Organize, share and live new experiences",
+    "title": "EventManager",
+    "subtitle": "Manage all your events in one place. Collaborate with your team and inspire new participants.",
+    "loginButton": "Log in",
+    "registerButton": "Sign up"
+  },
+
+  "register": {
+    "messages": {
+      "success": "Account successfully created! Welcome {{username}}",
+      "redirecting": "You will be redirected to the login in a few seconds...",
+      "errorFallback": "Error creating the account."
+    }
+  },
+
+    
+  "login": {
+    "messages": {
+      "welcome": "Welcome back, {{username}}!",
+      "redirecting": "Redirecting...",
+      "errorFallback": "Login failed."
+    }
+  },
+
+
+  "eventsPage": {
+    "filters": {
+      "title": "Filter your events",
+      "subtitle": "Find the perfect plan by adjusting language, available seats or topic tags.",
+      "searchPlaceholder": "Search events by name or description...",
+      "language": {
+        "buttonLabel": "Language",
+        "buttonTitle": "Filter by language",
+        "searchPlaceholder": "Search language...",
+        "any": "Any language",
+        "es": "Spanish",
+        "en": "English",
+        "fr": "French",
+        "de": "German",
+        "it": "Italian",
+        "pt": "Portuguese",
+        "ru": "Russian"
+      },
+      "capacity": {
+        "buttonLabel": "Capacity",
+        "buttonTitle": "Filter by maximum capacity",
+        "label": "Maximum capacity:",
+        "placeholder": "Ex: 10",
+        "unit": "people",
+        "presets": {
+          "noLimit": "No limit",
+          "le5": "≤ 5",
+          "le10": "≤ 10",
+          "le20": "≤ 20"
+        }
+      },
+      "tags": {
+        "buttonLabel": "Tags",
+        "buttonTitle": "Filter by tags",
+        "empty": "There are no tags available yet.",
+        "clear": "Clear tags"
+      },
+      "favorites": {
+        "buttonTitle": "Show only saved events",
+        "buttonLabel": "Only favourites"
+      },
+      "clearFilters": "Clear filters"
+    },
+    "header": {
+      "title": "Events",
+      "subtitle": "Discover and save your next plans.",
+      "createButton": "Create event"
+    },
+    "list": {
+      "loading": "Loading events...",
+      "empty": "There are no events available with the current filters."
+    },
+    "messages": {
+      "loadError": "Error loading events. Please try again.",
+      "eventNotFound": "Event not found.",
+      "eventFull": "The event is full. You cannot join.",
+      "alreadyEnrolled": "You are already enrolled in this event.",
+      "joinSuccess": "You have successfully joined the event!",
+      "joinErrorFallback": "Error while joining the event.",
+      "notEnrolled": "You are not enrolled in this event.",
+      "leaveSuccess": "You have successfully left the event.",
+      "leaveErrorFallback": "Error while leaving the event.",
+      "createSuccess": "Event created successfully!"
+    }
+  },
+
+  "myEvents": {
+    "title": "My events schedule",
+    "subtitle": "Here you can see all the events you are enrolled in",
+
+    "loading": "Loading your events...",
+
+    "empty": {
+      "title": "You don't have any saved events yet",
+      "description": "Browse the available events and join the ones you are most interested in",
+      "button": "View available events"
+    },
+
+    "sections": {
+      "upcoming": "Upcoming events ({{count}})",
+      "past": "Past events ({{count}})"
+    },
+
+    "messages": {
+      "leaveSuccess": "You have successfully left the event.",
+      "loadError": "Error loading your events. Please try again.",
+      "leaveErrorFallback": "Error while leaving the event."
+    }
+  },
+
+  "nav": {
+    "brand": "Trips & Events",
+    "events": "Events",
+    "profile": "Profile",
+    "myEvents": "My events",
+    "logout": "Logout"
+  },
+
+  "profile": {
+
+      "theme": {
+    "sectionTitle": "Theme",
+    "save": "Save theme",
+    "savingShort": "Saving...",
+    "saving": "Saving theme...",
+    "cancel": "Cancel",
+    "saveSuccess": "Theme saved successfully",
+    "saveError": "Error saving theme",
+    "ariaLabel": "Select {{theme}} theme"
+  },
+
+    "loading": "Loading profile...",
+    "loadError": "Could not load user profile",
+    "loadErrorWithMessage": "Error loading data: {{error}}",
+    "noUserLogged": "No user logged in",
+    "unknownError": "Unknown error",
+
+    "header": {
+      "usernameLabel": "User",
+      "edit": "Edit profile",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "bgColorTitle": "Background color",
+      "changeAvatarTitle": "Change avatar",
+      "avatarAlt": "{{fullName}}'s avatar"
+    },
+
+    "sections": {
+      "personalInfo": "Personal information",
+      "description": "Description",
+      "languages": "Languages",
+      "createdEvents": "My created events ({{count}})"
+    },
+
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "city": "City",
+      "birthDate": "Date of birth",
+      "cityNotSpecified": "Not specified",
+      "birthDateNotSpecified": "Not specified",
+      "descriptionPlaceholder": "Tell us a bit about yourself...",
+      "noDescription": "No description available"
+    },
+
+    "languages": {
+      "addLanguage": "Add language",
+      "add": "Add"
+    },
+
+    "events": {
+      "dateNotAvailable": "Date not available",
+      "participants": "{{current}} / {{capacity}} participants"
+    },
+
+    "stats": {
+      "enrolledEvents": "Joined events",
+      "organizedEvents": "Organized events",
+      "ratings": "Ratings"
+    },
+
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "firstNameMin": "First name must be at least 2 characters",
+      "firstNameMax": "First name cannot be longer than 50 characters",
+
+      "lastNameRequired": "Last name is required",
+      "lastNameMin": "Last name must be at least 2 characters",
+      "lastNameMax": "Last name cannot be longer than 100 characters",
+
+      "emailRequired": "Email is required",
+      "emailInvalid": "Email is not valid",
+
+      "birthDateInvalid": "Date of birth is not valid",
+      "tooYoung": "You must be at least 13 years old to use this platform",
+      "tooOld": "The date of birth does not seem valid",
+      "birthDateFuture": "Date of birth cannot be in the future",
+
+      "cityMax": "City name cannot be longer than 100 characters",
+      "descriptionMax": "Description cannot be longer than 500 characters",
+
+      "fixErrors": "Please fix the errors in the form"
+    },
+
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Error updating the profile"
+  }
+}

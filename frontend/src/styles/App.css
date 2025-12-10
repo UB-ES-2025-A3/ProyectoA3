@@ -1,5 +1,166 @@
+/* ===== SISTEMA DE TEMAS ===== */
+
+/* Tema por defecto (gris claro) */
+:root,
+[data-theme="default"] {
+  --app-bg-color: #f3f3f3;
+  --primary-color: #000000;
+  --accent-color: #4f4f50;
+  --background-color: #f8f9fa;
+  --surface-color: #ffffff;
+  --text-color: #343a40;
+  --text-muted: #6c757d;
+  --text-light: #ffffff;
+  --border-color: #e9ecef;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  --navbar-gradient: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+  --btn-primary-bg: linear-gradient(135deg, #828282 0%, #4f4f50 50%, #000000 100%);
+  --card-bg: #ffffff;
+  --card-border: #eee;
+  --card-title-color: #2c3e50;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+}
+
+/* Tema Azul */
+[data-theme="blue"] {
+  --app-bg-color: #e8f4fc;
+  --primary-color: #1565c0;
+  --accent-color: #42a5f5;
+  --background-color: #e3f2fd;
+  --surface-color: #e3f2fd;
+  --text-color: #0d47a1;
+  --text-muted: #5472d3;
+  --text-light: #ffffff;
+  --border-color: #bbdefb;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(21, 101, 192, 0.1);
+  --shadow-md: 0 0.5rem 1rem rgba(21, 101, 192, 0.15);
+  --navbar-gradient: linear-gradient(135deg, #42a5f5 0%, #1976d2 50%, #0d47a1 100%);
+  --btn-primary-bg: linear-gradient(135deg, #42a5f5 0%, #1976d2 50%, #0d47a1 100%);
+  --card-bg: #e3f2fd;
+  --card-border: #bbdefb;
+  --card-title-color: #1565c0;
+  --success-color: #2e7d32;
+  --danger-color: #c62828;
+}
+
+/* Tema Verde */
+[data-theme="green"] {
+  --app-bg-color: #e8f5e9;
+  --primary-color: #2e7d32;
+  --accent-color: #66bb6a;
+  --background-color: #dcf6de;
+  --surface-color: #dcf6de;
+  --text-color: #1b5e20;
+  --text-muted: #4caf50;
+  --text-light: #ffffff;
+  --border-color: #c8e6c9;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(46, 125, 50, 0.1);
+  --shadow-md: 0 0.5rem 1rem rgba(46, 125, 50, 0.15);
+  --navbar-gradient: linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #1b5e20 100%);
+  --btn-primary-bg: linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #1b5e20 100%);
+  --card-bg: #dcf6de;
+  --card-border: #c8e6c9;
+  --card-title-color: #2e7d32;
+  --success-color: #1b5e20;
+  --danger-color: #c62828;
+}
+
+/* Tema Morado */
+[data-theme="purple"] {
+  --app-bg-color: #f3e5f5;
+  --primary-color: #7b1fa2;
+  --accent-color: #ab47bc;
+  --background-color: #f3d3f8;
+  --surface-color: #f3d3f8;
+  --text-color: #4a148c;
+  --text-muted: #9c27b0;
+  --text-light: #ffffff;
+  --border-color: #e1bee7;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(123, 31, 162, 0.1);
+  --shadow-md: 0 0.5rem 1rem rgba(123, 31, 162, 0.15);
+  --navbar-gradient: linear-gradient(135deg, #ab47bc 0%, #8e24aa 50%, #4a148c 100%);
+  --btn-primary-bg: linear-gradient(135deg, #ab47bc 0%, #8e24aa 50%, #4a148c 100%);
+  --card-bg: #f3d3f8;
+  --card-border: #e1bee7;
+  --card-title-color: #7b1fa2;
+  --success-color: #2e7d32;
+  --danger-color: #c62828;
+}
+
+/* Tema Naranja */
+[data-theme="orange"] {
+  --app-bg-color: #fff3e0;
+  --primary-color: #e65100;
+  --accent-color: #ff9800;
+  --background-color: #f9e7cb;
+  --surface-color: #f9e7cb;
+  --text-color: #bf360c;
+  --text-muted: #f57c00;
+  --text-light: #ffffff;
+  --border-color: #ffe0b2;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(230, 81, 0, 0.1);
+  --shadow-md: 0 0.5rem 1rem rgba(230, 81, 0, 0.15);
+  --navbar-gradient: linear-gradient(135deg, #ffb74d 0%, #f57c00 50%, #e65100 100%);
+  --btn-primary-bg: linear-gradient(135deg, #ffb74d 0%, #f57c00 50%, #e65100 100%);
+  --card-bg: #f9e7cb;
+  --card-border: #ffe0b2;
+  --card-title-color: #e65100;
+  --success-color: #2e7d32;
+  --danger-color: #c62828;
+}
+
+/* Tema Rosa */
+[data-theme="pink"] {
+  --app-bg-color: #fce4ec;
+  --primary-color: #c2185b;
+  --accent-color: #f06292;
+  --background-color: #fce4ec;
+  --surface-color: #fce4ec;
+  --text-color: #880e4f;
+  --text-muted: #e91e63;
+  --text-light: #ffffff;
+  --border-color: #f8bbd9;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(194, 24, 91, 0.1);
+  --shadow-md: 0 0.5rem 1rem rgba(194, 24, 91, 0.15);
+  --navbar-gradient: linear-gradient(135deg, #f06292 0%, #e91e63 50%, #880e4f 100%);
+  --btn-primary-bg: linear-gradient(135deg, #f06292 0%, #e91e63 50%, #880e4f 100%);
+  --card-bg: #fce4ec;
+  --card-border: #f8bbd9;
+  --card-title-color: #c2185b;
+  --success-color: #2e7d32;
+  --danger-color: #c62828;
+}
+
+/* Tema Oscuro */
+[data-theme="dark"] {
+  --app-bg-color: #121212;
+  --primary-color: #bb86fc;
+  --accent-color: #da0b8b;
+  --background-color: #121212;
+  --card-bg:#252525;
+  --card-border: #404040;
+  --surface-color: #1e1e1e;
+  --text-color: #f0f0f0;
+  --text-muted: #b0b0b0;
+  --text-light: #ffffff;
+  --border-color: #404040;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+  --navbar-gradient: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 50%, #121212 100%);
+  --btn-primary-bg: linear-gradient(135deg, #8a8a8a 0%, #666666 50%, #424242 100%);
+  --card-bg: #252525;
+  --card-border: #404040;
+  --card-title-color: #f0f0f0;
+  --success-color: #03dac6;
+  --danger-color: #cf6679;
+}
+
 .App {
   min-height: 100vh;
+  background-color: var(--app-bg-color);
+  transition: all 0.3s ease;
 }
 
 .message-banner {
@@ -61,6 +222,106 @@
 
 .login-page:has(.message-banner) .login-form-container {
   padding-top: 100px;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA TEMA OSCURO ===== */
+[data-theme="dark"] .login-form,
+[data-theme="dark"] .register-form {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .login-form .form-input,
+[data-theme="dark"] .register-form .form-input,
+[data-theme="dark"] .input-field,
+[data-theme="dark"] .bio-textarea,
+[data-theme="dark"] .main-search-input,
+[data-theme="dark"] .age-input,
+[data-theme="dark"] .capacity-input,
+[data-theme="dark"] .language-search-input {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .login-form .form-input::placeholder,
+[data-theme="dark"] .register-form .form-input::placeholder,
+[data-theme="dark"] .input-field::placeholder,
+[data-theme="dark"] .bio-textarea::placeholder,
+[data-theme="dark"] .main-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .password-requirements {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .filter-dropdown-content {
+  background-color: var(--surface-color);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] select.form-input {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] select.form-input option {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+/* Asegurar buen contraste en badges y tags en tema oscuro */
+[data-theme="dark"] .tag,
+[data-theme="dark"] .language-tag,
+[data-theme="dark"] .restriction-badge {
+  background: var(--border-color);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .stat-item {
+  background: var(--card-bg);
+}
+
+[data-theme="dark"] .info-icon {
+  background: var(--border-color);
+}
+
+/* Multi-dropdown en tema oscuro */
+[data-theme="dark"] .multi-dropdown-header,
+[data-theme="dark"] .multi-dropdown-menu {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* Modal en tema oscuro */
+[data-theme="dark"] .modal-content {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-footer {
+  border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .modal-section h3 {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .participant-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .detail-item {
+  background: var(--card-bg);
+  border-color: var(--border-color);
 }
 
 

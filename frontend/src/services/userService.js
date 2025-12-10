@@ -125,6 +125,79 @@ const userService = {
       };
     }
   },
+
+  /**
+   * Obtiene el tema del usuario
+   * @param {number|string} userId - ID del usuario
+   */
+  async getTema(userId) {
+    if (USE_MOCKS) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return { success: true, data: { tema: localStorage.getItem('profileBgColor') || 'default' } };
+    }
+
+    try {
+      const token = getToken();
+      const response = await axios.get(`${API_BASE_URL}/clients/${userId}/tema`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      });
+
+      // Normalizar posibles formas de respuesta: string o { tema } o { data: { tema } }
+      const raw = response.data;
+      const tema =
+        (typeof raw === 'string' && raw) ||
+        raw?.tema ||
+        raw?.data?.tema ||
+        null;
+
+      return { success: true, data: { tema } };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Error al obtener el tema del usuario",
+      };
+    }
+  },
+
+  /**
+   * Actualiza el tema del usuario
+   * @param {number|string} userId - ID del usuario
+   * @param {string} tema - El nuevo tema (color) a guardar
+   */
+  async updateTema(userId, tema) {
+    if (USE_MOCKS) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      localStorage.setItem('profileBgColor', tema);
+      return { success: true, data: { tema } };
+    }
+
+    try {
+      const token = getToken();
+      const response = await axios.put(`${API_BASE_URL}/clients/${userId}/tema`, { tema }, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : undefined,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Normalizar respuesta a { tema }
+      const raw = response.data;
+      const temaResp =
+        (typeof raw === 'string' && raw) ||
+        raw?.tema ||
+        raw?.data?.tema ||
+        tema;
+
+      return { success: true, data: { tema: temaResp } };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Error al actualizar el tema",
+      };
+    }
+  },
 };
 
 export default userService;
