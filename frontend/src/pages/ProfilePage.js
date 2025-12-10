@@ -345,18 +345,18 @@ export default function ProfilePage() {
         setSavedTheme(savedThemeName);
         setPreviewTheme(savedThemeName);
         setThemeChanged(false);
-        setBanner({ type: "success", message: "Tema guardado correctamente" });
-        setTimeout(() => setBanner({ type: "success", message: "" }), 3000);
+        setBanner({ type: 'success', message: t('profile.theme.saveSuccess') });
+        setTimeout(() => setBanner({ type: 'success', message: '' }), 3000);
       } else {
         setBanner({
           type: 'error',
-          message: result.error || 'Error al guardar el tema'
+          message: result.error || t('profile.theme.saveError')
         });
         setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
       }
     } catch (error) {
       console.error('Error guardando tema:', error);
-      setBanner({ type: 'error', message: 'Error al guardar el tema' });
+      setBanner({ type: 'error', message: t('profile.theme.saveError') });
       setTimeout(() => setBanner({ type: 'success', message: '' }), 5000);
     } finally {
       setSavingTema(false);
@@ -396,18 +396,17 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page"
-      style={{ backgroundImage: `url(${getBackgroundForTheme(previewTheme)})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-
-    }}
-    
+      style={{
+        backgroundImage: `url(${getBackgroundForTheme(previewTheme)})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
     >
-      <div className="profile-container" >
+      <div className="profile-container">
         {/* Header with Profile Picture */}
-        <div className="profile-header" >
-          <div className="profile-avatar-container" >
+        <div className="profile-header">
+          <div className="profile-avatar-container">
             {/* AQUÍ CAMBIAMOS LA LETRA POR LA IMAGEN */}
             <div
               className="profile-avatar"
@@ -448,7 +447,7 @@ export default function ProfilePage() {
 
         {/* Sección de Tema - siempre visible e independiente */}
         <div className="profile-section">
-          <h2 className="section-title">Tema</h2>
+          <h2 className="section-title">{t('profile.theme.sectionTitle')}</h2>
 
           <div className="color-options">
             {THEME_OPTIONS.map((theme) => (
@@ -463,7 +462,7 @@ export default function ProfilePage() {
                 }}
                 onClick={() => handleThemePreview(theme)}
                 disabled={savingTema}
-                aria-label={`Seleccionar tema ${theme}`}
+                aria-label={t('profile.theme.ariaLabel', { theme })}
                 title={theme.charAt(0).toUpperCase() + theme.slice(1)}
               />
             ))}
@@ -480,7 +479,7 @@ export default function ProfilePage() {
                 disabled={savingTema}
                 style={{ padding: '8px 20px', borderRadius: '8px' }}
               >
-                <FaCheck /> {savingTema ? 'Guardando...' : 'Guardar tema'}
+                <FaCheck /> {savingTema ? t('profile.theme.savingShort') : t('profile.theme.save')}
               </button>
               <button
                 className="cancel-btn"
@@ -494,14 +493,14 @@ export default function ProfilePage() {
                   border: 'none'
                 }}
               >
-                <FaTimes /> Cancelar
+                <FaTimes /> {t('profile.theme.cancel')}
               </button>
             </div>
           )}
 
           {savingTema && (
             <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-              Guardando tema...
+              {t('profile.theme.saving')}
             </p>
           )}
         </div>

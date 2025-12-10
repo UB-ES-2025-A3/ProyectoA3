@@ -1,5 +1,34 @@
 {
 
+"EventMap": {
+  "search": {
+    "placeholder": "Buscar ubicación (ej: Barcelona, Madrid...)",
+    "buttonTitle": "Buscar ubicación",
+    "clearTitle": "Limpiar búsqueda",
+    "noResults": "No se encontró la ubicación. Intenta con otro término de búsqueda.",
+    "error": "Error al buscar la ubicación. Por favor, intenta de nuevo."
+  },
+  "mapStyle": {
+    "selectorTitle": "Cambiar estilo del mapa",
+    "names": {
+      "googlelike": "Estilo Google Maps",
+      "light": "Claro (Positron)",
+      "dark": "Oscuro (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topográfico",
+      "satellite": "Satelital"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Desfijar evento del mapa",
+    "unpinLabel": "Desfijar"
+  },
+  "mapClick": {
+    "waterError": "Por favor, selecciona un lugar en tierra firme."
+  }
+},
+
+
 
   "SplashPage": {
   "tagline": "Organiza, comparte y vive experiencias",
@@ -505,6 +534,17 @@
   },
 
   "profile": {
+      "theme": {
+    "sectionTitle": "Tema",
+    "save": "Guardar tema",
+    "savingShort": "Guardando...",
+    "saving": "Guardando tema...",
+    "cancel": "Cancelar",
+    "saveSuccess": "Tema guardado correctamente",
+    "saveError": "Error al guardar el tema",
+    "ariaLabel": "Seleccionar tema {{theme}}"
+  },
+
     "loading": "Cargando perfil...",
     "loadError": "No se pudo cargar el perfil del usuario",
     "loadErrorWithMessage": "Error al cargar los datos: {{error}}",

@@ -1,5 +1,34 @@
 {
  
+
+  "EventMap": {
+  "search": {
+    "placeholder": "Cerca ubicació (ex: Barcelona, Madrid...)",
+    "buttonTitle": "Cerca ubicació",
+    "clearTitle": "Neteja la cerca",
+    "noResults": "No s'ha trobat la ubicació. Intenta amb un altre terme de cerca.",
+    "error": "Error en cercar la ubicació. Si us plau, torna-ho a provar."
+  },
+  "mapStyle": {
+    "selectorTitle": "Canvia l'estil del mapa",
+    "names": {
+      "googlelike": "Estil Google Maps",
+      "light": "Clar (Positron)",
+      "dark": "Fosc (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topogràfic",
+      "satellite": "Satèl·lit"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Desfixa l'esdeveniment del mapa",
+    "unpinLabel": "Desfixa"
+  },
+  "mapClick": {
+    "waterError": "Si us plau, selecciona un lloc en terra ferma."
+  }
+},
+
 "SplashPage": {
   "tagline": "Organitza, comparteix i viu experiències",
   "title": "EventManager",
@@ -504,6 +533,16 @@
   },
 
   "profile": {
+      "theme": {
+    "sectionTitle": "Tema",
+    "save": "Desa el tema",
+    "savingShort": "Desant...",
+    "saving": "S'està desant el tema...",
+    "cancel": "Cancel·la",
+    "saveSuccess": "Tema desat correctament",
+    "saveError": "Error en desar el tema",
+    "ariaLabel": "Selecciona el tema {{theme}}"
+  },
     "loading": "Carregant perfil...",
     "loadError": "No s'ha pogut carregar el perfil de l'usuari",
     "loadErrorWithMessage": "Error en carregar les dades: {{error}}",
