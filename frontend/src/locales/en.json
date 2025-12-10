@@ -1,5 +1,32 @@
 {
 
+  "EventMap": {
+  "search": {
+    "placeholder": "Search location (e.g. Barcelona, Madrid...)",
+    "buttonTitle": "Search location",
+    "clearTitle": "Clear search",
+    "noResults": "Location not found. Try another search term.",
+    "error": "Error searching location. Please try again."
+  },
+  "mapStyle": {
+    "selectorTitle": "Change map style",
+    "names": {
+      "googlelike": "Google Maps style",
+      "light": "Light (Positron)",
+      "dark": "Dark (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topographic",
+      "satellite": "Satellite"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Unpin event from map",
+    "unpinLabel": "Unpin"
+  },
+  "mapClick": {
+    "waterError": "Please select a place on land."
+  }
+},
 
   "SplashPage": {
   "tagline": "Organize, share and live experiences",
@@ -518,7 +545,7 @@
     "saveError": "Error saving theme",
     "ariaLabel": "Select {{theme}} theme"
   },
-  
+
     "loading": "Loading profile...",
     "loadError": "Could not load user profile",
     "loadErrorWithMessage": "Error loading data: {{error}}",

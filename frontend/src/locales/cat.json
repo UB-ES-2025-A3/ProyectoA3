@@ -1,6 +1,34 @@
 {
  
 
+  "EventMap": {
+  "search": {
+    "placeholder": "Cerca ubicació (ex: Barcelona, Madrid...)",
+    "buttonTitle": "Cerca ubicació",
+    "clearTitle": "Neteja la cerca",
+    "noResults": "No s'ha trobat la ubicació. Intenta amb un altre terme de cerca.",
+    "error": "Error en cercar la ubicació. Si us plau, torna-ho a provar."
+  },
+  "mapStyle": {
+    "selectorTitle": "Canvia l'estil del mapa",
+    "names": {
+      "googlelike": "Estil Google Maps",
+      "light": "Clar (Positron)",
+      "dark": "Fosc (Dark Matter)",
+      "default": "OpenStreetMap",
+      "terrain": "Topogràfic",
+      "satellite": "Satèl·lit"
+    }
+  },
+  "pin": {
+    "unpinTitle": "Desfixa l'esdeveniment del mapa",
+    "unpinLabel": "Desfixa"
+  },
+  "mapClick": {
+    "waterError": "Si us plau, selecciona un lloc en terra ferma."
+  }
+},
+
 "SplashPage": {
   "tagline": "Organitza, comparteix i viu experiències",
   "title": "EventManager",
